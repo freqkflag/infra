@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET=${1:-vps.host}
+echo "=== Deploying to $TARGET ==="
+
+# Load environment and verify
+source ~/.workspace/.env
+./scripts/preflight.sh
+
+# Run docker stack
+docker compose -f docker-compose/$TARGET.yml pull
+docker compose -f docker-compose/$TARGET.yml up -d
+
+./scripts/status.sh
