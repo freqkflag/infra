@@ -21,3 +21,27 @@ This repository defines the deployment, orchestration, and governance framework 
    ```bash  
    cd ~/infra  
    ./cursor deploy vps.host  
+   ```
+   or
+   ```bash
+   ./cursor deploy home.macmini
+   ```
+   (depending on target host)
+
+Project Structure
+```
+~/infra/
+├─ agents.md          — behavioural config for Cursor and agents  
+├─ project-plan.yml   — declarative plan of services & hosts  
+├─ services/          — sub-folders for each service (Compose files)  
+├─ scripts/           — helper scripts (backup, scan, etc)  
+└─ docs/              — runbooks, network templates, etc
+```
+Contributing & Maintenance
+	•	All changes must append ~/server-changelog.md on the host (see “Logging & Change Tracking”).
+	•	Use Infisical to manage secrets — never commit them to Git.
+	•	Services should run only via Docker Compose + labels; no other orchestrator unless explicitly approved.
+
+License
+
+MIT License – safe use of community-driven FOSS tools.
