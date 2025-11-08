@@ -1,0 +1,52 @@
+# === Environment & Secrets ===
+.env
+*.env
+*.env.*
+.infisical.json
+infisical.json
+**/secrets/*
+**/*.pem
+**/*.key
+**/private_keys/
+**/certs/*
+
+# === Logs & Backups ===
+**/.logs/
+**/.backup/
+**/.cache/
+**/tmp/
+*.log
+*.bak
+
+# === Node, Python, Go, etc. (in case of utility scripts) ===
+node_modules/
+venv/
+__pycache__/
+dist/
+build/
+*.egg-info/
+
+# === IDE / Editor junk ===
+.DS_Store
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+
+# === Docker ===
+**/docker-compose.override.yml
+**/.docker/
+**/.envrc
+**/compose-cache/
+**/config.json
+
+# === Generated / Runtime Files ===
+**/server-changelog.md
+**/server-status.log
+**/state.json
+**/.cursor/
+
+# === OS Artifacts ===
+ehthumbs.db
+Icon?
+.Trashes
