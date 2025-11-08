@@ -1,82 +1,33 @@
+```markdown
 # Cursor Agent Context — Cult of Joey Infra
 
-## Objective
-Deploy and maintain the entire self-hosted ecosystem defined in `Cursor Deployment Framework`.
+## Objective  
+Execute the deployment framework described in README and project-plan. Automate consistent, secure, and auditable infrastructure operations across all nodes.
 
-## Primary Agents
-- **infra-architect** — reads `project-plan.yml` and composes Docker, Traefik, and network files.
-- **secrets-keeper** — handles Infisical variable injection and validation.
-- **dev-orchestrator** — runs deployments on each host, verifies tunnels, executes preflight safety checks.
-- **security-sentinel** — monitors ClamAV, firewalls, and WAF reports; updates changelog.md.
-- **api-gatekeeper** — manages Kong routes, policies, and key rotations.
-- **automator** — triggers Node-RED/n8n workflows for backups, logs, and scans.
+## Primary Agents  
+- infra-architect — generates service manifests, labels, networks  
+- secrets-keeper — injects secrets via Infisical and validates no statics remain  
+- dev-orchestrator — executes the host-specific deployment plan, verifies tunnel/edge network  
+- security-sentinel — manages ClamAV, firewall policies, WAF/Zero-Trust monitoring  
+- api-gatekeeper — defines Kong gateway services, keys, rate-limits  
+- automator — drives n8n/Node-RED workflows: backups, logs, scans  
 
-## Base Environment
-.env path: `/Users/freqkflag/Projects/.workspace/.env`  
-Secrets loaded via: `infisical run --env=production`  
-Primary networks: `edge` (external bridge)  
+## Environments & Hosts  
+- Host: vps.host — domain: freqkflag.co — token: `${CF_TUNNEL_TOKEN_VPS}`  
+- Host: home.macmini — domain: twist3dkink.online — token: `${CF_TUNNEL_TOKEN_MAC}`  
+- Host: home.linux — domain: cult-of-joey.com — token: `${CF_TUNNEL_TOKEN_LINUX}`  
+- Edge Docker network: `edge`
 
-## General Protocol
-1. Verify `.env` presence and Infisical connectivity.  
-2. Mount secrets into context using Infisical CLI.  
-3. Build Compose files per service under `~/infra/services/`.  
-4. Validate network links (`edge`, tunnels, ports).  
-5. Deploy with `docker compose up -d` and confirm health.  
-6. Append all changes to `~/server-changelog.md`.
+## Standard Protocol  
+1. Confirm presence of `.env` and valid Infisical connection  
+2. Load secrets: `infisical run --env=production`  
+3. Generate Compose files under `services/`  
+4. Deploy: `docker compose up -d`  
+5. Confirm service health probes pass  
+6. Append entries to `~/server-changelog.md`  
 
----
-
-### 3. **project-plan.yml** — defines infrastructure as tasks
-A YAML blueprint Cursor can parse or use with an agent script.
-
-```yaml
-project: "Cult of Joey Infra Deployment"
-version: "2025-11-08"
-
-environments:
-  - name: vps.host
-    domain: freqkflag.co
-    services:
-      - traefik
-      - infisical
-      - kong
-      - gitea
-      - ghost
-      - wordpress
-      - discourse
-      - wiki
-      - linkstack
-      - localai
-      - openwebui
-      - node-red
-      - clamav
-      - postgres
-      - mariadb
-      - redis
-  - name: home.macmini
-    domain: twist3dkink.online
-    services: [frontend, dev-tools]
-  - name: home.linux
-    domain: cult-of-joey.com
-    services: [vaultwarden, bookstack]
-
-workflows:
-  deploy:
-    - run: preflight-check
-    - run: load-secrets
-    - run: compose-up
-    - run: verify-containers
-    - run: log-to-changelog
-  backup:
-    - run: backup-databases
-    - run: sync-to-homelab
-  security:
-    - run: clamav-scan
-    - run: update-signatures
-    - run: report-results
-
-policies:
-  secrets: infisical-only
-  databases: centralized-on-vps
-  ingress: cloudflare-tunnels
-  network: edge-shared
+## Error Handling  
+If any deployment step fails:  
+- Abort further tasks  
+- Log error in `~/server-changelog.md`  
+- Notify via automation (n8n webhook)  
