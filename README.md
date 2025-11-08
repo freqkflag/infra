@@ -1,4 +1,4 @@
-# Cult of Joey Infra  
+# Cult of Joey - Infra  
 Self-hosted multi-node infrastructure managed with FOSS tools and zero-trust edge.
 
 ## Description  
