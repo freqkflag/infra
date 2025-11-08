@@ -1,0 +1,12 @@
+# Changelog  
+All notable changes to this project will be documented here.
+
+## [2025-11-08]  
+### Added  
+- API Gateway (Kong OSS) service defined.  
+- Malware scanning with ClamAV integrated.  
+- Admin UIs for DB and Redis added behind CF Access.  
+### Changed  
+- Centralised DB/cache strategy for all services.  
+### Removed  
+- Per-container databases on each service host.  
