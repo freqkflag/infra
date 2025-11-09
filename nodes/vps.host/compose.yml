@@ -1,12 +1,35 @@
+x-service-defaults: &service_defaults
+  networks:
+    - edge
+
 version: "3.9"
 
 services:
   traefik:
+    <<: *service_defaults
     extends:
       file: ../../services/traefik/compose.yml
       service: traefik
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - traefik healthcheck --ping
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USERS}"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
   cloudflared:
+    <<: *service_defaults
     extends:
       file: ../../services/cloudflared/compose.yml
       service: cloudflared
@@ -14,6 +37,7 @@ services:
       CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_VPS}
 
   postgres:
+    <<: *service_defaults
     extends:
       file: ../../services/postgres/compose.yml
       service: postgres
@@ -21,71 +45,85 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   mariadb:
+    <<: *service_defaults
     extends:
       file: ../../services/mariadb/compose.yml
       service: mariadb
 
   redis:
+    <<: *service_defaults
     extends:
       file: ../../services/redis/compose.yml
       service: redis
 
   infisical:
+    <<: *service_defaults
     extends:
       file: ../../services/infisical/compose.yml
       service: infisical
 
   kong:
+    <<: *service_defaults
     extends:
       file: ../../services/kong/compose.yml
       service: kong
 
   clamav:
+    <<: *service_defaults
     extends:
       file: ../../services/clamav/compose.yml
       service: clamav
 
   gitea:
+    <<: *service_defaults
     extends:
       file: ../../services/gitea/compose.yml
       service: gitea
 
   ghost:
+    <<: *service_defaults
     extends:
       file: ../../services/ghost/compose.yml
       service: ghost
 
   wordpress:
+    <<: *service_defaults
     extends:
       file: ../../services/wordpress/compose.yml
       service: wordpress
 
   discourse:
+    <<: *service_defaults
     extends:
       file: ../../services/discourse/compose.yml
       service: discourse
 
   wikijs:
+    <<: *service_defaults
     extends:
       file: ../../services/wikijs/compose.yml
       service: wikijs
 
   linkstack:
+    <<: *service_defaults
     extends:
       file: ../../services/linkstack/compose.yml
       service: linkstack
 
   localai:
+    <<: *service_defaults
     extends:
       file: ../../services/localai/compose.yml
       service: localai
 
   openwebui:
+    <<: *service_defaults
     extends:
       file: ../../services/openwebui/compose.yml
       service: openwebui
 
   node-red:
+    <<: *service_defaults
     extends:
       file: ../../services/node-red/compose.yml
       service: node-red

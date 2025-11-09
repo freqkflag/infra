@@ -29,11 +29,13 @@
 | `home.linux` | homelab | `nodes/home.linux/` | `nodes/home.linux/compose.yml` | `nodes/home.linux/deploy.sh` | `nodes/home.linux/domains.yml` | `nodes/home.linux/networks.yml` | `${CF_TUNNEL_TOKEN_LINUX}` |
 
 Domain coverage:
+
 - `nodes/vps.host/domains.yml` — freqkflag.co services (Traefik, Kong, Infisical, application suite).
 - `nodes/home.macmini/domains.yml` — twist3dkink.online developer endpoints (frontend, dev-tools).
 - `nodes/home.linux/domains.yml` — cult-of-joey.com homelab endpoints (Vaultwarden, BookStack, Auxiliary).
 
 Networks & tunnels:
+
 - Each node attaches to the shared external `edge` network as described in its `networks.yml`.
 - Cloudflared tunnel metadata (token variables and purpose) resides alongside each node; execute node scripts with `infisical run --env=<profile>` to populate secrets.
 
@@ -97,6 +99,38 @@ Networks & tunnels:
 4. After remediation, trigger `infisical run --env=production -- n8n execute --workflow post-recovery-audit`.
 5. Commit any config or doc updates; ensure CF tunnels + DNS are synced.
 
+## 9. Cursor Agent Suite
+
+| Agent | Command | Purpose |
+| ----- | ------- | ------- |
+| Discovery Cartographer | `python scripts/agents/run-agent.py run discovery-cartographer -- --dry-run` | Inventory compose/env templates and update prerequisites markers. |
+| Compose Engineer | `python scripts/agents/run-agent.py run compose-engineer -- --env=production -- --dry-run` | Render compose bundles via Infisical and verify Traefik/health labels. |
+| Secrets Steward | `python scripts/agents/run-agent.py run secrets-steward -- --env=production -- --dry-run` | Audit `${VAR}` coverage across compose/env templates and Infisical exports. |
+| Deployment Runner | `python scripts/agents/run-agent.py run deployment-runner -- --target vps.host -- --dry-run` | Run preflight/deploy/status/health scripts with rollback guardrails. |
+| Security Sentinel | `python scripts/agents/run-agent.py run security-sentinel -- --dry-run` | Execute ClamAV scans and Zero-Trust config checks. |
+| API Gatekeeper | `python scripts/agents/run-agent.py run api-gatekeeper -- --dry-run` | Validate `services/kong/kong.yml`, domain templates, and Kong reload readiness. |
+| Documentation & Audit Scribe | `python scripts/agents/run-agent.py run documentation-scribe -- --note "<msg>" -- --dry-run` | Append automation notes to README/PROJECT_PLAN/infra-build-plan plus changelogs. |
+| Review Agent (Reagents) | `python scripts/agents/run-agent.py run review-agent -- --validation server-changelog.md -- --dry-run` | Inspect git diff + rendered compose config and log `Reviewed-by` entries. |
+| Release Agent | `python scripts/agents/run-agent.py run release-agent -- --scope feat -- --summary "..." -- --dry-run` | Produce signed commits/pushes with explicit assumption text. |
+| Automator | `python scripts/agents/run-agent.py run automator -- --workflow daily-maintenance -- --dry-run` | Trigger n8n workflows and emit Infisical webhook events. |
+
+Run `python scripts/agents/run-agent.py list` to see descriptions or `python scripts/agents/run-agent.py describe <name>` for metadata. The `scripts/agents/selftest_agents.py` helper loads every registry entry to ensure wiring stays healthy after edits.
+
 ---
 
 Maintaining this plan alongside `infra-build-plan.md` ensures every agent shares the same sequence, prerequisites, and expectations before touching the infrastructure.
+
+
+<!-- discovery-cartographer:start -->
+
+### Discovery Cartographer Inventory
+
+- Last run: 2025-11-09T09:02:03.125405+00:00
+- Compose manifests tracked: 26
+- Known template variables: 106
+
+**Drift Signals**
+- None detected
+
+<!-- discovery-cartographer:end -->
+

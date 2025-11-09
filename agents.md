@@ -83,6 +83,10 @@
 - Production execution requires `AGENT_HOST=<host>` and `infisical run`.
 - Broadcast events over Infisical-secured webhooks (`INFISICAL_WEBHOOK_URL`) with schema `{ agent, action, status, timestamp, details }`.
 - Critical automation must emit to the n8n event bus for observability.
+- Shared CLI guardrails:
+  - Every agent exposes `--dry-run` and `--host` flags and enforces `allowed_hosts` via `.cursor/agents/utils.py`.
+  - Infisical wrappers live in `.cursor/agents/utils.py`; use them instead of bespoke subprocess calls.
+  - Run `python scripts/agents/selftest_agents.py` to smoke-check registry/agent wiring after edits.
 
 ## 5. Deployment Workflow Synchronization
 

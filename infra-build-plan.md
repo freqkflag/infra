@@ -494,5 +494,20 @@ infisical run --env=homelab -- docker compose -f compose.orchestrator.yml --prof
 - Validate `.gitignore` excludes secrets, logs, and backups
 - Maintain changelog entries for all deployments
 
+## 18. Cursor Automation
+
+- Run `python scripts/agents/run-agent.py list` (or `describe <name>`) to inspect any automation role defined in `AGENTS.md`.
+- `python scripts/agents/selftest_agents.py` must succeed before pushing registry changes; it instantiates each `.cursor/agents/*_agent.py`.
+- Representative workflows:
+  - `python scripts/agents/run-agent.py run discovery-cartographer -- --dry-run`
+  - `python scripts/agents/run-agent.py run compose-engineer -- --env=production -- --dry-run`
+  - `python scripts/agents/run-agent.py run secrets-steward -- --env=production -- --dry-run`
+  - `python scripts/agents/run-agent.py run deployment-runner -- --target vps.host -- --dry-run`
+  - `python scripts/agents/run-agent.py run api-gatekeeper -- --dry-run`
+  - `python scripts/agents/run-agent.py run documentation-scribe -- --note "phase X docs synced" -- --dry-run`
+  - `python scripts/agents/run-agent.py run review-agent -- --validation server-changelog.md -- --dry-run`
+  - `python scripts/agents/run-agent.py run release-agent -- --scope feat -- --summary "..." -- --dry-run`
+  - `python scripts/agents/run-agent.py run automator -- --workflow daily-maintenance -- --dry-run`
+
 This document is the authoritative deployment reference for the Cult of Joey
 infrastructure and must be updated alongside any stack modifications.

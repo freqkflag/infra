@@ -76,7 +76,97 @@
       "allowed_hosts": ["mac", "vps"],
       "tags": ["verification", "dev-orchestrator"],
       "outputs": ["server-changelog.md"]
+    },
+    "discovery-cartographer": {
+      "module_path": ".cursor/agents/discovery_cartographer_agent.py",
+      "class": "DiscoveryCartographerAgent",
+      "description": "Scan repo/services/env templates for drift and inventory updates.",
+      "allowed_hosts": ["mac", "vps", "linux"],
+      "tags": ["inventory", "planning"],
+      "outputs": ["PROJECT_PLAN.md", "server-changelog.md"],
+      "project_plan": "PROJECT_PLAN.md"
+    },
+    "compose-engineer": {
+      "module_path": ".cursor/agents/compose_engineer_agent.py",
+      "class": "ComposeEngineerAgent",
+      "description": "Run docker compose config via Infisical and verify Traefik/health requirements.",
+      "allowed_hosts": ["mac", "vps", "linux"],
+      "tags": ["compose", "traefik", "lint"],
+      "outputs": ["server-changelog.md"],
+      "default_env": "production"
+    },
+    "secrets-steward": {
+      "module_path": ".cursor/agents/secrets_steward_agent.py",
+      "class": "SecretsStewardAgent",
+      "description": "Audit ${VAR} usage and ensure Infisical/env template coverage.",
+      "allowed_hosts": ["mac", "vps", "linux"],
+      "tags": ["security", "secrets"],
+      "outputs": ["server-changelog.md"],
+      "default_env": "production",
+      "infisical_path": "prod/"
+    },
+    "deployment-runner": {
+      "module_path": ".cursor/agents/deployment_runner_agent.py",
+      "class": "DeploymentRunnerAgent",
+      "description": "Execute preflight/deploy/status/health scripts with edge-network enforcement.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["deployment", "runner"],
+      "outputs": ["server-changelog.md"],
+      "default_env": "production"
+    },
+    "security-sentinel": {
+      "module_path": ".cursor/agents/security_sentinel_agent.py",
+      "class": "SecuritySentinelAgent",
+      "description": "Run ClamAV scan and verify Zero-Trust posture.",
+      "allowed_hosts": ["mac", "vps", "linux"],
+      "tags": ["security", "clamav"],
+      "outputs": ["server-changelog.md"]
+    },
+    "api-gatekeeper": {
+      "module_path": ".cursor/agents/api_gatekeeper_agent.py",
+      "class": "APIGatekeeperAgent",
+      "description": "Validate Kong config, domain templates, and reload Kong.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["kong", "cloudflare", "ingress"],
+      "outputs": ["server-changelog.md"],
+      "default_env": "production"
+    },
+    "documentation-scribe": {
+      "module_path": ".cursor/agents/documentation_scribe_agent.py",
+      "class": "DocumentationScribeAgent",
+      "description": "Append automation notes to README/PROJECT_PLAN/infra-build-plan and changelogs.",
+      "allowed_hosts": ["mac", "vps", "linux"],
+      "tags": ["documentation", "audit"],
+      "outputs": ["README.md", "PROJECT_PLAN.md", "infra-build-plan.md", "CHANGE.log", "server-changelog.md"]
+    },
+    "review-agent": {
+      "module_path": ".cursor/agents/review_agent.py",
+      "class": "ReviewAgent",
+      "description": "Final verification gate ensuring diffs, compose configs, and validation evidence are present.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["review", "quality"],
+      "outputs": ["CHANGE.log", "server-changelog.md"]
+    },
+    "release-agent": {
+      "module_path": ".cursor/agents/release_agent.py",
+      "class": "ReleaseAgent",
+      "description": "Create signed commits with assumption annotations and optional push.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["release", "git"],
+      "outputs": ["server-changelog.md"]
+    },
+    "automator": {
+      "module_path": ".cursor/agents/automator_agent.py",
+      "class": "AutomatorAgent",
+      "description": "Trigger n8n workflows under Infisical and emit webhook events.",
+      "allowed_hosts": ["mac", "vps", "linux"],
+      "tags": ["automation", "n8n"],
+      "outputs": ["server-changelog.md"],
+      "default_env": "production",
+      "workflows": [
+        "daily-maintenance",
+        "post-recovery-audit"
+      ]
     }
   }
 }
-
