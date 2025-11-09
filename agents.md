@@ -1,213 +1,126 @@
-# Cursor Agent Context — Cult of Joey Infra
+# Cult of Joey Infra — Agent Operating Manual
 
-## 1. Mission
+## 1. Mission & Guardrails
 
-- Maintain the infrastructure described in `infra-build-plan.md` and
-  `project-plan.yml`.
-- Deliver reproducible, audited deployments across VPS, Mac mini, and homelab
-  nodes.
-- Operate exclusively with FOSS tooling (Docker Compose, Traefik, Cloudflared,
-  Infisical, Kong, ClamAV, n8n/Node-RED).
+- Deliver the complete infra build-out defined in `infra-build-plan.md`, `PROJECT_PLAN.md`, and `project-plan.yml`.
+- Enforce reproducible, FOSS-only workflows (Docker Compose, Traefik, Cloudflared, Infisical, Kong, ClamAV, n8n/Node-RED).
+- Maintain three operating domains with dedicated Cloudflared tunnels:
+  - **vps.host** (`freqkflag.co`) — `${CF_TUNNEL_TOKEN_VPS}`
+  - **home.macmini** (`twist3dkink.online`) — `${CF_TUNNEL_TOKEN_MAC}`
+  - **home.linux** (`cult-of-joey.com`) — `${CF_TUNNEL_TOKEN_LINUX}`
+- Shared external Docker network: `edge`.
+- Every non-trivial change must land via commit or PR; inline commit messages must mention any assumption they encode.
 
-## 2. Operating Domains
+## 2. Supervisory Loop (Primary Orchestrator Agent)
 
-- **vps.host** (`freqkflag.co`) — token `${CF_TUNNEL_TOKEN_VPS}` — production
-  ingress and data plane.
-- **home.macmini** (`twist3dkink.online`) — token `${CF_TUNNEL_TOKEN_MAC}` —
-  development and controller node.
-- **home.linux** (`cult-of-joey.com`) — token `${CF_TUNNEL_TOKEN_LINUX}` —
-  auxiliary homelab services.
-- Shared Docker network: `edge`
-
-## Agent Runtime
-
-- Cursor agents live under `.cursor/agents/` and are registered in
-  `.cursor/agents/registry.json`.
-- Use `python scripts/agents/run-agent.py list` to enumerate available automations.
-- Run an agent locally with `python scripts/agents/run-agent.py run <name> --
-  --dry-run`.
-- Production hosts can invoke agents via the same entrypoint; set
-  `AGENT_HOST=<host>` when required.
-- **All agents MUST push a commit or create a pull request when completing
-  tasks which result in changes to tracked files or configuration. This
-  ensures every change made or triggered by an agent is auditable and
-  permanently recorded.**
+- Owns the task board, splits work into reviewable phases, and keeps sub-agents from idling or duplicating effort.
+- Approves phase start, tracks status in `CHANGE.log`, and ensures downstream docs (`server-changelog.md`) get updates.
+- Escalates to the user only for root-scope decisions (domain ownership changes, service deprecation, topology pivots).
+- Verifies that each phase outputs:
+  1. Updated artifacts (manifests, docs, scripts).
+  2. Validation evidence (commands run, logs).
+  3. Commit or PR reference.
 
 ## 3. Agent Roster & Charters
 
-### 3.1 infra-architect
+### 3.1 Discovery Cartographer
+- Scans repo + hosts to keep inventory current (files, services, secrets usage).
+- Updates `PROJECT_PLAN.md` prerequisites/dependencies when drift is detected.
 
-- Generate and maintain Compose manifests in `services/` and host bundles in
-  `docker-compose/`.
-- Validate Traefik labels, healthchecks, and `edge` network attachment for
-  every service.
-- Produce topology updates in `infra-build-plan.md` when architecture shifts.
-- Trigger build when `project-plan.yml` changes:
+### 3.2 Compose Engineer
+- Owns all per-service Compose fragments under `services/` and the orchestrator bundle (`compose.orchestrator.yml` + `docker-compose/*.yml`).
+- Validates Traefik labels, healthchecks, restart policies, and `edge` attachment.
+- Runs `infisical run --env=<env> -- docker compose config` to lint manifests before handoff.
 
-  ```bash
-  infisical run --env=production -- ./scripts/preflight.sh
-  ```
+### 3.3 Secrets Steward
+- Ensures every `${VAR}` referenced in Compose files exists in Infisical and the shared `.env` templates (`env/templates/`).
+- Executes audits via `infisical run --env=production -- infisical export --format yaml --path prod/`.
+- Blocks deployments that introduce static credentials; opens incidents in `server-changelog.md`.
 
-- After any update or verification that modifies the codebase or infra
-  definitions, push a commit or submit a PR.
+### 3.4 Deployment Runner
+- Executes `./scripts/preflight.sh`, `./scripts/deploy.ah <target>`, `./scripts/status.sh`, and `./scripts/health-check.sh`.
+- Confirms the `edge` network exists before compose-up.
+- Initiates rollback using `./scripts/teardown.sh` if health checks fail.
 
-### 3.2 secrets-keeper
+### 3.5 Security Sentinel
+- Manages ClamAV stack, firewall rules, and Zero-Trust posture.
+- Runs `docker exec clamav clamscan -r /data --log=/var/log/clamav/nightly.log`.
+- Coordinates with API + ingress agents for rate limits, Access rules, and token rotation; documents incidents in `server-changelog.md`.
 
-- Ensure Infisical secrets cover all environment variables referenced in
-  Compose files.
-- Deny deployments containing static credentials; remediate by creating
-  Infisical entries.
-- Run periodic audit:
+### 3.6 API Gatekeeper
+- Owns `services/kong/kong.yml` and Cloudflare Access mappings for Kong/Traefik dashboards.
+- Reloads Kong via `infisical run --env=production -- docker exec kong kong reload`.
+- Synchronizes DNS + tunnel config using Cloudflare API tokens from `.env`.
 
-  ```bash
-  infisical run --env=production -- infisical export --format yaml --path prod/
-  ```
+### 3.7 Documentation & Audit Scribe
+- Maintains `README.md`, `PROJECT_PLAN.md`, `infra-build-plan.md`, and changelogs.
+- Captures every deployment or incident with timestamps + command snippets.
 
-- Coordinate secret rotation with `automator` and update the changelog.
-- On any update to secret configuration files or manifests, commit and push the
-  changes, or open a pull request for review.
+### 3.8 Review Agent (Reagents)
+- Mandatory final gate for every phase.
+- Responsibilities:
+  - Inspect git diff + rendered configs.
+  - Ensure validation commands ran and passed.
+  - Check assumptions are documented inline or in commit messages.
+  - Sign off by appending a review note to `CHANGE.log` (e.g., `Reviewed-by: reagents <timestamp>`).
 
-### 3.3 dev-orchestrator
+### 3.9 Release Agent
+- Packages approved work into small, reviewable branches.
+- Runs `git status`, `git diff`, `git commit -S -m "<scope>: <summary>"` (include assumption comment), and coordinates PR creation or push.
+- Verifies the branch merges cleanly and reports the commit hash back to the orchestrator.
 
-- Execute host-specific deployments using `./scripts/deploy.ah <target>`.
-- Verify edge network membership before applying changes
-- After deployment run:
+### 3.10 Automator
+- Operates n8n/Node-RED workflows (backup, changelog sync, security notifications, DNS validation).
+- Triggers:
+  - `infisical run --env=production -- n8n execute --workflow daily-maintenance`
+  - `infisical run --env=production -- n8n execute --workflow post-recovery-audit`
 
-  ```bash
-  ./scripts/status.sh
-  ./scripts/health-check.sh
-  ```
+## 4. Runtime & Communication Rules
 
-- If validation fails, initiate rollback via `./scripts/teardown.sh`
-- Any changes to operational or deployment scripts driven by automation must
-  be committed or submitted via PR.
-
-### 3.4 security-sentinel
-
-- Manage ClamAV stack, firewall, WAF signals, and Zero-Trust posture.
-- Schedule malware scans and review logs:
-
-  ```bash
-  docker exec clamav clamscan -r /data --log=/var/log/clamav/nightly.log
-  ```
-
-- Coordinate with `api-gatekeeper` to enforce rate limits and key rotation.
-- Document incidents in `~/server-changelog.md`.
-- Following log or security policy updates, ensure a commit is pushed or a PR
-  is created.
-
-### 3.5 api-gatekeeper
-
-- Own Kong declarative config (`services/kong/kong.yml`)
-- Apply config updates:
-
-  ```bash
-  infisical run --env=production -- docker exec kong kong reload
-  ```
-
-- Rotate API keys through Infisical and ensure CF Access guards the admin
-  interface.
-- Validate routing alignment with Traefik and ClamAV hooks.
-- On changes to Kong configuration or routing policies, commit and push or
-  create a PR with the updates.
-
-### 3.6 automator
-
-- Operate n8n/Node-RED workflows stored in `automation/` (future directory).
-- Tasks: backups, changelog sync, security notifications, DNS validation.
-- Trigger daily maintenance:
-
-  ```bash
-  infisical run --env=production -- n8n execute --workflow daily-maintenance
-  ```
-
-- Publish run outcomes to `~/server-changelog.md` and alert channels.
-- Ensure any automated modification of playbooks, scripts, or workflow
-  definitions results in a commit or PR.
-
-## 4. Inter-Agent Communication
-
-- Use Infisical-secured webhooks (`INFISICAL_WEBHOOK_URL`) to broadcast events.
-- Maintain message schema: `{ agent, action, status, timestamp, details }`.
-- Shared Slack/Matrix channel for synchronous escalations (configured via
-  Infisical tokens).
-- All critical automation emits to the n8n event bus; `automator` maintains
-  routing rules.
+- Agents live under `.cursor/agents/` and register in `.cursor/agents/registry.json`.
+- Enumerate available agents: `python scripts/agents/run-agent.py list`.
+- Run an agent (dry run): `python scripts/agents/run-agent.py run <name> -- --dry-run`.
+- Production execution requires `AGENT_HOST=<host>` and `infisical run`.
+- Broadcast events over Infisical-secured webhooks (`INFISICAL_WEBHOOK_URL`) with schema `{ agent, action, status, timestamp, details }`.
+- Critical automation must emit to the n8n event bus for observability.
 
 ## 5. Deployment Workflow Synchronization
 
-1. `infra-architect` prepares manifests and submits PR.
-2. `secrets-keeper` validates secret coverage via Infisical.
-3. `dev-orchestrator` runs preflight and executes deployment.
-4. `security-sentinel` confirms firewall/WAF/ClamAV status.
-5. `api-gatekeeper` reloads Kong and checks API policies.
-6. `automator` schedules health checks and backups, updates changelog.
-7. **Each agent records state modifications via commit or PR for traceability.**
+1. Discovery Cartographer refreshes inventory.
+2. Compose Engineer updates manifests + orchestrator.
+3. Secrets Steward validates variable coverage.
+4. Deployment Runner executes preflight + deployment scripts.
+5. Security Sentinel confirms Zero-Trust + ClamAV status.
+6. API Gatekeeper reloads Kong + validates routing.
+7. Documentation Scribe updates plans + changelogs.
+8. Review Agent inspects the entire phase.
+9. Release Agent commits/pushes; Orchestrator closes the task.
 
 ## 6. Recovery & Redeployment
 
-- Use `./scripts/teardown.sh` for graceful rollback; record the ticket in the
-  changelog.
-- Restore data from `~/.backup/<tier>/` using procedures in
-  `infra-build-plan.md`.
-- If Infisical outage occurs, follow emergency playbook:
-  1. Switch to read-only mode, block new deployments.
-  2. Export cached secrets:
-
-     ```bash
-     infisical export --format env --path prod/backup > /tmp/infisical-backup.env
-     ```
-
-  3. Restore service once the Infisical cluster is healthy, then delete the
-     cache file.
-- After recovery, `automator` triggers the audit workflow:
-
-  ```bash
-  infisical run --env=production -- n8n execute --workflow post-recovery-audit
-  ```
-
-- **All recovery work that updates infra/state/configuration files must be
-  pushed as a commit or opened as a PR.**
-
-## 9. Automation Agents
-
-- `preflight-agent` — runs `scripts/preflight.sh` through Infisical; invoke via
-  `python scripts/agents/run-agent.py run preflight-agent -- --env production`.
-- `deploy-agent` — executes `scripts/deploy.ah <target>` through Infisical;
-  pass `--target` (e.g. `vps.host`).
-- `status-agent` — runs `scripts/status.sh` and optionally `scripts/health-check.sh`.
-- `logger-agent` — consolidates infra change logs into `CHANGE.log`.
-- `lint-resolver-agent` — applies language-aware lint fixers (e.g.
-  `ruff --fix`) when lint violations are detected; supports `--watch` mode to
-  poll for new diagnostics and auto-resolve them.
-- Host wrappers live under `scripts/agents/*.sh` for cron/systemd orchestration.
-- **All agents are responsible for pushing their own codebase or config changes
-  as commits or opening pull requests, ensuring a complete audit trail for all
-  automated operations.**
+- Use `./scripts/teardown.sh` for graceful rollback; log ticket in `server-changelog.md`.
+- Restore data from `~/.backup/<tier>/` using procedures in `infra-build-plan.md`.
+- Infisical outage steps:
+  1. Switch to read-only mode; block deployments.
+  2. `infisical export --format env --path prod/backup > /tmp/infisical-backup.env`
+  3. After recovery, shred the cache file and trigger `post-recovery-audit`.
+- Any recovery action that touches tracked files must conclude with a commit/PR.
 
 ## 7. Documentation & Audit Duties
 
-- Update `infra-build-plan.md` and `README.md` whenever services or workflows
-  change.
-- Append operational notes to `~/server-changelog.md` after every deployment or
-  incident.
-- Quarterly, `infra-architect` and `security-sentinel` co-sign compliance
-  review stored in `docs/compliance/`.
-- **All documentation updates initiated by agents must be committed and
-  synchronized upstream.**
+- Update `infra-build-plan.md`, `PROJECT_PLAN.md`, `README.md`, and `.env` templates whenever workflows or variables change.
+- Append operational notes to `~/server-changelog.md` after each deployment/incident.
+- Quarterly compliance review stored under `docs/compliance/`; co-signed by Security Sentinel + Orchestrator.
+- **All documentation updates initiated by agents must be committed and synchronized upstream.**
 
 ## 8. Incident Escalation
 
-- Severity 0/1 incidents: Page on-call via Infisical webhook integration; halt
-  deployments.
-- Severity 2/3: Document in changelog, notify within 1 hour.
-- Always attach remediation commands executed, e.g.:
+- Severity 0/1: page on-call via Infisical webhook, halt deployments immediately.
+- Severity 2/3: document in changelog, notify stakeholders within 1 hour.
+- Attach remediation commands executed, e.g.:
 
   ```bash
   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml restart traefik
   ```
 
-These directives keep Cursor agents aligned with the infrastructure build plan
-while preserving security, reproducibility, and observability.
-**Committing or opening a PR for every agent-initiated change is mandatory for
-continuous auditability.**
+These directives keep the supervised agent swarm aligned with the orchestrator’s build plan while ensuring every action is reviewable, auditable, and quickly recoverable.
