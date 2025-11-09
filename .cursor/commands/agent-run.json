@@ -1,0 +1,7 @@
+{
+  "name": "agent-run",
+  "description": "Execute an automation agent registered in .cursor/agents/registry.json. Usage: agent-run agent=<name> args=\"--dry-run\"",
+  "usage": "agent-run agent=logger-agent args=\"--dry-run\"",
+  "command": "bash -lc '\nset -euo pipefail\nAGENT=\"${agent:-}\" || true\nARGS=\"${args:-}\"\nif [ -z \"$AGENT\" ]; then\n  echo \"agent parameter is required (agent=<name>)\" >&2\n  exit 2\nfi\ncd /Users/freqkflag/Projects/GitHub/infra\nif [ -n \"$ARGS\" ]; then\n  # shellcheck disable=SC2086\n  set -- $ARGS\n  python3 scripts/agents/run-agent.py run \"$AGENT\" -- \"$@\"\nelse\n  python3 scripts/agents/run-agent.py run \"$AGENT\"\nfi\n'"
+}
+

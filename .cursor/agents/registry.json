@@ -1,0 +1,42 @@
+{
+  "agents": {
+    "logger-agent": {
+      "module_path": ".cursor/agents/logger_agent.py",
+      "class": "LoggerAgent",
+      "description": "Merge host change logs into ~/infra/CHANGE.log with append-only semantics.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["logging", "audit", "observability"],
+      "outputs": ["CHANGE.log"],
+      "source_logs": ["server-changelog.md", "**/*.log"],
+      "state_file": ".state/logger-agent.json",
+      "target_log": "CHANGE.log"
+    },
+    "preflight-agent": {
+      "module_path": ".cursor/agents/preflight_agent.py",
+      "class": "PreflightAgent",
+      "description": "Run scripts/preflight.sh under Infisical.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["preflight", "infra-architect"],
+      "outputs": ["server-changelog.md"],
+      "default_env": "production"
+    },
+    "deploy-agent": {
+      "module_path": ".cursor/agents/deploy_agent.py",
+      "class": "DeployAgent",
+      "description": "Execute scripts/deploy.ah <target> under Infisical.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["deployment", "dev-orchestrator"],
+      "outputs": ["server-changelog.md"],
+      "default_env": "production"
+    },
+    "status-agent": {
+      "module_path": ".cursor/agents/status_agent.py",
+      "class": "StatusAgent",
+      "description": "Run scripts/status.sh and scripts/health-check.sh.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["verification", "dev-orchestrator"],
+      "outputs": ["server-changelog.md"]
+    }
+  }
+}
+
