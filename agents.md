@@ -86,6 +86,7 @@
 - Shared CLI guardrails:
   - Every agent exposes `--dry-run` and `--host` flags and enforces `allowed_hosts` via `.cursor/agents/utils.py`.
   - Infisical wrappers live in `.cursor/agents/utils.py`; use them instead of bespoke subprocess calls.
+  - Set `INFISICAL_SECRET_PATH` (e.g., `/prod`) if your workspace secrets live outside the root `/` folder; the helper automatically adds `--path` to every `infisical run`.
   - Run `python scripts/agents/selftest_agents.py` to smoke-check registry/agent wiring after edits.
 
 ## 5. Deployment Workflow Synchronization

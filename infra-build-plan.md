@@ -508,6 +508,7 @@ infisical run --env=homelab -- docker compose -f compose.orchestrator.yml --prof
   - `python scripts/agents/run-agent.py run review-agent -- --validation server-changelog.md -- --dry-run`
   - `python scripts/agents/run-agent.py run release-agent -- --scope feat -- --summary "..." -- --dry-run`
   - `python scripts/agents/run-agent.py run automator -- --workflow daily-maintenance -- --dry-run`
+- If production secrets live under a nested Infisical path (e.g., `/prod`), export `INFISICAL_SECRET_PATH=/prod` before running agents so the helper adds `--path=/prod` to `infisical run`.
 
 This document is the authoritative deployment reference for the Cult of Joey
 infrastructure and must be updated alongside any stack modifications.

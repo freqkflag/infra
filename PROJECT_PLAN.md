@@ -115,6 +115,7 @@ Networks & tunnels:
 | Automator | `python scripts/agents/run-agent.py run automator -- --workflow daily-maintenance -- --dry-run` | Trigger n8n workflows and emit Infisical webhook events. |
 
 Run `python scripts/agents/run-agent.py list` to see descriptions or `python scripts/agents/run-agent.py describe <name>` for metadata. The `scripts/agents/selftest_agents.py` helper loads every registry entry to ensure wiring stays healthy after edits.
+Export `INFISICAL_SECRET_PATH=/prod` (or the path where prod secrets live) before running agents so `infisical run` fetches variables from the correct folder.
 
 ---
 
@@ -133,4 +134,3 @@ Maintaining this plan alongside `infra-build-plan.md` ensures every agent shares
 - None detected
 
 <!-- discovery-cartographer:end -->
-

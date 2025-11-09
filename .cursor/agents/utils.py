@@ -205,15 +205,18 @@ def run_infisical(
     dry_run: bool = False,
     check: bool = False,
     stream: bool = False,
+    secret_path: Optional[str] = None,
 ) -> CommandResult:
-    """Invoke ``infisical run --env=<env> -- <inner_command>``."""
+    """Invoke ``infisical run`` with optional secret path support."""
+    path_value = secret_path or os.environ.get("INFISICAL_SECRET_PATH")
     command = [
         "infisical",
         "run",
         f"--env={env_name}",
-        "--",
-        *inner_command,
     ]
+    if path_value:
+        command.append(f"--path={path_value}")
+    command.extend(["--", *inner_command])
     return run_command(
         command,
         cwd=cwd,
