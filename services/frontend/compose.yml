@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      NODE_ENV: production
+      PORT: ${FRONTEND_PORT}
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:${FRONTEND_PORT}/health || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${FRONTEND_DOMAIN}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.services.frontend.loadbalancer.server.port=${FRONTEND_PORT}"
+
+networks:
+  edge:
+    external: true

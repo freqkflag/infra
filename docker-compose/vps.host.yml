@@ -1,0 +1,95 @@
+version: "3.9"
+
+services:
+  traefik:
+    extends:
+      file: ../services/traefik/compose.yml
+      service: traefik
+
+  cloudflared:
+    extends:
+      file: ../services/cloudflared/compose.yml
+      service: cloudflared
+    environment:
+      CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_VPS}
+
+  postgres:
+    extends:
+      file: ../services/postgres/compose.yml
+      service: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  mariadb:
+    extends:
+      file: ../services/mariadb/compose.yml
+      service: mariadb
+
+  redis:
+    extends:
+      file: ../services/redis/compose.yml
+      service: redis
+
+  infisical:
+    extends:
+      file: ../services/infisical/compose.yml
+      service: infisical
+
+  kong:
+    extends:
+      file: ../services/kong/compose.yml
+      service: kong
+
+  clamav:
+    extends:
+      file: ../services/clamav/compose.yml
+      service: clamav
+
+  gitea:
+    extends:
+      file: ../services/gitea/compose.yml
+      service: gitea
+
+  ghost:
+    extends:
+      file: ../services/ghost/compose.yml
+      service: ghost
+
+  wordpress:
+    extends:
+      file: ../services/wordpress/compose.yml
+      service: wordpress
+
+  discourse:
+    extends:
+      file: ../services/discourse/compose.yml
+      service: discourse
+
+  wikijs:
+    extends:
+      file: ../services/wikijs/compose.yml
+      service: wikijs
+
+  linkstack:
+    extends:
+      file: ../services/linkstack/compose.yml
+      service: linkstack
+
+  localai:
+    extends:
+      file: ../services/localai/compose.yml
+      service: localai
+
+  openwebui:
+    extends:
+      file: ../services/openwebui/compose.yml
+      service: openwebui
+
+  node-red:
+    extends:
+      file: ../services/node-red/compose.yml
+      service: node-red
+
+networks:
+  edge:
+    external: true

@@ -1,0 +1,37 @@
+# .ssh - SSH config for Cult of Joey Infra remote hosts
+
+# VPS HOST (Root Access)
+Host vps
+    HostName 62.72.26.113
+    User root
+    Port 22
+    # Password: Warren7882??
+    # Server: vps.freqkflag.co
+    # For security, use SSH keys; never store passwords in plaintext configs.
+
+# HOMELAB LINUX (Freqkflag User)
+Host homelab
+    HostName 192.168.12.102
+    User freqkflag
+    Port 22
+    # Password: 7882
+    # Server: homelab.cult-of-joey.com
+    # Recommend: Use SSH keys and SSH agent forwarding.
+
+# MAC MINI LAB (Localhost / Freqkflag User)
+Host maclab
+    HostName maclab.twist3dkink.online
+    User freqkflag
+    Port 22
+    # Password: 7882
+    # Localhost or LAN-accessible Mac Mini
+    # Recommend: Use SSH keys for authentication.
+
+# Usage Examples:
+#   ssh vps
+#   ssh homelab
+#   ssh maclab
+
+# NOTE: DO NOT keep passwords hardcoded in files or scripts.
+# To convert this for production, set up ssh-agent and ssh-copy-id.
+//

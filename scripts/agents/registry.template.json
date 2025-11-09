@@ -1,0 +1,13 @@
+{
+  "agents": {
+    "template-agent": {
+      "module_path": ".cursor/agents/template_agent.py",
+      "class": "TemplateAgent",
+      "description": "Replace with template agent description.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["template"],
+      "outputs": ["~/infra/server-changelog.md"]
+    }
+  }
+}
+

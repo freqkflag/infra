@@ -4,6 +4,8 @@
 .infisical*
 infisical*.json
 /Users/freqkflag/Projects/.workspace/.env
+secrets/
+.secrets/
 
 # Local-only logs and backups
 logs/
@@ -11,8 +13,53 @@ logs/
 .logs/
 .backup/
 backup/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# Certificates and private keys
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.p12
+*.pfx
+
+# Runtime artifacts
+docker-compose.override.yml
+docker-compose.override.yaml
+*.override.yml
+*.override.yaml
+**/docker-compose.override.*
+*.pid
+*.sock
+tmp/
+run/
+
+# Datastore dumps
+*.sql
+*.sql.gz
+*.db
+*.sqlite
+*.sqlite3
 
 # Machine-specific stuff
 .DS_Store
 *.swp
 *.swo
+.idea/
+.vscode/
+.fleet/
+.history/
+
+# Node and Python workspace noise
+node_modules/
+__pycache__/
+*.pyc
+
+# Coverage and test artifacts
+.coverage
+coverage/
+htmlcov/

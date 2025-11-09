@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      ROCKET_PORT: 8080
+      DOMAIN: https://${VAULTWARDEN_DOMAIN}
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
+      SIGNUPS_ALLOWED: ${VAULTWARDEN_SIGNUPS_ALLOWED}
+      LOG_LEVEL: ${VAULTWARDEN_LOG_LEVEL}
+    volumes:
+      - vaultwarden_data:/data
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:8080/health || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden.rule=Host(`${VAULTWARDEN_DOMAIN}`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.services.vaultwarden.loadbalancer.server.port=8080"
+      - "traefik.http.routers.vaultwarden.middlewares=secure-headers@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  vaultwarden_data:

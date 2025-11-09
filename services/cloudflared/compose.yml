@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:2025.8.1
+    command:
+      - tunnel
+      - --metrics
+      - 0.0.0.0:2000
+      - --no-autoupdate
+      - run
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}
+    restart: unless-stopped
+    networks:
+      - edge
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:2000/ready || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - cloudflared_etc:/etc/cloudflared
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  cloudflared_etc:
