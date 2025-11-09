@@ -28,7 +28,7 @@ compose_args_from_dir() {
   local compose_dir="$1"
   local -n __result="$2"
   if [[ -d "${compose_dir}" ]]; then
-    mapfile -t __result < <(find "${compose_dir}" -maxdepth 1 -type f -name '*.yml' -o -name '*.yaml' | sort)
+    mapfile -t __result < <(find "${compose_dir}" -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
   fi
 }
 
