@@ -1,4 +1,4 @@
-<!-- Infra Build Plan generated 2025-11-09 -->
+<!-- Infra Build Plan generated 2025-11-09, updated 2025-11-09 -->
 # Cursor Infrastructure Build Plan
 
 ## 1. Purpose
@@ -17,9 +17,14 @@
    infisical --version
    ```
 
-2. Confirm environment file and Infisical credentials:
+2. Prepare environment file and Infisical credentials:
 
    ```bash
+   # Copy base template and merge host-specific overrides
+   cp .env.example .workspace/.env
+   # Merge values from env/templates/base.env.example
+   # Then layer host-specific: env/templates/vps.env.example (or mac/linux)
+   
    test -f .workspace/.env
    infisical status --workspace prod
    ```
@@ -43,9 +48,17 @@
 infra/
 ├── infra-build-plan.md
 ├── AGENTS.md
+├── PROJECT_PLAN.md
 ├── README.md
 ├── project-plan.yml
-├── services/
+├── compose.orchestrator.yml    # Master bundle with profiles per host
+├── env/
+│   └── templates/
+│       ├── base.env.example    # Shared defaults
+│       ├── vps.env.example     # Production overrides
+│       ├── mac.env.example     # Mac mini dev overrides
+│       └── linux.env.example   # Homelab overrides
+├── services/                   # Per-service Compose definitions
 │   ├── traefik/compose.yml
 │   ├── cloudflared/compose.yml
 │   ├── infisical/compose.yml
@@ -54,12 +67,30 @@ infra/
 │   ├── mariadb/compose.yml
 │   ├── redis/compose.yml
 │   ├── clamav/compose.yml
-│   └── apps/* (ghost, wordpress, discourse, wikijs, gitea, linkstack, localai, openwebui, node-red)
-├── nodes/
-│   ├── vps.host.yml
-│   ├── home.macmini.yml
-│   └── home.linux.yml
-└── scripts/
+│   └── apps/* (ghost, wordpress, discourse, wikijs, gitea, linkstack, localai, openwebui, node-red, vaultwarden, bookstack, auxiliary, frontend, dev-tools)
+├── nodes/                      # Per-node deployment configs
+│   ├── vps.host/
+│   │   ├── compose.yml         # Host-specific service bundle
+│   │   ├── deploy.sh           # Wrapper around scripts/deploy.ah
+│   │   ├── health-check.sh     # Per-node health validation
+│   │   ├── teardown.sh         # Per-node teardown wrapper
+│   │   ├── domains.yml         # Domain-to-service mappings
+│   │   └── networks.yml        # Network and tunnel metadata
+│   ├── home.macmini/
+│   │   ├── compose.yml
+│   │   ├── deploy.sh
+│   │   ├── health-check.sh
+│   │   ├── teardown.sh
+│   │   ├── domains.yml
+│   │   └── networks.yml
+│   └── home.linux/
+│       ├── compose.yml
+│       ├── deploy.sh
+│       ├── health-check.sh
+│       ├── teardown.sh
+│       ├── domains.yml
+│       └── networks.yml
+└── scripts/                    # Global automation scripts
     ├── preflight.sh
     ├── deploy.ah
     ├── backup.sh
@@ -96,12 +127,19 @@ infra/
 
 Every Compose definition must include:
 
-- `networks: [edge]`
+- `networks: [edge]` (external network)
 - `restart: unless-stopped`
 - `healthcheck` with meaningful command and intervals
-- `env_file: .workspace/.env` (or relative path)
-- Secrets via `Infisical` injection: deploy with `infisical run --env=production -- docker compose ...`
-- Traefik labels using existing naming conventions (e.g., `traefik.http.routers.<service>.rule`)
+- `env_file: ../../.workspace/.env` (relative path from service directory) or `.workspace/.env` (from repo root)
+- Secrets via `Infisical` injection: deploy with `infisical run --env=<environment> -- docker compose ...`
+- Traefik labels using existing naming conventions:
+  - `traefik.enable=true`
+  - `traefik.http.routers.<service>.rule=Host(\`${DOMAIN_VAR}\`)`
+  - `traefik.http.routers.<service>.entrypoints=websecure`
+  - `traefik.http.routers.<service>.tls.certresolver=letsencrypt` (required for TLS)
+  - `traefik.http.services.<service>.loadbalancer.server.port=<port>`
+  - Middleware labels as needed (`secure-headers@file`, `cf-access@file`)
+- TLS certificate resolver: `letsencrypt` (uses Cloudflare DNS-01 challenge)
 
 ## 7. Deployment Workflow
 
@@ -124,7 +162,9 @@ Every Compose definition must include:
 
    ```bash
    ./scripts/status.sh
-   ./scripts/health-check.sh
+   ./scripts/health-check.sh vps.host  # or home.macmini, home.linux
+   # Or use node-specific wrapper:
+   ./nodes/vps.host/health-check.sh
    ```
 
 4. Append changelog:
@@ -200,8 +240,19 @@ Every Compose definition must include:
 
 - Organize secrets per environment path (`prod/`, `dev/`, `homelab/`).
 - No hardcoded credentials in Compose files; reference variables like `${POSTGRES_PASSWORD}`.
-- During automation tasks (backups, health checks), wrap command with `infisical run`.
+- Environment templates live in `env/templates/`:
+  - `base.env.example` — shared defaults (timezone, Cloudflare tokens, Traefik, DB connection strings)
+  - `vps.env.example` — production domains and application credentials
+  - `mac.env.example` — Mac mini development overrides
+  - `linux.env.example` — homelab service overrides
+- Merge templates into `.workspace/.env` before bootstrap or deployment.
+- During automation tasks (backups, health checks), wrap command with `infisical run --env=<environment>`.
 - Regularly rotate secrets; record rotations in `server-changelog.md`.
+- Sync local `.workspace/.env` to Infisical when updating secrets:
+
+  ```bash
+  infisical --domain https://vault.freqkflag.co/api secrets set --file .workspace/.env --env prod --path / --token <service-token>
+  ```
 
 ## 9. Automation & Maintenance
 
@@ -236,13 +287,18 @@ Every Compose definition must include:
 - Run health checks after deployments:
 
   ```bash
-  ./scripts/health-check.sh
+  # Global health check (requires target argument)
+  ./scripts/health-check.sh vps.host
+  
+  # Or use node-specific wrapper
+  ./nodes/vps.host/health-check.sh
   ```
 
-- Inspect Traefik routes:
+- Inspect Traefik routes and TLS status:
 
   ```bash
   docker exec traefik traefik healthcheck
+  docker exec traefik traefik api --raw /api/http/routers
   ```
 
 - Verify Kong status:
@@ -255,12 +311,23 @@ Every Compose definition must include:
 
   ```bash
   docker logs --tail 50 cloudflared
+  # Check tunnel status per node
+  docker logs cloudflared | grep -i "connection\|tunnel\|error"
   ```
 
 - Monitor resource usage:
 
   ```bash
   docker stats --no-stream
+  ```
+
+- Validate TLS certificates:
+
+  ```bash
+  # Check certificate resolver configuration
+  docker exec traefik cat /letsencrypt/acme.json | jq .
+  # Verify domain resolution
+  curl -I https://traefik.freqkflag.co
   ```
 
 ## 12. Backup & Restore Procedures
@@ -298,9 +365,13 @@ Every Compose definition must include:
 
 ## 13. Teardown / Rollback
 
-1. Stop application tier:
+1. Stop application tier (using node-specific script or direct compose):
 
    ```bash
+   # Using node wrapper
+   infisical run --env=production -- ./nodes/vps.host/teardown.sh ghost wordpress discourse
+   
+   # Or direct compose command
    infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml down ghost wordpress discourse wikijs gitea linkstack localai openwebui node-red
    ```
 
@@ -310,13 +381,19 @@ Every Compose definition must include:
    infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml down clamav kong cloudflared traefik infisical
    ```
 
-3. Remove network (only if no hosts rely on it):
+3. Full teardown (using global script):
+
+   ```bash
+   infisical run --env=production -- ./scripts/teardown.sh vps.host
+   ```
+
+4. Remove network (only if no hosts rely on it):
 
    ```bash
    docker network rm edge
    ```
 
-4. Document actions in changelog:
+5. Document actions in changelog:
 
    ```bash
    echo "$(date +"%Y-%m-%d %H:%M:%S") - Performed teardown on vps.host" >> ~/server-changelog.md
@@ -333,13 +410,89 @@ Every Compose definition must include:
   infisical run --env=production -- ./scripts/status.sh && docker image ls
   ```
 
-## 15. Next Actions for Cursor Agents
+## 15. Node Configuration Files
 
-1. Build host-specific Compose files under `nodes/<node>/`.
-2. Create per-service Compose manifests with health checks and restart policies.
-3. Implement `scripts/health-check.sh` and `scripts/teardown.sh`.
-4. Update `AGENTS.md` and `README.md` per this plan.
-5. Validate `.gitignore` to exclude secrets, logs, and backups.
+Each node directory (`nodes/<host>/`) contains:
+
+- **`compose.yml`**: Host-specific service bundle using `extends` to reference `services/*/compose.yml`
+- **`deploy.sh`**: Wrapper script that calls `scripts/deploy.ah` with the correct target
+- **`health-check.sh`**: Per-node health validation wrapper
+- **`teardown.sh`**: Per-node teardown wrapper
+- **`domains.yml`**: Domain-to-service mappings and Cloudflare zone configuration
+- **`networks.yml`**: Network metadata and Cloudflared tunnel token references
+
+### Domain Configuration (`domains.yml`)
+
+Each `domains.yml` file maps environment variables to hostnames and services:
+
+```yaml
+zone: freqkflag.co
+cloudflare_zone_variable: CF_ZONE_FREQKFLAG_CO
+domains:
+  - env: GHOST_DOMAIN
+    host: ghost.freqkflag.co
+    service: ghost
+```
+
+### Network Configuration (`networks.yml`)
+
+Each `networks.yml` file documents network requirements:
+
+```yaml
+networks:
+  - name: edge
+    scope: external
+    purpose: shared overlay network for all nodes
+tunnels:
+  - name: cloudflared-vps
+    token_env: CF_TUNNEL_TOKEN_VPS
+    description: Cloudflare tunnel anchoring freqkflag.co ingress
+```
+
+## 16. Deployment Alternatives
+
+### Option 1: Node-Specific Scripts (Recommended)
+
+```bash
+infisical run --env=production -- ./nodes/vps.host/deploy.sh
+infisical run --env=development -- ./nodes/home.macmini/deploy.sh
+infisical run --env=homelab -- ./nodes/home.linux/deploy.sh
+```
+
+### Option 2: Global Deploy Script
+
+```bash
+infisical run --env=production -- ./scripts/deploy.ah vps.host
+infisical run --env=development -- ./scripts/deploy.ah home.macmini
+infisical run --env=homelab -- ./scripts/deploy.ah home.linux
+```
+
+### Option 3: Orchestrator Compose (Profiles)
+
+```bash
+infisical run --env=production -- docker compose -f compose.orchestrator.yml --profile vps up -d
+infisical run --env=development -- docker compose -f compose.orchestrator.yml --profile mac up -d
+infisical run --env=homelab -- docker compose -f compose.orchestrator.yml --profile linux up -d
+```
+
+## 17. Maintenance Status
+
+✅ **Completed:**
+
+- Host-specific Compose files under `nodes/<node>/compose.yml`
+- Per-service Compose manifests with health checks and restart policies
+- `scripts/health-check.sh` and `scripts/teardown.sh` implemented
+- Node-specific wrapper scripts (`deploy.sh`, `health-check.sh`, `teardown.sh`)
+- Domain and network configuration files (`domains.yml`, `networks.yml`)
+- Environment template structure (`env/templates/`)
+- TLS certificate resolver configuration (`letsencrypt`)
+- Traefik middleware definitions (`services/traefik/dynamic/middlewares.yml`)
+
+📋 **Ongoing:**
+
+- Keep `AGENTS.md` and `README.md` synchronized with this plan
+- Validate `.gitignore` excludes secrets, logs, and backups
+- Maintain changelog entries for all deployments
 
 This document is the authoritative deployment reference for the Cult of Joey
 infrastructure and must be updated alongside any stack modifications.
