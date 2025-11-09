@@ -33,6 +33,7 @@
   ```bash
   infisical run --env=production -- ./scripts/preflight.sh
   ```
+
 - After any update or verification that modifies the codebase or infra definitions, push a commit or submit a PR.
 
 ### 3.2 secrets-keeper
@@ -44,6 +45,7 @@
   ```bash
   infisical run --env=production -- infisical export --format yaml --path prod/
   ```
+
 - Coordinate secret rotation with `automator` and update changelog
 - On any update to secret configuration files or manifests, commit and push the changes, or open a pull request for review.
 
@@ -57,6 +59,7 @@
   ./scripts/status.sh
   ./scripts/health-check.sh
   ```
+
 - If validation fails, initiate rollback via `./scripts/teardown.sh`
 - Any changes to operational or deployment scripts driven by automation must be committed or submitted via PR.
 
@@ -68,6 +71,7 @@
   ```bash
   docker exec clamav clamscan -r /data --log=/var/log/clamav/nightly.log
   ```
+
 - Coordinate with `api-gatekeeper` to enforce rate limits and key rotation
 - Document incidents in `~/server-changelog.md`
 - Following log or security policy updates, ensure a commit is pushed or a PR is created.
@@ -80,6 +84,7 @@
   ```bash
   infisical run --env=production -- docker exec kong kong reload
   ```
+
 - Rotate API keys through Infisical and ensure CF Access guards admin interface
 - Validate routing alignment with Traefik and ClamAV hooks
 - On changes to Kong configuration or routing policies, commit and push or create a PR with the updates.
@@ -93,6 +98,7 @@
   ```bash
   infisical run --env=production -- n8n execute --workflow daily-maintenance
   ```
+
 - Publish run outcomes to `~/server-changelog.md` and alert channels
 - Ensure any automated modification of playbooks, scripts, or workflow definitions results in a commit or PR.
 
@@ -131,6 +137,7 @@
   ```bash
   infisical run --env=production -- n8n execute --workflow post-recovery-audit
   ```
+
 - **All recovery work that updates infra/state/configuration files must be pushed as a commit or opened as a PR.**
 
 ## 9. Automation Agents
@@ -139,6 +146,7 @@
 - `deploy-agent` — executes `scripts/deploy.ah <target>` through Infisical; pass `--target` (e.g. `vps.host`).
 - `status-agent` — runs `scripts/status.sh` and optionally `scripts/health-check.sh`.
 - `logger-agent` — consolidates infra change logs into `CHANGE.log`.
+- `lint-resolver-agent` — applies language-aware lint fixers (e.g. `ruff --fix`) when lint violations are detected.
 - Host wrappers live under `scripts/agents/*.sh` for cron/systemd orchestration.
 - **All agents are responsible for pushing their own codebase or config changes as commits or opening pull requests, ensuring a complete audit trail for all automated operations.**
 

@@ -11,6 +11,40 @@
       "state_file": ".state/logger-agent.json",
       "target_log": "CHANGE.log"
     },
+    "lint-resolver-agent": {
+      "module_path": ".cursor/agents/lint_resolver_agent.py",
+      "class": "LintResolverAgent",
+      "description": "Resolve lint warnings with language aware fixers.",
+      "allowed_hosts": ["mac", "vps"],
+      "tags": ["quality", "lint"],
+      "outputs": ["server-changelog.md"],
+      "resolvers": [
+        {
+          "id": "python-ruff",
+          "patterns": [
+            "*.py",
+            "scripts/**/*.py",
+            ".cursor/**/*.py"
+          ],
+          "commands": [
+            [
+              ["uv", "run", "ruff", "check", "--fix", "{file}"],
+              ["ruff", "check", "--fix", "{file}"]
+            ],
+            [
+              ["uv", "run", "ruff", "format", "{file}"],
+              ["ruff", "format", "{file}"]
+            ]
+          ],
+          "verify": [
+            [
+              ["uv", "run", "ruff", "check", "{file}"],
+              ["ruff", "check", "{file}"]
+            ]
+          ]
+        }
+      ]
+    },
     "preflight-agent": {
       "module_path": ".cursor/agents/preflight_agent.py",
       "class": "PreflightAgent",
