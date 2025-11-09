@@ -1,4 +1,5 @@
 # Environment and secrets
+<<<<<<< HEAD
 .env
 .env.*
 .infisical*
@@ -63,3 +64,11 @@ __pycache__/
 .coverage
 coverage/
 htmlcov/
+=======
+
+
+# Local-only logs and backups
+
+
+# Machine-specific stuff
+>>>>>>> 6f675cc (Add initial project structure and configuration files for Cult of Joey Infra deployment)
