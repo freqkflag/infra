@@ -1,0 +1,11 @@
+# Central network mapping for cross-node connectivity.
+# Populated during ingestion and validated before redeploy.
+
+edge:
+  scope: external
+  description: Shared overlay network attaching all nodes
+  nodes:
+    - vps.host
+    - home.macmini
+    - home.linux
+

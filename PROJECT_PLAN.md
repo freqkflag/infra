@@ -37,7 +37,45 @@ Networks & tunnels:
 - Each node attaches to the shared external `edge` network as described in its `networks.yml`.
 - Cloudflared tunnel metadata (token variables and purpose) resides alongside each node; execute node scripts with `infisical run --env=<profile>` to populate secrets.
 
-## 4. Service Inventory & Dependencies
+## 4. Ingestion & Redeploy Roadmap
+
+### 4.1 Folder Tree Targets
+
+- `AGENTS.md` — expands to include harvesting, ingestion, redeploy orchestration agents.
+- `PROJECT_PLAN.md` — reflects phased ingestion timeline (this document).
+- `PROJECT_PLAN.yml` — authoritative index for `nodes/<device>/` bundles and scripts.
+- `INVENTORY.md` — tabular inventory (devices, services, images, ports, domains).
+- `STATE_SNAPSHOT.md` — timestamped snapshots of harvested state.
+- `nodes/<device>/compose/<service>.yml` — per-service definitions with overrides under `nodes/<device>/compose/overrides/`.
+- `nodes/<device>/systemd/` — rendered units referencing compose bundles or binaries.
+- `nodes/<device>/env/.env.example` — placeholders only; always redact secrets.
+- `nodes/<device>/traefik/` (or `reverse-proxy/`) — labels/middleware definitions.
+- `domains/` — central domain maps consumed by nodes and documentation.
+- `networks/` — overlay/local network maps; referenced by Makefile + scripts.
+- `scripts/harvest_<device>.sh` — pull-only data capture scripts (no mutation).
+- `scripts/redeploy_<device>.sh` — idempotent redeploy orchestrations with health checks.
+- `Makefile` — targets: `harvest`, `plan`, `deploy`, `rollout`, `status` (parameterised with `DEVICE`).
+- `.gitignore` — excludes `.env`, `*.secret`, `harvest_*`, `*.tar.gz`, and other transient data.
+
+### 4.2 Phase Gate Criteria
+
+| Phase | Entrance Criteria | Exit Criteria |
+| ----- | ----------------- | ------------- |
+| Plan | Current infra docs reviewed, device list confirmed | `PROJECT_PLAN.md` + `project-plan.yml` updated with nodes + deliverables |
+| Generate Harvesters | Scripts scaffolded, dry-run validated locally | Operators can run `./scripts/harvest_<device>.sh --dry-run` without mutations |
+| Harvest | Harvester executed on target node, artifact stored securely | `STATE_SNAPSHOT.md` updated with timestamp + summary; artifact ingested |
+| Ingest | Harvest tarball processed into repo structure | `nodes/<device>/` populated, `.env.example` placeholders generated |
+| Redeploy Prep | Compose bundles normalised, scripts in place | `make deploy DEVICE=<device>` dry-run OK, health checks scripted |
+| Rollout | Redeploy executed in target environment | Services healthy; `STATE_SNAPSHOT.md` + `INVENTORY.md` reflect live state |
+
+### 4.3 Safety Considerations
+
+- All harvester scripts run read-only commands; no container restarts or writes.
+- Extract harvest artifacts into `tmp/harvest/` (ignored by git) before ingestion.
+- Use Infisical or external secret stores for all secret material; never commit raw values.
+- Rollback instructions remain `./scripts/teardown.sh <services...>` until new redeploy scripts are verified.
+
+## 5. Service Inventory & Dependencies
 
 | Layer | Services | Depends On |
 | ----- | -------- | ---------- |
@@ -51,30 +89,45 @@ Networks & tunnels:
 | Apps | Ghost, WordPress, Discourse, Wiki.js, Gitea, Linkstack, LocalAI, OpenWebUI, Node-RED, Vaultwarden, BookStack, Auxiliary, Frontend, Dev-tools | Gateways + databases |
 | Automation | n8n / Node-RED flows | Apps + logging layer |
 
-## 5. Execution Order
+## 6. Execution Order
 
-1. **Discovery Phase**
-   - Run `./scripts/preflight.sh`.
-   - Inventory services & env variables; update `PROJECT_PLAN.md` if needed.
-2. **Compose Phase**
-   - Generate/update per-service `services/<name>/compose.yml`.
-   - Update orchestrator bundle `compose.orchestrator.yml` with host profiles.
-   - Keep node bundles current under `nodes/<host>/compose.yml`.
-3. **Secrets Phase**
-   - Ensure `.env` templates + Infisical entries cover every `${VAR}`.
-   - Run `infisical run --env=production -- infisical export --format yaml --path prod/` for audit.
-4. **Deployment Phase**
-   - For each host: `infisical run --env=<env> -- ./nodes/<host>/deploy.sh` (wrapper around `scripts/deploy.ah`).
-   - Validate globally with `./scripts/status.sh` and per-node with `./nodes/<host>/health-check.sh`.
-5. **Verification Phase**
-   - `docker logs --tail 50 cloudflared`
-   - `docker exec traefik traefik healthcheck`
-   - `curl -s https://api.freqkflag.co/status --header "Authorization: Kong-Key ${KONG_ADMIN_KEY}"`
-6. **Documentation & Review**
-   - Update `CHANGE.log`, `server-changelog.md`.
-   - Review agent signs off, release agent commits/pushes (`git commit -S`).
+1. **Planning & Tree Draft**
+   - Confirm device list (`vps.host`, `home.macmini`, `home.linux`; add more as discovered).
+   - Document target layout in this plan and `project-plan.yml` under `nodes/<device>/`.
+   - Record deliverables and acceptance criteria for ingestion + redeploy program.
+2. **Harvest Preparation**
+   - Scaffold `scripts/harvest_<device>.sh` templates (pull-only, read-only).
+   - Define standard harvest output format (`harvest/<device>/YYYYMMDDHHMMSS/` + `tar.gz` artifact).
+   - Update `.gitignore` to exclude harvest archives, dumps, `.env`, and secret placeholders.
+3. **Harvest Execution**
+   - Guide operators to run each harvester on target node (via SSH, docker context, or MCP agent).
+   - Collect `docker ps`, `docker inspect`, `docker compose` data, networks, volumes, and systemd references.
+   - Redact sensitive values; capture source paths for secrets/configs only.
+4. **Ingestion & Normalization**
+   - Decompress harvest artifacts into `tmp/harvest/` (ignored by git).
+   - Convert into repo-native structure:
+     - `nodes/<device>/compose/<service>.yml`
+     - `nodes/<device>/systemd/<unit>.service`
+     - `nodes/<device>/env/.env.example`
+     - `nodes/<device>/traefik/` (or `reverse-proxy/`) for routing metadata.
+   - Populate global maps in `domains/` and `networks/`.
+5. **Redeploy Architecture**
+   - Generate `scripts/redeploy_<device>.sh` orchestrating compose bundles + health checks.
+   - Add Makefile targets: `harvest`, `plan`, `deploy`, `rollout`, `status` (parameterized by `DEVICE`).
+   - Ensure `AGENTS.md` documents automation roles covering harvest, ingestion, redeploy verification.
+6. **Secrets & Compliance**
+   - Produce `.env.example` placeholders only; cross-reference with Infisical paths.
+   - Update `secrets/README.md` with instructions for populating env files and linking to Infisical.
+   - Run `infisical` audits (`infisical export --format yaml --path prod/`) as part of review.
+7. **Validation & Rollout**
+   - Dry-run redeploy scripts with `--dry-run` or `--plan` mode where supported.
+   - For each device, `make deploy DEVICE=<device>` should converge identical service set.
+   - Execute `scripts/status.sh` + `scripts/health-check.sh` post-rollout; log results in `STATE_SNAPSHOT.md`.
+8. **Documentation & Review**
+   - Update `INVENTORY.md`, `STATE_SNAPSHOT.md`, and `CHANGE.log` with newly ingested data.
+   - Produce PR summary per device; allow auto-merge if CI + health checks pass.
 
-## 6. Environment Templates
+## 7. Environment Templates
 
 - `env/templates/base.env.example` — shared defaults (timezone, CF tokens, Traefik vars).
 - `env/templates/vps.env.example` — production overrides (DB creds, public domains).
@@ -83,13 +136,13 @@ Networks & tunnels:
 - `.env.example` at repo root lists the minimum keys new operators must populate before running bootstrap scripts.
 - Node-specific domain and network manifests are maintained under `nodes/<host>/domains.yml` and `nodes/<host>/networks.yml`.
 
-## 7. Branch & Review Policy
+## 8. Branch & Review Policy
 
 - Each phase lands in a dedicated branch named `feat/<phase>-<short-desc>`.
 - Commits must mention assumptions inline, e.g. `feat(compose): add mac profile (# assumes dev DNS stays on twist3dkink.online)`.
 - Review agent validates diffs + tests before Release agent merges or submits PR.
 
-## 8. Incident & Recovery Checklist
+## 9. Incident & Recovery Checklist
 
 1. Document issue in `server-changelog.md` with severity level.
 2. Run `./scripts/status.sh` + `./nodes/<host>/health-check.sh`.

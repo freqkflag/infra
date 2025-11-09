@@ -1,0 +1,95 @@
+# Central domain mapping generated during ingestion.
+# Domain records map fully-qualified hostnames to services and nodes.
+
+freqkflag.co:
+  zone_variable: CF_ZONE_FREQKFLAG_CO
+  records:
+    - host: traefik.freqkflag.co
+      service: traefik-dashboard
+      node: vps.host
+      env: TRAEFIK_DASHBOARD_HOST
+    - host: api.freqkflag.co
+      service: kong-proxy
+      node: vps.host
+      env: KONG_PROXY_HOST
+    - host: api-admin.freqkflag.co
+      service: kong-admin
+      node: vps.host
+      env: KONG_ADMIN_HOST
+    - host: infisical.freqkflag.co
+      service: infisical-core
+      node: vps.host
+      env: INFISICAL_HOST
+    - host: https://infisical.freqkflag.co
+      service: infisical-ui
+      node: vps.host
+      env: INFISICAL_PUBLIC_URL
+    - host: git.freqkflag.co
+      service: gitea-ui
+      node: vps.host
+      env: GITEA_DOMAIN
+    - host: ssh://git.freqkflag.co
+      service: gitea-ssh
+      node: vps.host
+      env: GITEA_SSH_DOMAIN
+    - host: ghost.freqkflag.co
+      service: ghost
+      node: vps.host
+      env: GHOST_DOMAIN
+    - host: wp.freqkflag.co
+      service: wordpress
+      node: vps.host
+      env: WORDPRESS_DOMAIN
+    - host: forum.freqkflag.co
+      service: discourse
+      node: vps.host
+      env: DISCOURSE_DOMAIN
+    - host: wiki.freqkflag.co
+      service: wikijs
+      node: vps.host
+      env: WIKIJS_DOMAIN
+    - host: links.freqkflag.co
+      service: linkstack
+      node: vps.host
+      env: LINKSTACK_DOMAIN
+    - host: localai.freqkflag.co
+      service: localai
+      node: vps.host
+      env: LOCALAI_DOMAIN
+    - host: openwebui.freqkflag.co
+      service: openwebui
+      node: vps.host
+      env: OPENWEBUI_DOMAIN
+    - host: automation.freqkflag.co
+      service: node-red
+      node: vps.host
+      env: NODE_RED_DOMAIN
+
+twist3dkink.online:
+  zone_variable: CF_ZONE_TWIST3DKINK_ONLINE
+  records:
+    - host: dev.twist3dkink.online
+      service: frontend
+      node: home.macmini
+      env: FRONTEND_DOMAIN
+    - host: tools.twist3dkink.online
+      service: dev-tools
+      node: home.macmini
+      env: DEVTOOLS_DOMAIN
+
+cult-of-joey.com:
+  zone_variable: CF_ZONE_CULT_OF_JOEY_COM
+  records:
+    - host: vault.cult-of-joey.com
+      service: vaultwarden
+      node: home.linux
+      env: VAULTWARDEN_DOMAIN
+    - host: notes.cult-of-joey.com
+      service: bookstack
+      node: home.linux
+      env: BOOKSTACK_DOMAIN
+    - host: aux.cult-of-joey.com
+      service: auxiliary
+      node: home.linux
+      env: AUXILIARY_DOMAIN
+
