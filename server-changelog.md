@@ -13,3 +13,4 @@
 - 2025-11-09T08:59:52Z — Completed Cursor agent suite implementation (discovery, compose, secrets, deployment, security, API gatekeeper, documentation scribe, review, release, automator), centralized helpers in `.cursor/agents/utils.py`, and documented invocation workflow in project/infra plans. Added `scripts/agents/selftest_agents.py` for loader smoke-tests.
 - 2025-11-09T09:02:03.125951+00:00Z — discovery-cartographer scanned 26 compose files; drift entries=0.
 - 2025-11-10T10:23:00Z — Resolved compose-engineer warnings by layering shared `edge` network defaults, Traefik router labels, and health checks into `nodes/vps.host/compose.yml` prior to agent execution.
+- 2025-11-10T11:04:00Z — Added `INFISICAL_WEBHOOK_URL` placeholders to environment templates and documented population requirements so automation agents can emit webhook payloads outside `--dry-run`.

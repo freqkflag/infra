@@ -23,3 +23,4 @@ Reviewed-by: reagents 2025-11-09T04:02Z (docker compose -f compose.orchestrator.
 ### Changed  
 - Documented the agent suite and invocation flow across `AGENTS.md`, `PROJECT_PLAN.md`, and `infra-build-plan.md`.  
 - Hardened `nodes/vps.host/compose.yml` with shared service defaults, explicit Traefik labels, and health checks to satisfy compose-engineer validation ahead of agent execution.  
+- Populated `INFISICAL_WEBHOOK_URL` placeholders in environment templates so automation agents can emit webhook events outside dry runs.  

@@ -81,7 +81,7 @@
 - Enumerate available agents: `python scripts/agents/run-agent.py list`.
 - Run an agent (dry run): `python scripts/agents/run-agent.py run <name> -- --dry-run`.
 - Production execution requires `AGENT_HOST=<host>` and `infisical run`.
-- Broadcast events over Infisical-secured webhooks (`INFISICAL_WEBHOOK_URL`) with schema `{ agent, action, status, timestamp, details }`.
+- Broadcast events over Infisical-secured webhooks (`INFISICAL_WEBHOOK_URL`) with schema `{ agent, action, status, timestamp, details }`. Populate this variable via `.workspace/.env` (see `env/templates/base.env.example`) before running outside `--dry-run`.
 - Critical automation must emit to the n8n event bus for observability.
 - Shared CLI guardrails:
   - Every agent exposes `--dry-run` and `--host` flags and enforces `allowed_hosts` via `.cursor/agents/utils.py`.
