@@ -1,9 +1,0 @@
----
-description: infra ops guardrails for freqkflag infra
-globs:
-  - "**/*.sh"
-  - "**/*.yml"
-  - "**/*.yaml"
-  - "**/*.compose*"
-alwaysApply: false
----
