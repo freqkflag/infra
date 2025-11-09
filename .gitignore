@@ -1,9 +1,11 @@
 # Environment and secrets
 .env
 .env.*
+# Track `.workspace/` directory but keep environment files out of Git.
+.workspace/.env
+.workspace/.env.*
 .infisical*
 infisical*.json
-/Users/freqkflag/Projects/.workspace/.env
 secrets/
 .secrets/
 
