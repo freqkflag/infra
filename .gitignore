@@ -1,7 +1,18 @@
 # Environment and secrets
-
+.env
+.env.*
+.infisical*
+infisical*.json
+/Users/freqkflag/Projects/.workspace/.env
 
 # Local-only logs and backups
-
+logs/
+*.log
+.logs/
+.backup/
+backup/
 
 # Machine-specific stuff
+.DS_Store
+*.swp
+*.swo

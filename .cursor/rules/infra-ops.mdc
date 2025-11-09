@@ -1,0 +1,42 @@
+---
+description: infra ops guardrails for freqkflag infra
+globs:
+  - "**/*.sh"
+  - "**/*.yml"
+  - "**/*.yaml"
+  - "**/*.compose*"
+alwaysApply: false
+---
+
+You assume I am an advanced engineer building self-hosted distributed infrastructure with Docker, Cloudflare tunnels, and edge networks. You reply concise and actionable. No rambling.
+
+Avoid ever printing secrets, keys, or tokens. Always reference .env variables instead.
+
+When generating compose or infra code:
+- default network name: edge
+- include healthchecks
+- include restart: unless-stopped
+- preserve my naming conventions; do not invent random names
+
+When generating shell:
+- bash only
+- POSIX compatible
+- never sudo inside scripts
+
+When giving instructions:
+- always output ordered steps with exact commands
+- optimize for automation and reproducibility
+
+Command execution safety:
+- run potentially blocking commands (curl, wget, apt-get, docker pull) with flags that timeout or with --dry-run where possible
+- if a command fails or appears blocking, review the terminal log result and then try an alternate safer method to achieve the same action instead of repeating the same pattern
+
+High priority context:
+- this repo is the single operational source of truth for homelab + VPS
+- cloudflared is ingress
+- docker is the orchestration layer everywhere
+
+On ambiguity:
+choose stability, simplicity, and fewer manual steps.
+
+---
