@@ -1,0 +1,16 @@
+_format_version: "3.0"
+
+services: []
+
+routes: []
+
+plugins:
+  - name: key-auth
+    enabled: true
+  - name: rate-limiting
+    enabled: true
+    config:
+      minute: 120
+      policy: local
+  - name: cors
+    enabled: true

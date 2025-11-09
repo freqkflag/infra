@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  dev-tools:
+    image: lscr.io/linuxserver/code-server:latest
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      PUID: ${DEVTOOLS_PUID}
+      PGID: ${DEVTOOLS_PGID}
+      TZ: ${TIMEZONE}
+      PASSWORD: ${DEVTOOLS_PASSWORD}
+      SUDO_PASSWORD: ${DEVTOOLS_SUDO_PASSWORD}
+    volumes:
+      - devtools_config:/config
+      - ${DEVTOOLS_WORKSPACE}:/workspace
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:8443/healthz || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.devtools.rule=Host(`${DEVTOOLS_DOMAIN}`)"
+      - "traefik.http.routers.devtools.entrypoints=websecure"
+      - "traefik.http.services.devtools.loadbalancer.server.port=8443"
+      - "traefik.http.routers.devtools.middlewares=cf-access@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  devtools_config:

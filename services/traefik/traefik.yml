@@ -1,0 +1,17 @@
+# Static Traefik configuration
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+api:
+  dashboard: true
+
+ping: {}
+
+log:
+  level: INFO
+
+accessLog: {}
+

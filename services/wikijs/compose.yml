@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  wikijs:
+    image: requarks/wiki:2.5
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_USER: ${WIKIJS_DB_USER}
+      DB_PASS: ${WIKIJS_DB_PASSWORD}
+      DB_NAME: ${WIKIJS_DB_NAME}
+      APP_URL: https://${WIKIJS_DOMAIN}
+    depends_on:
+      - postgres
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:3000/healthz || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wikijs.rule=Host(`${WIKIJS_DOMAIN}`)"
+      - "traefik.http.routers.wikijs.entrypoints=websecure"
+      - "traefik.http.services.wikijs.loadbalancer.server.port=3000"
+      - "traefik.http.routers.wikijs.middlewares=secure-headers@file"
+
+networks:
+  edge:
+    external: true

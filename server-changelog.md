@@ -1,2 +1,2 @@
-``` markdown
-```
+2025-11-09T01:14:01Z - Repository baseline audit: only `services/traefik` populated; remaining service manifests absent; `docker-compose/` host bundles missing; `scripts/health-check.sh` and `scripts/teardown.sh` not yet implemented; workspace structure captured in `/tmp/infra-structure.txt` for review.
+2025-11-09T01:21:28Z - Added per-service Compose manifests, populated host-level bundles, and delivered `scripts/health-check.sh` plus `scripts/teardown.sh`; ready for subsequent documentation updates.

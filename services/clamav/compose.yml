@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  clamav:
+    image: mkodockx/docker-clamav:alpine
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      CLAMD_STARTUP_TIMEOUT: 120
+    volumes:
+      - clamav_data:/data
+      - clamav_logs:/var/log/clamav
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "clamdscan --version >/dev/null 2>&1 || exit 1"
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 2m
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  clamav_data:
+  clamav_logs:

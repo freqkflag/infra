@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "mysqladmin ping -h localhost -u ${MARIADB_USER} --password=${MARIADB_PASSWORD}"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  mariadb_data:

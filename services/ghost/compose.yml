@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  ghost:
+    image: ghost:5-alpine
+    env_file:
+      - /Users/freqkflag/Projects/.workspace/.env
+    environment:
+      url: https://${GHOST_DOMAIN}
+      database__client: mysql
+      database__connection__host: ${MARIADB_HOST}
+      database__connection__user: ${GHOST_DB_USER}
+      database__connection__password: ${GHOST_DB_PASSWORD}
+      database__connection__database: ${GHOST_DB_NAME}
+    volumes:
+      - ghost_content:/var/lib/ghost/content
+    depends_on:
+      - mariadb
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:2368/ghost/api/v4/admin/site || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ghost.entrypoints=websecure"
+      - "traefik.http.routers.ghost.rule=Host(`${GHOST_DOMAIN}`)"
+      - "traefik.http.services.ghost.loadbalancer.server.port=2368"
+      - "traefik.http.routers.ghost.middlewares=secure-headers@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  ghost_content:
