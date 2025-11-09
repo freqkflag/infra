@@ -11,3 +11,7 @@ All notable changes to this project will be documented here.
 ### Removed  
 - Per-container databases on each service host.  
 Reviewed-by: reagents 2025-11-09T04:02Z (docker compose -f compose.orchestrator.yml config)
+
+## [2025-11-09]  
+### Changed  
+- Synced Infisical prod secrets from `.workspace/.env` via `infisical --domain https://vault.freqkflag.co/api secrets set --file .workspace/.env --env prod --path / --token <service-token>` (2025-11-09T07:12:55Z).  
