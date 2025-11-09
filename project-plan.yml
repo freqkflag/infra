@@ -7,6 +7,8 @@ environments:
     domain: freqkflag.co
     node_directory: nodes/vps.host
     compose_bundle: nodes/vps.host/compose.yml
+    harvest_script: scripts/harvest_vps.host.sh
+    redeploy_script: scripts/redeploy_vps.host.sh
     deploy_script: nodes/vps.host/deploy.sh
     health_check: nodes/vps.host/health-check.sh
     teardown_script: nodes/vps.host/teardown.sh
@@ -53,6 +55,8 @@ environments:
     domain: twist3dkink.online
     node_directory: nodes/home.macmini
     compose_bundle: nodes/home.macmini/compose.yml
+    harvest_script: scripts/harvest_home.macmini.sh
+    redeploy_script: scripts/redeploy_home.macmini.sh
     deploy_script: nodes/home.macmini/deploy.sh
     health_check: nodes/home.macmini/health-check.sh
     teardown_script: nodes/home.macmini/teardown.sh
@@ -72,6 +76,8 @@ environments:
     domain: cult-of-joey.com
     node_directory: nodes/home.linux
     compose_bundle: nodes/home.linux/compose.yml
+    harvest_script: scripts/harvest_home.linux.sh
+    redeploy_script: scripts/redeploy_home.linux.sh
     deploy_script: nodes/home.linux/deploy.sh
     health_check: nodes/home.linux/health-check.sh
     teardown_script: nodes/home.linux/teardown.sh
