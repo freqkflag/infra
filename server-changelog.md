@@ -14,3 +14,4 @@
 - 2025-11-09T09:02:03.125951+00:00Z — discovery-cartographer scanned 26 compose files; drift entries=0.
 - 2025-11-10T10:23:00Z — Resolved compose-engineer warnings by layering shared `edge` network defaults, Traefik router labels, and health checks into `nodes/vps.host/compose.yml` prior to agent execution.
 - 2025-11-10T11:04:00Z — Added `INFISICAL_WEBHOOK_URL` placeholders to environment templates and documented population requirements so automation agents can emit webhook payloads outside `--dry-run`.
+- 2025-11-10T11:32:00Z — Deployment runner now posts structured webhook events for edge network enforcement, deployment steps, and rollbacks; health check script receives the target argument to align with compose bundles.

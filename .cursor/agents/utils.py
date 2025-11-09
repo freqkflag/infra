@@ -20,6 +20,8 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence
+from urllib import error as urlerror
+from urllib import request as urlrequest
 
 try:
     import yaml  # type: ignore
@@ -360,3 +362,40 @@ def log_server_event(
     if details:
         lines.extend(f"  - {item}" for item in details)
     append_lines(DEFAULT_LOG_PATH, lines, dry_run=dry_run)
+
+
+def _webhook_url() -> str:
+    url = os.environ.get("INFISICAL_WEBHOOK_URL")
+    if not url:
+        raise SystemExit(
+            "INFISICAL_WEBHOOK_URL is not set; populate it in the environment before running agents."
+        )
+    return url
+
+
+def post_webhook(payload: Dict[str, object], *, dry_run: bool = False) -> None:
+    """
+    Send ``payload`` to ``INFISICAL_WEBHOOK_URL`` as JSON.
+
+    Honors ``dry_run`` by printing the payload instead of performing the HTTP
+    request.
+    """
+    url = _webhook_url()
+    serialized = json.dumps(payload, indent=2, sort_keys=True)
+    if dry_run:
+        print(f"DRY RUN webhook -> {url}\n{serialized}")
+        return
+
+    data = serialized.encode("utf-8")
+    req = urlrequest.Request(
+        url,
+        data=data,
+        headers={"Content-Type": "application/json", "Content-Length": str(len(data))},
+        method="POST",
+    )
+    try:
+        with urlrequest.urlopen(req, timeout=15) as resp:
+            # Drain response to ensure the request completes; ignore body.
+            resp.read()
+    except urlerror.URLError as exc:  # pragma: no cover - network error handling
+        raise SystemExit(f"webhook POST to {url} failed: {exc}") from exc

@@ -12,7 +12,7 @@ import argparse
 import importlib.util
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 BASE_MODULE_PATH = Path(__file__).resolve().parent / "base.py"
 UTILS_MODULE_PATH = Path(__file__).resolve().parent / "utils.py"
@@ -78,8 +78,15 @@ class DeploymentRunnerAgent(BaseAgent):
             ("preflight", ["./scripts/preflight.sh"]),
             ("deploy", ["./scripts/deploy.ah", args.target]),
             ("status", ["./scripts/status.sh"]),
-            ("health", ["./scripts/health-check.sh"]),
+            ("health", ["./scripts/health-check.sh", args.target]),
         ]
+
+        step_meta = {
+            "preflight": {"event": "preflight-check", "mutates": False},
+            "deploy": {"event": "deploy-run", "mutates": True},
+            "status": {"event": "status-check", "mutates": False},
+            "health": {"event": "health-check", "mutates": False},
+        }
 
         for label, command in steps:
             result = utils.run_infisical(
@@ -92,16 +99,45 @@ class DeploymentRunnerAgent(BaseAgent):
             if not result.ok:
                 if label == "health" and not args.dry_run:
                     self._rollback(args.dry_run, env)
+                self._emit_webhook(
+                    step_meta[label]["event"],
+                    status="error",
+                    error=f"step '{label}' failed rc={result.returncode}",
+                    details={"command": command, "returncode": result.returncode},
+                    dry_run=args.dry_run,
+                )
                 utils.log_server_event(
                     "deployment-runner",
                     f"step '{label}' failed rc={result.returncode}",
                     dry_run=args.dry_run,
                 )
                 return result.returncode
+            else:
+                meta = step_meta[label]
+                if meta["mutates"]:
+                    self._emit_webhook(
+                        meta["event"],
+                        status="success",
+                        details={"command": command, "returncode": result.returncode},
+                        dry_run=args.dry_run,
+                    )
+                else:
+                    self._emit_webhook(
+                        meta["event"],
+                        status="noop",
+                        details={"command": command, "returncode": result.returncode},
+                        dry_run=args.dry_run,
+                    )
 
         utils.log_server_event(
             "deployment-runner",
             f"target {args.target} succeeded.",
+            dry_run=args.dry_run,
+        )
+        self._emit_webhook(
+            "deployment-complete",
+            status="success",
+            details={"target": args.target},
             dry_run=args.dry_run,
         )
         return 0
@@ -114,25 +150,84 @@ class DeploymentRunnerAgent(BaseAgent):
             dry_run=dry_run,
         )
         if dry_run:
+            self._emit_webhook(
+                "edge-network-check",
+                status="noop",
+                details={"command": result.command, "returncode": result.returncode, "dry_run": True},
+                dry_run=True,
+            )
             return
         networks = {line.strip() for line in result.stdout.splitlines()}
         if "edge" in networks:
+            self._emit_webhook(
+                "edge-network-check",
+                status="noop",
+                details={"state": "exists"},
+                dry_run=False,
+            )
             return
-        utils.run_command(
+        create_result = utils.run_command(
             ["docker", "network", "create", "edge"],
             cwd=self.repo_root,
             dry_run=dry_run,
-            check=True,
+            check=False,
         )
+        if create_result.ok:
+            self._emit_webhook(
+                "edge-network-create",
+                status="success",
+                details={"command": create_result.command, "returncode": create_result.returncode},
+                dry_run=dry_run,
+            )
+        else:
+            self._emit_webhook(
+                "edge-network-create",
+                status="error",
+                error=f"failed rc={create_result.returncode}",
+                details={"command": create_result.command, "returncode": create_result.returncode},
+                dry_run=dry_run,
+            )
+            raise SystemExit("failed to create edge network")
 
     def _rollback(self, dry_run: bool, env: str) -> None:
-        utils.run_infisical(
+        result = utils.run_infisical(
             env,
             ["./scripts/teardown.sh"],
             cwd=self.repo_root,
             dry_run=dry_run,
             stream=True,
         )
+        if result.ok:
+            self._emit_webhook(
+                "rollback",
+                status="success",
+                details={"command": ["./scripts/teardown.sh"], "returncode": result.returncode},
+                dry_run=dry_run,
+            )
+        else:
+            self._emit_webhook(
+                "rollback",
+                status="error",
+                error=f"teardown failed rc={result.returncode}",
+                details={"command": ["./scripts/teardown.sh"], "returncode": result.returncode},
+                dry_run=dry_run,
+            )
+
+    def _emit_webhook(
+        self,
+        event: str,
+        *,
+        status: str,
+        details: Optional[Dict[str, object]] = None,
+        error: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> None:
+        payload: Dict[str, object] = {"agent": self.name, "event": event, "status": status}
+        if details is not None:
+            payload["details"] = details
+        if error is not None:
+            payload["error"] = error
+        utils.post_webhook(payload, dry_run=dry_run)
 
 
 def main() -> int:  # pragma: no cover
