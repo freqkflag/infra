@@ -61,11 +61,78 @@ services:
       service: redis
     networks: [edge]
 
+  # Infisical stack (harvested from /srv/infisical)
+  infisical-db:
+    <<: *service_defaults
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${INFISICAL_DB_USER:-infisical}
+      POSTGRES_PASSWORD: ${INFISICAL_DB_PASSWORD}
+      POSTGRES_DB: ${INFISICAL_DB_NAME:-infisical}
+    volumes:
+      - infisical_pg_data:/var/lib/postgresql/data
+    networks: [edge]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${INFISICAL_DB_USER:-infisical}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  infisical-redis:
+    <<: *service_defaults
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--save', '', '--appendonly', 'no']
+    volumes:
+      - infisical_redis_data:/data
+    networks: [edge]
+
   infisical:
     <<: *service_defaults
-    extends:
-      file: ../../services/infisical/compose.yml
-      service: infisical
+    image: infisical/infisical:latest
+    restart: unless-stopped
+    depends_on:
+      infisical-db:
+        condition: service_healthy
+      infisical-redis:
+        condition: service_started
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      ENCRYPTION_KEY: ${INFISICAL_ENCRYPTION_KEY}
+      AUTH_SECRET: ${INFISICAL_AUTH_SECRET}
+      DB_CONNECTION_URI: postgres://${INFISICAL_DB_USER:-infisical}:${INFISICAL_DB_PASSWORD}@infisical-db:5432/${INFISICAL_DB_NAME:-infisical}
+      REDIS_URL: redis://infisical-redis:6379
+      SITE_URL: ${INFISICAL_PUBLIC_URL}
+      NODE_ENV: production
+      PORT: 8080
+      PORT_SECURE: 443
+      HTTPS_ENABLED: 'true'
+      INFISICAL_FEATURE_WORKFLOWS: 'true'
+    networks: [edge]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:8080/api/status || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  infisical-nginx:
+    <<: *service_defaults
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      infisical:
+        condition: service_started
+    volumes:
+      - ./compose/infisical-nginx/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./compose/infisical-nginx/nginx/certs:/etc/nginx/certs:ro
+    ports:
+      - '80:80'
+      - '443:443'
     networks: [edge]
 
   kong:
@@ -164,6 +231,8 @@ volumes:
   clamav_data: {}
   clamav_logs: {}
   kong_tmp: {}
+  infisical_pg_data: {}
+  infisical_redis_data: {}
 
 networks:
   edge:
