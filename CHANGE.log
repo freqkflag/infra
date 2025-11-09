@@ -10,3 +10,4 @@ All notable changes to this project will be documented here.
 - Centralised DB/cache strategy for all services.  
 ### Removed  
 - Per-container databases on each service host.  
+Reviewed-by: reagents 2025-11-09T04:02Z (docker compose -f compose.orchestrator.yml config)
