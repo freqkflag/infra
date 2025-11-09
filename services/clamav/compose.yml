@@ -4,7 +4,7 @@ services:
   clamav:
     image: mkodockx/docker-clamav:alpine
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       CLAMD_STARTUP_TIMEOUT: 120
     volumes:

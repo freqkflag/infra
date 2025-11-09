@@ -1,0 +1,9 @@
+networks:
+  - name: edge
+    scope: external
+    purpose: shared overlay network for all nodes
+tunnels:
+  - name: cloudflared-linux
+    token_env: CF_TUNNEL_TOKEN_LINUX
+    description: Cloudflare tunnel for cult-of-joey.com ingress
+

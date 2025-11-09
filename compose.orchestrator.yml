@@ -1,0 +1,158 @@
+version: "3.9"
+
+services:
+  traefik:
+    extends:
+      file: ./services/traefik/compose.yml
+      service: traefik
+    profiles: ["vps"]
+
+  cloudflared_vps:
+    extends:
+      file: ./services/cloudflared/compose.yml
+      service: cloudflared
+    environment:
+      CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_VPS}
+    profiles: ["vps"]
+
+  postgres:
+    extends:
+      file: ./services/postgres/compose.yml
+      service: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    profiles: ["vps"]
+
+  mariadb:
+    extends:
+      file: ./services/mariadb/compose.yml
+      service: mariadb
+    profiles: ["vps"]
+
+  redis:
+    extends:
+      file: ./services/redis/compose.yml
+      service: redis
+    profiles: ["vps"]
+
+  infisical:
+    extends:
+      file: ./services/infisical/compose.yml
+      service: infisical
+    profiles: ["vps"]
+
+  kong:
+    extends:
+      file: ./services/kong/compose.yml
+      service: kong
+    profiles: ["vps"]
+
+  clamav:
+    extends:
+      file: ./services/clamav/compose.yml
+      service: clamav
+    profiles: ["vps"]
+
+  gitea:
+    extends:
+      file: ./services/gitea/compose.yml
+      service: gitea
+    profiles: ["vps"]
+
+  ghost:
+    extends:
+      file: ./services/ghost/compose.yml
+      service: ghost
+    profiles: ["vps"]
+
+  wordpress:
+    extends:
+      file: ./services/wordpress/compose.yml
+      service: wordpress
+    profiles: ["vps"]
+
+  discourse:
+    extends:
+      file: ./services/discourse/compose.yml
+      service: discourse
+    profiles: ["vps"]
+
+  wikijs:
+    extends:
+      file: ./services/wikijs/compose.yml
+      service: wikijs
+    profiles: ["vps"]
+
+  linkstack:
+    extends:
+      file: ./services/linkstack/compose.yml
+      service: linkstack
+    profiles: ["vps"]
+
+  localai:
+    extends:
+      file: ./services/localai/compose.yml
+      service: localai
+    profiles: ["vps"]
+
+  openwebui:
+    extends:
+      file: ./services/openwebui/compose.yml
+      service: openwebui
+    profiles: ["vps"]
+
+  node-red:
+    extends:
+      file: ./services/node-red/compose.yml
+      service: node-red
+    profiles: ["vps"]
+
+  cloudflared_mac:
+    extends:
+      file: ./services/cloudflared/compose.yml
+      service: cloudflared
+    environment:
+      CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_MAC}
+    profiles: ["mac"]
+
+  frontend:
+    extends:
+      file: ./services/frontend/compose.yml
+      service: frontend
+    profiles: ["mac"]
+
+  dev-tools:
+    extends:
+      file: ./services/dev-tools/compose.yml
+      service: dev-tools
+    profiles: ["mac"]
+
+  cloudflared_linux:
+    extends:
+      file: ./services/cloudflared/compose.yml
+      service: cloudflared
+    environment:
+      CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_LINUX}
+    profiles: ["linux"]
+
+  vaultwarden:
+    extends:
+      file: ./services/vaultwarden/compose.yml
+      service: vaultwarden
+    profiles: ["linux"]
+
+  bookstack:
+    extends:
+      file: ./services/bookstack/compose.yml
+      service: bookstack
+    profiles: ["linux"]
+
+  auxiliary:
+    extends:
+      file: ./services/auxiliary/compose.yml
+      service: auxiliary
+    profiles: ["linux"]
+
+networks:
+  edge:
+    external: true

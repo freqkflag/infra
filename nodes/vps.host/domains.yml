@@ -1,0 +1,49 @@
+zone: freqkflag.co
+cloudflare_zone_variable: CF_ZONE_FREQKFLAG_CO
+domains:
+  - env: TRAEFIK_DASHBOARD_HOST
+    host: traefik.freqkflag.co
+    service: traefik-dashboard
+  - env: KONG_PROXY_HOST
+    host: api.freqkflag.co
+    service: kong-proxy
+  - env: KONG_ADMIN_HOST
+    host: api-admin.freqkflag.co
+    service: kong-admin
+  - env: INFISICAL_HOST
+    host: infisical.freqkflag.co
+    service: infisical-core
+  - env: INFISICAL_PUBLIC_URL
+    host: https://infisical.freqkflag.co
+    service: infisical-ui
+  - env: GITEA_DOMAIN
+    host: git.freqkflag.co
+    service: gitea-ui
+  - env: GITEA_SSH_DOMAIN
+    host: git.freqkflag.co
+    service: gitea-ssh
+  - env: GHOST_DOMAIN
+    host: ghost.freqkflag.co
+    service: ghost
+  - env: WORDPRESS_DOMAIN
+    host: wp.freqkflag.co
+    service: wordpress
+  - env: DISCOURSE_DOMAIN
+    host: forum.freqkflag.co
+    service: discourse
+  - env: WIKIJS_DOMAIN
+    host: wiki.freqkflag.co
+    service: wikijs
+  - env: LINKSTACK_DOMAIN
+    host: links.freqkflag.co
+    service: linkstack
+  - env: LOCALAI_DOMAIN
+    host: localai.freqkflag.co
+    service: localai
+  - env: OPENWEBUI_DOMAIN
+    host: openwebui.freqkflag.co
+    service: openwebui
+  - env: NODE_RED_DOMAIN
+    host: automation.freqkflag.co
+    service: node-red
+

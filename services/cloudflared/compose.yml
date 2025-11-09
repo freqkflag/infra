@@ -10,7 +10,7 @@ services:
       - --no-autoupdate
       - run
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}
     restart: unless-stopped

@@ -4,7 +4,7 @@ services:
   discourse:
     image: bitnami/discourse:3.3.0
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       DISCOURSE_HOST: ${DISCOURSE_DOMAIN}
       DISCOURSE_USERNAME: ${DISCOURSE_ADMIN_USER}
@@ -41,6 +41,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.discourse.rule=Host(`${DISCOURSE_DOMAIN}`)"
       - "traefik.http.routers.discourse.entrypoints=websecure"
+      - "traefik.http.routers.discourse.tls.certresolver=letsencrypt"
       - "traefik.http.services.discourse.loadbalancer.server.port=3000"
       - "traefik.http.routers.discourse.middlewares=secure-headers@file"
 

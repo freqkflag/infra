@@ -9,15 +9,15 @@ fi
 TARGET="$1"
 case "$TARGET" in
   vps.host)
-    COMPOSE_FILE="docker-compose/vps.host.yml"
+    COMPOSE_FILE="nodes/vps.host/compose.yml"
     ENVIRONMENT="production"
     ;;
   home.macmini)
-    COMPOSE_FILE="docker-compose/home.macmini.yml"
+    COMPOSE_FILE="nodes/home.macmini/compose.yml"
     ENVIRONMENT="development"
     ;;
   home.linux)
-    COMPOSE_FILE="docker-compose/home.linux.yml"
+    COMPOSE_FILE="nodes/home.linux/compose.yml"
     ENVIRONMENT="homelab"
     ;;
   *)
