@@ -19,6 +19,7 @@
 - Use `python scripts/agents/run-agent.py list` to enumerate available automations.
 - Run an agent locally with `python scripts/agents/run-agent.py run <name> -- --dry-run`.
 - Production hosts can invoke agents via the same entrypoint; set `AGENT_HOST=<host>` when required.
+- **All agents MUST push a commit or create a pull request when completing tasks which result in changes to tracked files or configuration. This ensures every change made or triggered by an agent is auditable and permanently recorded.**
 
 ## 3. Agent Roster & Charters
 
@@ -32,6 +33,7 @@
   ```bash
   infisical run --env=production -- ./scripts/preflight.sh
   ```
+- After any update or verification that modifies the codebase or infra definitions, push a commit or submit a PR.
 
 ### 3.2 secrets-keeper
 
@@ -42,8 +44,8 @@
   ```bash
   infisical run --env=production -- infisical export --format yaml --path prod/
   ```
-
 - Coordinate secret rotation with `automator` and update changelog
+- On any update to secret configuration files or manifests, commit and push the changes, or open a pull request for review.
 
 ### 3.3 dev-orchestrator
 
@@ -55,8 +57,8 @@
   ./scripts/status.sh
   ./scripts/health-check.sh
   ```
-
 - If validation fails, initiate rollback via `./scripts/teardown.sh`
+- Any changes to operational or deployment scripts driven by automation must be committed or submitted via PR.
 
 ### 3.4 security-sentinel
 
@@ -66,9 +68,9 @@
   ```bash
   docker exec clamav clamscan -r /data --log=/var/log/clamav/nightly.log
   ```
-
 - Coordinate with `api-gatekeeper` to enforce rate limits and key rotation
 - Document incidents in `~/server-changelog.md`
+- Following log or security policy updates, ensure a commit is pushed or a PR is created.
 
 ### 3.5 api-gatekeeper
 
@@ -78,9 +80,9 @@
   ```bash
   infisical run --env=production -- docker exec kong kong reload
   ```
-
 - Rotate API keys through Infisical and ensure CF Access guards admin interface
 - Validate routing alignment with Traefik and ClamAV hooks
+- On changes to Kong configuration or routing policies, commit and push or create a PR with the updates.
 
 ### 3.6 automator
 
@@ -91,8 +93,8 @@
   ```bash
   infisical run --env=production -- n8n execute --workflow daily-maintenance
   ```
-
 - Publish run outcomes to `~/server-changelog.md` and alert channels
+- Ensure any automated modification of playbooks, scripts, or workflow definitions results in a commit or PR.
 
 ## 4. Inter-Agent Communication
 
@@ -109,6 +111,7 @@
 4. `security-sentinel` confirms firewall/WAF/ClamAV status.
 5. `api-gatekeeper` reloads Kong and checks API policies.
 6. `automator` schedules health checks and backups, updates changelog.
+7. **Each agent records state modifications via commit or PR for traceability.**
 
 ## 6. Recovery & Redeployment
 
@@ -128,6 +131,7 @@
   ```bash
   infisical run --env=production -- n8n execute --workflow post-recovery-audit
   ```
+- **All recovery work that updates infra/state/configuration files must be pushed as a commit or opened as a PR.**
 
 ## 9. Automation Agents
 
@@ -136,12 +140,14 @@
 - `status-agent` — runs `scripts/status.sh` and optionally `scripts/health-check.sh`.
 - `logger-agent` — consolidates infra change logs into `CHANGE.log`.
 - Host wrappers live under `scripts/agents/*.sh` for cron/systemd orchestration.
+- **All agents are responsible for pushing their own codebase or config changes as commits or opening pull requests, ensuring a complete audit trail for all automated operations.**
 
 ## 7. Documentation & Audit Duties
 
 - Update `infra-build-plan.md` and `README.md` whenever services or workflows change.
 - Append operational notes to `~/server-changelog.md` after every deployment or incident.
 - Quarterly, `infra-architect` and `security-sentinel` co-sign compliance review stored in `docs/compliance/`.
+- **All documentation updates initiated by agents must be committed and synchronized upstream.**
 
 ## 8. Incident Escalation
 
@@ -153,4 +159,4 @@
   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml restart traefik
   ```
 
-These directives keep Cursor agents aligned with the infrastructure build plan while preserving security, reproducibility, and observability.
+These directives keep Cursor agents aligned with the infrastructure build plan while preserving security, reproducibility, and observability. **Committing or opening a PR for every agent-initiated change is mandatory for continuous auditability.**

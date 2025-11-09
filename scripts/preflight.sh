@@ -4,9 +4,19 @@ set -euo pipefail
 echo "=== Preflight Check Starting ==="
 
 # Verify env file exists
-ENV_FILE="/Users/freqkflag/Projects/.workspace/.env"
-if [[ ! -f "$ENV_FILE" ]]; then
-  echo "❌ Missing environment file at $ENV_FILE"
+ENV_FILE="${WORKSPACE_ENV_FILE:-}"
+
+if [[ -z "${ENV_FILE}" ]]; then
+  for candidate in "/Users/freqkflag/Projects/.workspace/.env" "$HOME/.workspace/.env"; do
+    if [[ -f "${candidate}" ]]; then
+      ENV_FILE="${candidate}"
+      break
+    fi
+  done
+fi
+
+if [[ -z "${ENV_FILE}" || ! -f "${ENV_FILE}" ]]; then
+  echo "❌ Missing environment file. Set WORKSPACE_ENV_FILE or create one at /Users/freqkflag/Projects/.workspace/.env or $HOME/.workspace/.env"
   exit 1
 fi
 
