@@ -2,14 +2,27 @@
 set -euo pipefail
 
 TARGET=${1:-vps.host}
-echo "=== Deploying to $TARGET ==="
 
-# Load environment and verify
-source ~/.workspace/.env
-./scripts/preflight.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPOSE_FILE="${REPO_ROOT}/nodes/${TARGET}/compose.yml"
 
-# Run docker stack
-docker compose -f docker-compose/$TARGET.yml pull
-docker compose -f docker-compose/$TARGET.yml up -d
+if [[ ! -f "${COMPOSE_FILE}" ]]; then
+  echo "Unknown target or missing compose file: ${TARGET}" >&2
+  exit 1
+fi
 
-./scripts/status.sh
+echo "=== Deploying to ${TARGET} ==="
+
+ENV_FILE_CANDIDATE="${WORKSPACE_ENV_FILE:-${REPO_ROOT}/.workspace/.env}"
+if [[ ! -f "${ENV_FILE_CANDIDATE}" && -f "${HOME}/.workspace/.env" ]]; then
+  ENV_FILE_CANDIDATE="${HOME}/.workspace/.env"
+fi
+export WORKSPACE_ENV_FILE="${ENV_FILE_CANDIDATE}"
+
+"${REPO_ROOT}/scripts/preflight.sh"
+
+docker compose -f "${COMPOSE_FILE}" pull
+docker compose -f "${COMPOSE_FILE}" up -d
+
+"${REPO_ROOT}/scripts/status.sh"

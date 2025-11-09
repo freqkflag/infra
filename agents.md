@@ -28,7 +28,7 @@
 - Updates `PROJECT_PLAN.md` prerequisites/dependencies when drift is detected.
 
 ### 3.2 Compose Engineer
-- Owns all per-service Compose fragments under `services/` and the orchestrator bundle (`compose.orchestrator.yml` + `docker-compose/*.yml`).
+- Owns all per-service Compose fragments under `services/`, the orchestrator bundle (`compose.orchestrator.yml`), and node deployments (`nodes/*/compose.yml`).
 - Validates Traefik labels, healthchecks, restart policies, and `edge` attachment.
 - Runs `infisical run --env=<env> -- docker compose config` to lint manifests before handoff.
 
@@ -120,7 +120,7 @@
 - Attach remediation commands executed, e.g.:
 
   ```bash
-  infisical run --env=production -- docker compose -f docker-compose/vps.host.yml restart traefik
+  infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml restart traefik
   ```
 
 These directives keep the supervised agent swarm aligned with the orchestrator’s build plan while ensuring every action is reviewable, auditable, and quickly recoverable.

@@ -55,7 +55,7 @@ infra/
 │   ├── redis/compose.yml
 │   ├── clamav/compose.yml
 │   └── apps/* (ghost, wordpress, discourse, wikijs, gitea, linkstack, localai, openwebui, node-red)
-├── docker-compose/
+├── nodes/
 │   ├── vps.host.yml
 │   ├── home.macmini.yml
 │   └── home.linux.yml
@@ -138,37 +138,37 @@ Every Compose definition must include:
 1. Deploy Infisical:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml up -d infisical
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d infisical
    ```
 
 2. Deploy Traefik:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml up -d traefik
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d traefik
    ```
 
 3. Deploy Cloudflared tunnel:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml up -d cloudflared
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d cloudflared
    ```
 
 4. Deploy Kong and databases:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml up -d kong postgres mariadb redis
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d kong postgres mariadb redis
    ```
 
 5. Deploy ClamAV:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml up -d clamav
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d clamav
    ```
 
 6. Deploy application tier:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml up -d ghost wordpress discourse wikijs gitea linkstack localai openwebui node-red
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d ghost wordpress discourse wikijs gitea linkstack localai openwebui node-red
    ```
 
 ### 7.3 Mac mini Sequence
@@ -177,7 +177,7 @@ Every Compose definition must include:
 2. Deploy dev services:
 
    ```bash
-   infisical run --env=development -- docker compose -f docker-compose/home.macmini.yml up -d frontend dev-tools
+   infisical run --env=development -- docker compose -f nodes/home.macmini/compose.yml up -d frontend dev-tools
    ```
 
 3. Register with centralized databases via environment variables (DB host `vps.host`).
@@ -187,13 +187,13 @@ Every Compose definition must include:
 1. Start Cloudflared tunnel:
 
    ```bash
-   infisical run --env=homelab -- docker compose -f docker-compose/home.linux.yml up -d cloudflared
+   infisical run --env=homelab -- docker compose -f nodes/home.linux/compose.yml up -d cloudflared
    ```
 
 2. Deploy core services:
 
    ```bash
-   infisical run --env=homelab -- docker compose -f docker-compose/home.linux.yml up -d vaultwarden bookstack auxiliary
+   infisical run --env=homelab -- docker compose -f nodes/home.linux/compose.yml up -d vaultwarden bookstack auxiliary
    ```
 
 ## 8. Secret Management (Infisical)
@@ -301,13 +301,13 @@ Every Compose definition must include:
 1. Stop application tier:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml down ghost wordpress discourse wikijs gitea linkstack localai openwebui node-red
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml down ghost wordpress discourse wikijs gitea linkstack localai openwebui node-red
    ```
 
 2. Stop security/gateway services:
 
    ```bash
-   infisical run --env=production -- docker compose -f docker-compose/vps.host.yml down clamav kong cloudflared traefik infisical
+   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml down clamav kong cloudflared traefik infisical
    ```
 
 3. Remove network (only if no hosts rely on it):
@@ -335,7 +335,7 @@ Every Compose definition must include:
 
 ## 15. Next Actions for Cursor Agents
 
-1. Build host-specific Compose files under `docker-compose/`.
+1. Build host-specific Compose files under `nodes/<node>/`.
 2. Create per-service Compose manifests with health checks and restart policies.
 3. Implement `scripts/health-check.sh` and `scripts/teardown.sh`.
 4. Update `AGENTS.md` and `README.md` per this plan.

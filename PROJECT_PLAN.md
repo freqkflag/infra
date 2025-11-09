@@ -20,15 +20,22 @@
 
 > All commands should run via `infisical run --env=<environment>` whenever secrets are required.
 
-## 3. Environment Matrix
+## 3. Node Inventory
 
-| Host | Domain(s) | Profile | Cloudflared Token |
-| ---- | --------- | ------- | ----------------- |
-| `vps.host` | `freqkflag.co`, `cultofjoey.com`, shared ingress | `production` | `${CF_TUNNEL_TOKEN_VPS}` |
-| `home.macmini` | `twist3dkink.online`, dev subdomains | `development` | `${CF_TUNNEL_TOKEN_MAC}` |
-| `home.linux` | `cult-of-joey.com`, `notes.cult-of-joey.com` | `homelab` | `${CF_TUNNEL_TOKEN_LINUX}` |
+| Host | Profile | Node Directory | Compose Bundle | Deploy Script | Domains Config | Networks Config | Cloudflared Token |
+| ---- | ------- | -------------- | -------------- | ------------- | -------------- | --------------- | ----------------- |
+| `vps.host` | production | `nodes/vps.host/` | `nodes/vps.host/compose.yml` | `nodes/vps.host/deploy.sh` | `nodes/vps.host/domains.yml` | `nodes/vps.host/networks.yml` | `${CF_TUNNEL_TOKEN_VPS}` |
+| `home.macmini` | development | `nodes/home.macmini/` | `nodes/home.macmini/compose.yml` | `nodes/home.macmini/deploy.sh` | `nodes/home.macmini/domains.yml` | `nodes/home.macmini/networks.yml` | `${CF_TUNNEL_TOKEN_MAC}` |
+| `home.linux` | homelab | `nodes/home.linux/` | `nodes/home.linux/compose.yml` | `nodes/home.linux/deploy.sh` | `nodes/home.linux/domains.yml` | `nodes/home.linux/networks.yml` | `${CF_TUNNEL_TOKEN_LINUX}` |
 
-All services attach to the external `edge` network and load environment variables from the shared `.env` templates (see §6).
+Domain coverage:
+- `nodes/vps.host/domains.yml` — freqkflag.co services (Traefik, Kong, Infisical, application suite).
+- `nodes/home.macmini/domains.yml` — twist3dkink.online developer endpoints (frontend, dev-tools).
+- `nodes/home.linux/domains.yml` — cult-of-joey.com homelab endpoints (Vaultwarden, BookStack, Auxiliary).
+
+Networks & tunnels:
+- Each node attaches to the shared external `edge` network as described in its `networks.yml`.
+- Cloudflared tunnel metadata (token variables and purpose) resides alongside each node; execute node scripts with `infisical run --env=<profile>` to populate secrets.
 
 ## 4. Service Inventory & Dependencies
 
@@ -52,12 +59,13 @@ All services attach to the external `edge` network and load environment variable
 2. **Compose Phase**
    - Generate/update per-service `services/<name>/compose.yml`.
    - Update orchestrator bundle `compose.orchestrator.yml` with host profiles.
+   - Keep node bundles current under `nodes/<host>/compose.yml`.
 3. **Secrets Phase**
    - Ensure `.env` templates + Infisical entries cover every `${VAR}`.
    - Run `infisical run --env=production -- infisical export --format yaml --path prod/` for audit.
 4. **Deployment Phase**
-   - For each host: `infisical run --env=<env> -- ./scripts/deploy.ah <target>`.
-   - Validate with `./scripts/status.sh` and `./scripts/health-check.sh`.
+   - For each host: `infisical run --env=<env> -- ./nodes/<host>/deploy.sh` (wrapper around `scripts/deploy.ah`).
+   - Validate globally with `./scripts/status.sh` and per-node with `./nodes/<host>/health-check.sh`.
 5. **Verification Phase**
    - `docker logs --tail 50 cloudflared`
    - `docker exec traefik traefik healthcheck`
@@ -73,6 +81,7 @@ All services attach to the external `edge` network and load environment variable
 - `env/templates/mac.env.example` — development overrides (frontend tooling).
 - `env/templates/linux.env.example` — homelab overrides (Vaultwarden, BookStack).
 - `.env.example` at repo root lists the minimum keys new operators must populate before running bootstrap scripts.
+- Node-specific domain and network manifests are maintained under `nodes/<host>/domains.yml` and `nodes/<host>/networks.yml`.
 
 ## 7. Branch & Review Policy
 
@@ -83,7 +92,7 @@ All services attach to the external `edge` network and load environment variable
 ## 8. Incident & Recovery Checklist
 
 1. Document issue in `server-changelog.md` with severity level.
-2. Run `./scripts/status.sh` + `./scripts/health-check.sh`.
+2. Run `./scripts/status.sh` + `./nodes/<host>/health-check.sh`.
 3. If rollback needed, execute `./scripts/teardown.sh` with affected services.
 4. After remediation, trigger `infisical run --env=production -- n8n execute --workflow post-recovery-audit`.
 5. Commit any config or doc updates; ensure CF tunnels + DNS are synced.

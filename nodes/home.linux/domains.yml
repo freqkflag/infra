@@ -1,0 +1,13 @@
+zone: cult-of-joey.com
+cloudflare_zone_variable: CF_ZONE_CULT_OF_JOEY_COM
+domains:
+  - env: VAULTWARDEN_DOMAIN
+    host: vault.cult-of-joey.com
+    service: vaultwarden
+  - env: BOOKSTACK_DOMAIN
+    host: notes.cult-of-joey.com
+    service: bookstack
+  - env: AUXILIARY_DOMAIN
+    host: aux.cult-of-joey.com
+    service: auxiliary
+

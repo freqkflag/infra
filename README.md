@@ -75,7 +75,7 @@ Self-hosted multi-node infrastructure managed with FOSS tooling and Cloudflare Z
 - Teardown selected services (example: Ghost + WordPress):
 
   ```bash
-  infisical run --env=production -- docker compose -f docker-compose/vps.host.yml down ghost wordpress
+  infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml down ghost wordpress
   ```
 
 ## Architecture Reference
@@ -96,7 +96,7 @@ Self-hosted multi-node infrastructure managed with FOSS tooling and Cloudflare Z
 ├─ compose.orchestrator.yml    — master Compose bundle (profiles per host)
 ├─ env/templates/              — shared + host-specific env examples
 ├─ services/                   — per-service Compose definitions
-├─ docker-compose/             — host-specific Compose bundles
+├─ nodes/                      — per-node deployment configs, domains, scripts
 └─ scripts/                    — automation (preflight, deploy, backup, status, sync, etc.)
 ```
 
