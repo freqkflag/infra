@@ -13,8 +13,10 @@ import os
 import shutil
 import subprocess
 import sys
+import json
+import time
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, MutableMapping, Sequence
+from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Sequence
 
 BASE_MODULE_PATH = Path(__file__).resolve().parent / "base.py"
 BASE_MODULE_ID = "cursor_agent_base"
@@ -41,6 +43,12 @@ DEFAULT_RESOLVERS = [
             "*.py",
             "scripts/**/*.py",
             ".cursor/**/*.py",
+        ],
+        "diagnostics": [
+            [
+                ["uv", "run", "ruff", "check", "--exit-zero", "--format", "json"],
+                ["ruff", "check", "--exit-zero", "--format", "json"],
+            ],
         ],
         "commands": [
             [
@@ -97,6 +105,22 @@ class LintResolverAgent(BaseAgent):
             action="store_true",
             help="Print commands without executing them.",
         )
+        parser.add_argument(
+            "--watch",
+            action="store_true",
+            help="Continuously monitor lint diagnostics and resolve issues.",
+        )
+        parser.add_argument(
+            "--interval",
+            type=float,
+            default=5.0,
+            help="Polling interval (seconds) while running with --watch.",
+        )
+        parser.add_argument(
+            "--max-iterations",
+            type=int,
+            help="Optional iteration cap for --watch (omit for infinite).",
+        )
         return parser
 
     # ----------------------------------------------------------------- runtime
@@ -105,8 +129,16 @@ class LintResolverAgent(BaseAgent):
             self._print_resolvers()
             return 0
 
+        if args.watch:
+            self._run_watch_loop(
+                interval=max(args.interval, 0.1),
+                max_iterations=args.max_iterations,
+                dry_run=args.dry_run,
+            )
+            return 0
+
         if not args.file:
-            parser.error("--file is required unless --list-resolvers is used")
+            parser.error("--file is required unless --list-resolvers is used or --watch is enabled")
 
         target_path = self._resolve_target_path(args.file)
         if not target_path.exists():
@@ -341,6 +373,158 @@ class LintResolverAgent(BaseAgent):
         self.changelog_path.parent.mkdir(parents=True, exist_ok=True)
         with self.changelog_path.open("a", encoding="utf-8") as handle:
             handle.write(entry + "\n")
+
+    # ----------------------------------------------------------------- watch mode
+    def _run_watch_loop(
+        self,
+        *,
+        interval: float,
+        max_iterations: int | None,
+        dry_run: bool,
+    ) -> None:
+        iteration = 0
+        try:
+            while True:
+                updates = self._process_all_resolvers(dry_run=dry_run)
+                iteration += 1
+
+                if max_iterations is not None and iteration >= max_iterations:
+                    break
+
+                if not updates:
+                    time.sleep(interval)
+        except KeyboardInterrupt:
+            pass
+
+    def _process_all_resolvers(self, *, dry_run: bool) -> bool:
+        any_updates = False
+        for resolver in self.resolvers:
+            issues = self._collect_issues_for_resolver(resolver, dry_run=dry_run)
+            if not issues:
+                continue
+
+            processed_files: set[str] = set()
+            for issue in issues:
+                relative = issue["relative"]
+                if relative in processed_files:
+                    continue
+
+                selected = self._select_resolver(relative, issue.get("rule"))
+                if selected is None:
+                    continue
+
+                context = {
+                    "file": relative,
+                    "abs_file": issue["abs_path"],
+                    "rule": issue.get("rule", ""),
+                    "message": issue.get("message", ""),
+                    "repo_root": str(self.repo_root),
+                    "infra_root": str(self.infra_root),
+                }
+
+                try:
+                    self._run_resolver(selected, context, dry_run=dry_run)
+                except RuntimeError as exc:
+                    self._log_event(
+                        relative,
+                        selected.get("id", "<unknown>"),
+                        status=f"failure: {exc}",
+                        rule=issue.get("rule"),
+                    )
+                else:
+                    processed_files.add(relative)
+                    any_updates = True
+        return any_updates
+
+    def _collect_issues_for_resolver(
+        self,
+        resolver: Dict[str, Any],
+        *,
+        dry_run: bool,
+    ) -> List[Dict[str, Any]]:
+        diagnostics = resolver.get("diagnostics")
+        if not diagnostics:
+            return []
+
+        command = self._pick_command(diagnostics, {"repo_root": str(self.repo_root)})
+        if command is None:
+            return []
+
+        environment = self._build_environment(resolver.get("env"), {})
+        try:
+            output = self._run_command(
+                command,
+                environment,
+                capture_output=True,
+                dry_run=False,
+            )
+        except RuntimeError:
+            return []
+
+        if output is None:
+            return []
+
+        try:
+            payload = json.loads(output)
+        except json.JSONDecodeError:
+            return []
+
+        issues: List[Dict[str, Any]] = []
+        for item in payload or []:
+            filename = item.get("filename")
+            if not filename:
+                continue
+
+            abs_path = (self.repo_root / filename).resolve()
+            if not abs_path.exists():
+                continue
+
+            try:
+                relative = abs_path.relative_to(self.repo_root).as_posix()
+            except ValueError:
+                continue
+
+            issues.append(
+                {
+                    "relative": relative,
+                    "abs_path": str(abs_path),
+                    "rule": item.get("code"),
+                    "message": item.get("message"),
+                }
+            )
+
+        if not issues and dry_run:
+            print("No lint issues detected.")
+
+        return issues
+
+    def _run_command(
+        self,
+        command: Sequence[str],
+        environment: Mapping[str, str],
+        *,
+        capture_output: bool,
+        dry_run: bool,
+    ) -> str | None:
+        if dry_run:
+            print("DRY RUN:", " ".join(command))
+            return None
+
+        result = subprocess.run(
+            command,
+            cwd=self.repo_root,
+            env=environment,
+            check=False,
+            capture_output=capture_output,
+            text=capture_output,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"command '{' '.join(command)}' failed with code {result.returncode}"
+            )
+        if capture_output:
+            return result.stdout or ""
+        return None
 
 
 def main(argv: Sequence[str] | None = None) -> int:

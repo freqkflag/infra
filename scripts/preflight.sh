@@ -41,8 +41,41 @@ if ! docker compose version >/dev/null 2>&1; then
   fail "Docker Compose V2 (docker compose) is unavailable. Upgrade Docker or install the compose plugin."
 fi
 
-if ! docker info >/dev/null 2>&1; then
-  fail "Docker daemon is not reachable. Start Docker and rerun preflight."
+PYTHON_BIN=""
+if command -v python3 >/dev/null 2>&1; then
+  PYTHON_BIN="python3"
+elif command -v python >/dev/null 2>&1; then
+  PYTHON_BIN="python"
+else
+  fail "Python is required to perform docker health checks. Install python3."
+fi
+
+if ! "$PYTHON_BIN" - <<'PY'
+import subprocess
+import sys
+
+try:
+    subprocess.run(
+        ["docker", "info"],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        timeout=5,
+    )
+except subprocess.TimeoutExpired:
+    sys.exit(124)
+except subprocess.CalledProcessError:
+    sys.exit(1)
+except Exception:
+    sys.exit(2)
+PY
+then
+  status=$?
+  if [[ $status -eq 124 ]]; then
+    fail "Docker daemon did not respond within 5 seconds. Start Docker and rerun preflight."
+  else
+    fail "Docker daemon is not reachable. Start Docker and rerun preflight."
+  fi
 fi
 
 # Ensure edge network exists

@@ -26,6 +26,12 @@
             "scripts/**/*.py",
             ".cursor/**/*.py"
           ],
+          "diagnostics": [
+            [
+              ["uv", "run", "ruff", "check", "--exit-zero", "--format", "json"],
+              ["ruff", "check", "--exit-zero", "--format", "json"]
+            ]
+          ],
           "commands": [
             [
               ["uv", "run", "ruff", "check", "--fix", "{file}"],

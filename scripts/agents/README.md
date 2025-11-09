@@ -30,6 +30,8 @@ python scripts/agents/run-agent.py describe logger-agent
 
 ```bash
 python scripts/agents/run-agent.py run logger-agent -- --dry-run
+python scripts/agents/run-agent.py run lint-resolver-agent -- --file .cursor/agents/lint_resolver_agent.py
+python scripts/agents/run-agent.py run lint-resolver-agent -- --watch
 ```
 
 All arguments placed after `--` are passed directly to the agent.
@@ -65,6 +67,3 @@ Host automation (cron/systemd/n8n) can call:
 ```
 
 Set `AGENT_HOST=<host-label>` in the environment when running outside Cursor.
-
-
-

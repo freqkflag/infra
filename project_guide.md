@@ -1,25 +1,40 @@
 # **Cursor Deployment Framework**
 
-### Unified FOSS Infrastructure — Joey (v2025‑11‑08)
+## Unified FOSS Infrastructure — Joey (v2025‑11‑08)
 
-> A comprehensive guide for deploying, securing, and maintaining a distributed self‑hosted ecosystem. This document formalizes the architecture, automation, and governance model across all nodes using open‑source tooling — Docker, Traefik, Cloudflare Tunnels, Infisical, Kong OSS, and ClamAV.
+> A comprehensive guide for deploying, securing, and maintaining a distributed
+> self‑hosted ecosystem. This document formalizes the architecture, automation,
+> and governance model across all nodes using open‑source tooling — Docker,
+> Traefik, Cloudflare Tunnels, Infisical, Kong OSS, and ClamAV.
 
 ---
 
 ## I. Role and Function
 
-The orchestration framework provides a standardized methodology for deploying and managing multi‑node environments. It unifies configuration, automates workflows, and enforces reproducibility and compliance across both **VPS (Hostinger)** and **Homelab** nodes (Mac mini and Linux).
+The orchestration framework provides a standardized methodology for deploying
+and managing multi‑node environments. It unifies configuration, automates
+workflows, and enforces reproducibility and compliance across both
+**VPS (Hostinger)** and **Homelab** nodes (Mac mini and Linux).
 
-The **Deployment Orchestrator** functions as the central automation controller. It analyzes workspace structure, generates Docker Compose manifests, manages secret injection, and enforces security boundaries through Cloudflare Tunnels and Traefik. All changes are validated and logged to maintain deterministic, auditable builds.
+The **Deployment Orchestrator** functions as the central automation controller.
+It analyzes workspace structure, generates Docker Compose manifests, manages
+secret injection, and enforces security boundaries through Cloudflare Tunnels
+and Traefik. All changes are validated and logged to maintain deterministic,
+auditable builds.
 
 ---
 
 ## II. Primary Objectives
 
-1. **System Discovery and Normalization** — Catalog all hosts, networks, and repositories. Apply consistent directory and configuration standards.
-2. **Ingress and Orchestration Architecture** — Deploy **Cloudflare Tunnels** and **Traefik** for authenticated ingress, DNS‑01 TLS issuance, and zero‑trust segmentation.
-3. **Application Lifecycle and Resilience** — Deploy, monitor, and maintain services with persistent volumes, health probes, and rollback policies.
-4. **Governance and Documentation** — Integrate observability, backups, and change management under a unified documentation and audit framework.
+1. **System Discovery and Normalization** — Catalog all hosts, networks, and
+   repositories. Apply consistent directory and configuration standards.
+2. **Ingress and Orchestration Architecture** — Deploy **Cloudflare Tunnels**
+   and **Traefik** for authenticated ingress, DNS‑01 TLS issuance, and
+   zero‑trust segmentation.
+3. **Application Lifecycle and Resilience** — Deploy, monitor, and maintain
+   services with persistent volumes, health probes, and rollback policies.
+4. **Governance and Documentation** — Integrate observability, backups, and
+   change management under a unified documentation and audit framework.
 
 ---
 
@@ -74,7 +89,10 @@ Each validates Docker, plugin availability, and the `edge` network before orches
 
 ### Network Security and Defense
 
-Each node enforces firewall rules, ingress filtering, and DDoS mitigation through Cloudflare’s Zero‑Trust gateway. Only ports 80/443 and 22 are accessible. Cloudflare’s WAF and rate‑limiting reinforce protection against volumetric and application‑layer threats.
+Each node enforces firewall rules, ingress filtering, and DDoS mitigation
+through Cloudflare’s Zero‑Trust gateway. Only ports 80/443 and 22 are
+accessible. Cloudflare’s WAF and rate‑limiting reinforce protection against
+volumetric and application‑layer threats.
 
 ### Unified Domain and Service Map
 
@@ -84,13 +102,16 @@ Each node enforces firewall rules, ingress filtering, and DDoS mitigation throug
 | **Mac mini (home.macmini)** | `twist3dkink.online`, `dev.twist3dkink.online`                                                                                                                                                                              | Front‑end & experimental tools                                                                                                                                                      | `${CF_TUNNEL_TOKEN_MAC}`   |
 | **Homelab (home.linux)**    | `cult‑of‑joey.com`, `notes.cult‑of‑joey.com`                                                                                                                                                                                | Vaultwarden, BookStack, auxiliary services                                                                                                                                          | `${CF_TUNNEL_TOKEN_LINUX}` |
 
-> **TLS & Routing:** Traefik provisions certificates via ACME with Cloudflare DNS‑01 validation. Cloudflared handles secure ingress. Port 443 remains reserved for admin testing.
+> **TLS & Routing:** Traefik provisions certificates via ACME with Cloudflare
+> DNS‑01 validation. Cloudflared handles secure ingress. Port 443 remains
+> reserved for admin testing.
 
 ---
 
 ## VIII. Infisical Deployment
 
-Infisical functions as the authoritative secrets management layer. It adheres to ISO/IEC 27001 and SOC 2 Type II controls for encryption, access, and audit.
+Infisical functions as the authoritative secrets management layer. It adheres
+to ISO/IEC 27001 and SOC 2 Type II controls for encryption, access, and audit.
 
 ### Component Topology
 
@@ -102,7 +123,8 @@ Infisical functions as the authoritative secrets management layer. It adheres to
 | Dashboard     | Admin web UI          | 80   | Infisical‑API     |
 
 **Ingress:** Traefik routes traffic for `infisical.freqkflag.co`.
-**Bootstrap:** Credentials established once; subsequent access via CLI injection.
+**Bootstrap:** Credentials established once; subsequent access occurs via CLI
+injection.
 
 **Security Directives:**
 
@@ -129,15 +151,18 @@ All nodes log to `~/.logs/` and optionally forward to a Loki or syslog endpoint.
 
 ### Backup Management
 
-Data resides in `~/.backup/` under `daily`, `weekly`, `monthly`, and `manual` folders. Cron/systemd enforce encryption, rotation, and checksum validation.
+Data resides in `~/.backup/` under `daily`, `weekly`, `monthly`, and `manual`
+folders. Cron/systemd enforce encryption, rotation, and checksum validation.
 
 ### Automation and Synchronization
 
-**n8n** or **Node‑RED** (`automation.freqkflag.co`) handles backup scheduling, changelog updates, and notifications. Workflows preserve parity across nodes.
+**n8n** or **Node‑RED** (`automation.freqkflag.co`) handles backup scheduling,
+changelog updates, and notifications. Workflows preserve parity across nodes.
 
 ### Change Tracking
 
-Each host keeps `server‑changelog.md` documenting deployments and config changes. Infisical‑authenticated webhooks can centralize these records.
+Each host keeps `server‑changelog.md` documenting deployments and config
+changes. Infisical‑authenticated webhooks can centralize these records.
 
 ---
 
@@ -159,11 +184,14 @@ Ensures environment integrity and prevents undefined‑variable faults.
 
 ## XII. API Gateway — Kong OSS
 
-**Purpose:** Provide a unified, secure API entry point for agents and services. Handles authentication, rate‑limiting, routing, and observability.
+**Purpose:** Provide a unified, secure API entry point for agents and services.
+Handles authentication, rate‑limiting, routing, and observability.
 
-**Domains:** `api.freqkflag.co` (proxy) and `api-admin.freqkflag.co` (admin interface behind CF Access).
+**Domains:** `api.freqkflag.co` (proxy) and `api-admin.freqkflag.co` (admin
+interface behind CF Access).
 
-**Baseline Policy:** Enable `key‑auth`, `rate‑limiting`, and `cors` globally. Restrict admin access via IP and CF Access.
+**Baseline Policy:** Enable `key‑auth`, `rate‑limiting`, and `cors` globally.
+Restrict admin access via IP and CF Access.
 
 **Declarative Example (kong.yml):**
 
@@ -187,13 +215,15 @@ _plugins:
       minute: 120
 ```
 
-Automation tools may rotate keys via Infisical, sync configurations to `~/infra`, and log updates to `server‑changelog.md`.
+Automation tools may rotate keys via Infisical, sync configurations to
+`~/infra`, and log updates to `server‑changelog.md`.
 
 ---
 
 ## XIII. Malware Scanning — ClamAV (FOSS)
 
-**Purpose:** Centralized malware protection for uploads and shared volumes across WordPress, Discourse, Ghost, and Wiki.js.
+**Purpose:** Centralized malware protection for uploads and shared volumes
+across WordPress, Discourse, Ghost, and Wiki.js.
 
 **Domains:**
 
@@ -202,12 +232,15 @@ Automation tools may rotate keys via Infisical, sync configurations to `~/infra`
 
 **Integration:**
 
-* **Sidecar Scans:** Triggered via n8n/Node‑RED on file write; quarantines to `~/.backup/quarantine/`.
+* **Sidecar Scans:** Triggered via n8n/Node‑RED on file write; quarantines to
+  `~/.backup/quarantine/`.
 * **Inline Checks:** REST API call before upload acceptance (key‑auth via Kong).
-* **Nightly Sweeps:** Full‑volume scans; results logged to `~/.logs/clamav/` and changelog.
+* **Nightly Sweeps:** Full-volume scans; results logged to `~/.logs/clamav/`
+  and the changelog.
 
 **Security:**
-Expose only via Traefik within CF Access. Enable automatic signature updates (`freshclam`).
+Expose only via Traefik within CF Access.
+Enable automatic signature updates (`freshclam`).
 Redact sensitive paths in shared reports.
 
 ---
