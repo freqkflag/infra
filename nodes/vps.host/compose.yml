@@ -1,3 +1,4 @@
+# nodes/vps.host/compose.yml  (fixed)
 x-service-defaults: &service_defaults
   networks:
     - edge
@@ -35,6 +36,7 @@ services:
       service: cloudflared
     environment:
       CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_VPS}
+    networks: [edge]
 
   postgres:
     <<: *service_defaults
@@ -43,92 +45,126 @@ services:
       service: postgres
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+    networks: [edge]
 
   mariadb:
     <<: *service_defaults
     extends:
       file: ../../services/mariadb/compose.yml
       service: mariadb
+    networks: [edge]
 
   redis:
     <<: *service_defaults
     extends:
       file: ../../services/redis/compose.yml
       service: redis
+    networks: [edge]
 
   infisical:
     <<: *service_defaults
     extends:
       file: ../../services/infisical/compose.yml
       service: infisical
+    networks: [edge]
 
   kong:
     <<: *service_defaults
     extends:
       file: ../../services/kong/compose.yml
       service: kong
+    networks: [edge]
 
   clamav:
     <<: *service_defaults
     extends:
       file: ../../services/clamav/compose.yml
       service: clamav
+    networks: [edge]
 
   gitea:
     <<: *service_defaults
     extends:
       file: ../../services/gitea/compose.yml
       service: gitea
+    networks: [edge]
 
   ghost:
     <<: *service_defaults
     extends:
       file: ../../services/ghost/compose.yml
       service: ghost
+    networks: [edge]
 
   wordpress:
     <<: *service_defaults
     extends:
       file: ../../services/wordpress/compose.yml
       service: wordpress
+    networks: [edge]
 
   discourse:
     <<: *service_defaults
     extends:
       file: ../../services/discourse/compose.yml
       service: discourse
+    networks: [edge]
 
   wikijs:
     <<: *service_defaults
     extends:
       file: ../../services/wikijs/compose.yml
       service: wikijs
+    networks: [edge]
 
   linkstack:
     <<: *service_defaults
     extends:
       file: ../../services/linkstack/compose.yml
       service: linkstack
+    networks: [edge]
 
   localai:
     <<: *service_defaults
     extends:
       file: ../../services/localai/compose.yml
       service: localai
+    networks: [edge]
 
   openwebui:
     <<: *service_defaults
     extends:
       file: ../../services/openwebui/compose.yml
       service: openwebui
+    networks: [edge]
 
   node-red:
     <<: *service_defaults
     extends:
       file: ../../services/node-red/compose.yml
       service: node-red
+    volumes:
+      - node_red_data:/data
+    networks: [edge]
+
+volumes:
+  node_red_data: {}
+  postgres_data: {}
+  mariadb_data: {}
+  redis_data: {}
+  traefik_letsencrypt: {}
+  cloudflared_etc: {}
+  gitea_data: {}
+  ghost_content: {}
+  wordpress_html: {}
+  discourse_data: {}
+  linkstack_data: {}
+  localai_models: {}
+  openwebui_data: {}
+  clamav_data: {}
+  clamav_logs: {}
+  kong_tmp: {}
 
 networks:
   edge:
     external: true
-

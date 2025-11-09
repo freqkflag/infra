@@ -1,0 +1,68 @@
+services:
+  infisical:
+    image: infisical/infisical:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env.infisical-bootstrap
+    environment:
+      ENCRYPTION_KEY: de92d934dd1af1da872546190c125c8f
+      AUTH_SECRET: yuEnU6TkLM8OXpojkQXWIHd0H3t6lGULAEyEKW+I53E=
+      DB_CONNECTION_URI: postgres://infisical:87605e6ef503440f630daecb52106fd3188dbfb48e7035cec507ee25f700c588@db:5432/infisical
+      REDIS_URL: redis://redis:6379
+      SITE_URL: https://vps.freqkflag.co:8083
+      NODE_ENV: production
+      PORT: 8080
+      PORT_SECURE: 443
+      HTTPS_ENABLED: 'true'
+      INFISICAL_FEATURE_WORKFLOWS: true
+    networks:
+      - edge
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      infisical:
+        condition: service_started
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - edge
+  db:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: infisical
+      POSTGRES_PASSWORD: 87605e6ef503440f630daecb52106fd3188dbfb48e7035cec507ee25f700c588
+      POSTGRES_DB: infisical
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - edge
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U infisical']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--save', '', '--appendonly', 'no']
+    volumes:
+      - redis_data:/data
+    networks:
+      - edge
+volumes:
+  pg_data:
+  redis_data:
+networks:
+  edge:
+    external: true
