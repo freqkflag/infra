@@ -20,7 +20,7 @@
 2. Confirm environment file and Infisical credentials:
 
    ```bash
-   test -f /Users/freqkflag/Projects/.workspace/.env
+   test -f .workspace/.env
    infisical status --workspace prod
    ```
 
@@ -99,7 +99,7 @@ Every Compose definition must include:
 - `networks: [edge]`
 - `restart: unless-stopped`
 - `healthcheck` with meaningful command and intervals
-- `env_file: /Users/freqkflag/Projects/.workspace/.env` (or relative path)
+- `env_file: .workspace/.env` (or relative path)
 - Secrets via `Infisical` injection: deploy with `infisical run --env=production -- docker compose ...`
 - Traefik labels using existing naming conventions (e.g., `traefik.http.routers.<service>.rule`)
 

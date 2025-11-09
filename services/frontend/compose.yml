@@ -4,7 +4,7 @@ services:
   frontend:
     image: ${FRONTEND_IMAGE}
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       NODE_ENV: production
       PORT: ${FRONTEND_PORT}

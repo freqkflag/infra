@@ -4,7 +4,7 @@ services:
   discourse:
     image: bitnami/discourse:3.3.0
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       DISCOURSE_HOST: ${DISCOURSE_DOMAIN}
       DISCOURSE_USERNAME: ${DISCOURSE_ADMIN_USER}

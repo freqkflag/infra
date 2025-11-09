@@ -4,7 +4,7 @@ services:
   ghost:
     image: ghost:5-alpine
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       url: https://${GHOST_DOMAIN}
       database__client: mysql

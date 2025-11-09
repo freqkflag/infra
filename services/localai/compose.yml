@@ -4,7 +4,7 @@ services:
   localai:
     image: localai/localai:latest
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       MODELS_PATH: /models
       OPENAI_BASE_URL: https://${LOCALAI_DOMAIN}

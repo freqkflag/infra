@@ -7,7 +7,7 @@ services:
     volumes:
       - redis_data:/data
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     networks:
       - edge
     restart: unless-stopped

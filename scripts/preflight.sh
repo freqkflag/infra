@@ -22,7 +22,7 @@ log "=== Preflight Check Starting ==="
 ENV_FILE="${WORKSPACE_ENV_FILE:-}"
 
 if [[ -z "${ENV_FILE}" ]]; then
-  for candidate in "/Users/freqkflag/Projects/.workspace/.env" "$HOME/.workspace/.env"; do
+  for candidate in "$PWD/.workspace/.env" "$HOME/.workspace/.env"; do
     if [[ -f "${candidate}" ]]; then
       ENV_FILE="${candidate}"
       break
@@ -31,7 +31,7 @@ if [[ -z "${ENV_FILE}" ]]; then
 fi
 
 if [[ -z "${ENV_FILE}" || ! -f "${ENV_FILE}" ]]; then
-  fail "Missing environment file. Set WORKSPACE_ENV_FILE or create one at /Users/freqkflag/Projects/.workspace/.env or $HOME/.workspace/.env"
+  fail "Missing environment file. Set WORKSPACE_ENV_FILE or create one at $PWD/.workspace/.env or $HOME/.workspace/.env"
 fi
 
 require_cli docker

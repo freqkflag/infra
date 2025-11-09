@@ -4,7 +4,7 @@ services:
   kong:
     image: kong:3.7
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: ${POSTGRES_HOST}

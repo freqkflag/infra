@@ -4,7 +4,7 @@ services:
   wikijs:
     image: requarks/wiki:2.5
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       DB_TYPE: postgres
       DB_HOST: ${POSTGRES_HOST}

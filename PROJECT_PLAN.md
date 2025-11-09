@@ -14,7 +14,7 @@
 | ----------- | ------------------ |
 | Docker daemon + Compose v2 | `docker --version && docker compose version` |
 | Infisical CLI | `infisical --version` |
-| Workspace env file | `test -f /Users/freqkflag/Projects/.workspace/.env` |
+| Workspace env file | `test -f .workspace/.env` |
 | Repo sync | `git status --short` (clean or intentional branch) |
 | Edge network | `docker network inspect edge >/dev/null 2>&1 || docker network create --driver bridge edge` |
 

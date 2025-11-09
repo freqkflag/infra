@@ -13,7 +13,7 @@ Self-hosted multi-node infrastructure managed with FOSS tooling and Cloudflare Z
 1. Prepare environment (copy `.env.example` and extend with `env/templates/*.env.example` values):
 
    ```bash
-   test -f /Users/freqkflag/Projects/.workspace/.env
+   test -f .workspace/.env
    docker --version
    docker compose version
    infisical --version
@@ -106,7 +106,7 @@ Self-hosted multi-node infrastructure managed with FOSS tooling and Cloudflare Z
 - `env/templates/vps.env.example` — production domains + app creds.
 - `env/templates/mac.env.example` — Mac mini development overrides.
 - `env/templates/linux.env.example` — homelab overrides.
-- Merge the templates into `/Users/freqkflag/Projects/.workspace/.env` before running bootstrap or deployment scripts.
+- Merge the templates into `.workspace/.env` before running bootstrap or deployment scripts.
 
 ## Maintenance Guidelines
 

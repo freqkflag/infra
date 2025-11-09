@@ -4,7 +4,7 @@ services:
   wordpress:
     image: wordpress:6.6-apache
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       WORDPRESS_DB_HOST: ${MARIADB_HOST}
       WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}

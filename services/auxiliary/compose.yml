@@ -4,7 +4,7 @@ services:
   auxiliary:
     image: lscr.io/linuxserver/heimdall:latest
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       PUID: ${AUXILIARY_PUID}
       PGID: ${AUXILIARY_PGID}

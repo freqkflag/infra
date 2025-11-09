@@ -4,7 +4,7 @@ services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:latest
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       WEBUI_SECRET_KEY: ${OPENWEBUI_SECRET_KEY}
       OPENAI_API_BASE_URL: ${LOCALAI_INTERNAL_URL}

@@ -13,10 +13,10 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.cloudflare.acme.email=${TRAEFIK_ACME_EMAIL}"
-      - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
       - "--api.dashboard=true"
       - "--ping=true"
     ports:
@@ -29,7 +29,7 @@ services:
         protocol: tcp
         mode: host
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
     volumes:

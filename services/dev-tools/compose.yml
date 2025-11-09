@@ -4,7 +4,7 @@ services:
   dev-tools:
     image: lscr.io/linuxserver/code-server:latest
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       PUID: ${DEVTOOLS_PUID}
       PGID: ${DEVTOOLS_PGID}

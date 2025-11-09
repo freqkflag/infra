@@ -8,3 +8,4 @@
 - 2025-11-09T01:21:28Z — Added per-service Compose manifests, populated
   host-level bundles, and delivered `scripts/health-check.sh` plus
   `scripts/teardown.sh`; ready for subsequent documentation updates.
+- 2025-11-09T06:55:24+00:00Z — Standardized workspace env path, added Traefik middleware bundle, and documented TLS handoff to nginx for vault.freqkflag.co.

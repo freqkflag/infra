@@ -5,5 +5,5 @@ scripts:
   backup: "./scripts/backup.sh"
   sync: "./scripts/sync.sh"
 env:
-  file: "/Users/freqkflag/Projects/.workspace/.env"
+  file: ".workspace/.env"
 

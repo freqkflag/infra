@@ -52,7 +52,7 @@ auditable builds.
 
 * **Root Repository:** `~/infra` (workspace root)
 * **Secrets Authority:** Infisical on VPS
-* **Primary Environment File:** `/Users/freqkflag/Projects/.workspace/.env`
+* **Primary Environment File:** `.workspace/.env`
 
   * Used for bootstrap and mirrored remotely.
   * Contains project metadata and Infisical credentials.
@@ -171,7 +171,7 @@ changes. Infisical‑authenticated webhooks can centralize these records.
 Before each orchestration:
 
 ```bash
-if [ ! -f /Users/freqkflag/Projects/.workspace/.env ]; then
+if [ ! -f .workspace/.env ]; then
   echo "❌ Environment file not found."; exit 1;
 else
   echo "✅ Environment context verified.";

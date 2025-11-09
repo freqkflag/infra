@@ -4,7 +4,7 @@ services:
   bookstack:
     image: lscr.io/linuxserver/bookstack:latest
     env_file:
-      - /Users/freqkflag/Projects/.workspace/.env
+      - ../../.workspace/.env
     environment:
       PUID: ${BOOKSTACK_PUID}
       PGID: ${BOOKSTACK_PGID}
