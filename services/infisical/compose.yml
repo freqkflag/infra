@@ -10,6 +10,7 @@ services:
       DB_CONNECTION_URI: ${INFISICAL_DB_CONNECTION}
       REDIS_URL: ${INFISICAL_REDIS_URL}
       NEXT_PUBLIC_SITE_URL: ${INFISICAL_PUBLIC_URL}
+      INFISICAL_FEATURE_WORKFLOWS: "true"
     networks:
       - edge
     restart: unless-stopped
