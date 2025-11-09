@@ -1,0 +1,106 @@
+name: infisical
+services:
+  db:
+    environment:
+      POSTGRES_DB: infisical
+      POSTGRES_PASSWORD: 87605e6ef503440f630daecb52106fd3188dbfb48e7035cec507ee25f700c588
+      POSTGRES_USER: infisical
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U infisical
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    image: postgres:14-alpine
+    networks:
+      edge: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: pg_data
+        target: /var/lib/postgresql/data
+        volume: {}
+  infisical:
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
+      redis:
+        condition: service_started
+        required: true
+    environment:
+      AUTH_SECRET: yuEnU6TkLM8OXpojkQXWIHd0H3t6lGULAEyEKW+I53E=
+      DB_CONNECTION_URI: postgres://infisical:87605e6ef503440f630daecb52106fd3188dbfb48e7035cec507ee25f700c588@db:5432/infisical
+      ENCRYPTION_KEY: de92d934dd1af1da872546190c125c8f
+      HTTPS_ENABLED: "true"
+      INFISICAL_ADMIN_EMAIL: admin@freqkflag.co
+      INFISICAL_ADMIN_FIRST_NAME: Joey
+      INFISICAL_ADMIN_LAST_NAME: King
+      INFISICAL_ADMIN_PASSWORD: yaAMCSdlp4adT0o1a8XybG7ZddP4reJt
+      INFISICAL_FEATURE_WORKFLOWS: "true"
+      NODE_ENV: production
+      PORT: "8080"
+      PORT_SECURE: "443"
+      REDIS_URL: redis://redis:6379
+      SITE_URL: https://vps.freqkflag.co:8083
+    image: infisical/infisical:latest
+    networks:
+      edge: null
+    restart: unless-stopped
+  nginx:
+    depends_on:
+      infisical:
+        condition: service_started
+        required: true
+    image: nginx:1.27-alpine
+    networks:
+      edge: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "80"
+        protocol: tcp
+      - mode: ingress
+        target: 443
+        published: "443"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /srv/infisical/nginx/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/infisical/nginx/certs
+        target: /etc/nginx/certs
+        read_only: true
+        bind:
+          create_host_path: true
+  redis:
+    command:
+      - redis-server
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    image: redis:7-alpine
+    networks:
+      edge: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: redis_data
+        target: /data
+        volume: {}
+networks:
+  edge:
+    name: edge
+    external: true
+volumes:
+  pg_data:
+    name: infisical_pg_data
+  redis_data:
+    name: infisical_redis_data

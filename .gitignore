@@ -38,6 +38,15 @@ docker-compose.override.yaml
 tmp/
 run/
 
+# Harvest artifacts and sensitive outputs
+harvest/
+harvest_*/
+harvest_*
+*.secret
+*.secrets
+*.env.local
+nodes/*/env/.env
+
 # Datastore dumps
 *.sql
 *.sql.gz
