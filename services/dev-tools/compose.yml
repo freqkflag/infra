@@ -29,6 +29,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.devtools.rule=Host(`${DEVTOOLS_DOMAIN}`)"
       - "traefik.http.routers.devtools.entrypoints=websecure"
+      - "traefik.http.routers.devtools.tls.certresolver=letsencrypt"
       - "traefik.http.services.devtools.loadbalancer.server.port=8443"
       - "traefik.http.routers.devtools.middlewares=cf-access@file"
 

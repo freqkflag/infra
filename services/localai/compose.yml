@@ -25,6 +25,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.localai.rule=Host(`${LOCALAI_DOMAIN}`)"
       - "traefik.http.routers.localai.entrypoints=websecure"
+      - "traefik.http.routers.localai.tls.certresolver=letsencrypt"
       - "traefik.http.services.localai.loadbalancer.server.port=8080"
       - "traefik.http.routers.localai.middlewares=cf-access@file"
 

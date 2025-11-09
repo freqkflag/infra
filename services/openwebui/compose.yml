@@ -27,6 +27,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
       - "traefik.http.routers.openwebui.entrypoints=websecure"
+      - "traefik.http.routers.openwebui.tls.certresolver=letsencrypt"
       - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
       - "traefik.http.routers.openwebui.middlewares=cf-access@file"
 

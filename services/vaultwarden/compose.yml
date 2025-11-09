@@ -28,6 +28,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.vaultwarden.rule=Host(`${VAULTWARDEN_DOMAIN}`)"
       - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
       - "traefik.http.services.vaultwarden.loadbalancer.server.port=8080"
       - "traefik.http.routers.vaultwarden.middlewares=secure-headers@file"
 

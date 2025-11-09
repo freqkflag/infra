@@ -42,9 +42,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.kong.rule=Host(`${KONG_PROXY_HOST}`)"
       - "traefik.http.routers.kong.entrypoints=websecure"
+      - "traefik.http.routers.kong.tls.certresolver=letsencrypt"
       - "traefik.http.services.kong.loadbalancer.server.port=8000"
       - "traefik.http.routers.kong-admin.rule=Host(`${KONG_ADMIN_HOST}`)"
       - "traefik.http.routers.kong-admin.entrypoints=websecure"
+      - "traefik.http.routers.kong-admin.tls.certresolver=letsencrypt"
       - "traefik.http.services.kong-admin.loadbalancer.server.port=8001"
       - "traefik.http.routers.kong-admin.middlewares=cf-access@file"
 

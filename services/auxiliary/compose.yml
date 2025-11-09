@@ -26,6 +26,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.auxiliary.rule=Host(`${AUXILIARY_DOMAIN}`)"
       - "traefik.http.routers.auxiliary.entrypoints=websecure"
+      - "traefik.http.routers.auxiliary.tls.certresolver=letsencrypt"
       - "traefik.http.services.auxiliary.loadbalancer.server.port=80"
 
 networks:

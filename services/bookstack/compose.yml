@@ -33,6 +33,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.bookstack.rule=Host(`${BOOKSTACK_DOMAIN}`)"
       - "traefik.http.routers.bookstack.entrypoints=websecure"
+      - "traefik.http.routers.bookstack.tls.certresolver=letsencrypt"
       - "traefik.http.services.bookstack.loadbalancer.server.port=80"
       - "traefik.http.routers.bookstack.middlewares=secure-headers@file"
 
