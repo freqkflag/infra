@@ -6,7 +6,7 @@ Self-hosted multi-node infrastructure managed with FOSS tooling and Cloudflare Z
 
 - Primary hosts: `vps.host`, `home.macmini`, `home.linux`
 - Core stack: Docker Compose, Traefik, Cloudflared, Infisical, Kong OSS, ClamAV, n8n/Node-RED
-- Service definitions and policy are governed by `infra-build-plan.md` and `project-plan.yml`
+- Service definitions and policy are governed by `infra-build-plan.md`, `PROJECT_PLAN.md`, and `project-plan.yml`
 
 ## Quick Start Bootstrap
 
@@ -54,6 +54,12 @@ Self-hosted multi-node infrastructure managed with FOSS tooling and Cloudflare Z
 
 ## Deployment Commands
 
+- Compose orchestrator (profiles: `vps`, `mac`, `linux`):
+
+  ```bash
+  infisical run --env=production -- docker compose -f compose.orchestrator.yml --profile vps up -d
+  ```
+
 - Update services for Mac mini:
 
   ```bash
@@ -82,13 +88,15 @@ Self-hosted multi-node infrastructure managed with FOSS tooling and Cloudflare Z
 
 ```text
 ~/infra/
-├─ infra-build-plan.md   — master deployment plan
-├─ AGENTS.md             — agent instructions and workflows
-├─ README.md             — quickstart and command reference
-├─ project-plan.yml      — declarative environment map
-├─ services/             — per-service Compose definitions
-├─ docker-compose/       — host-specific Compose bundles
-└─ scripts/              — automation (preflight, deploy, backup, status, sync, etc.)
+├─ README.md                   — quickstart and command reference
+├─ AGENTS.md                   — supervised-agent roster
+├─ PROJECT_PLAN.md             — sequenced build plan
+├─ infra-build-plan.md         — detailed orchestration blueprint
+├─ project-plan.yml            — declarative environment map
+├─ compose.orchestrator.yml    — master Compose bundle (profiles per host)
+├─ services/                   — per-service Compose definitions
+├─ docker-compose/             — host-specific Compose bundles
+└─ scripts/                    — automation (preflight, deploy, backup, status, sync, etc.)
 ```
 
 ## Maintenance Guidelines
