@@ -117,9 +117,11 @@ function authenticate(req, res, next) {
   res.status(401).send('Authentication failed');
 }
 
-app.use(authenticate);
+// Middleware (must be before authentication)
+app.use(express.json());
+app.use(express.static('public'));
 
-// OAuth routes (if enabled)
+// OAuth routes (if enabled) - must be before authenticate middleware
 if (OAUTH_ENABLED && passport) {
   app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
   app.get('/auth/callback', passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
@@ -132,9 +134,8 @@ if (OAUTH_ENABLED && passport) {
   });
 }
 
-// Middleware
-app.use(express.json());
-app.use(express.static('public'));
+// Apply authentication middleware (after OAuth routes)
+app.use(authenticate);
 
 // CORS for SSE
 app.use((req, res, next) => {

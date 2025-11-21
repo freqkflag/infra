@@ -7,13 +7,13 @@ services:
       TZ: ${TZ:-America/New_York}
       OPS_AUTH_USER: ${OPS_AUTH_USER:-admin}
       OPS_AUTH_PASS: ${OPS_AUTH_PASS:-changeme}
-      # OAuth Configuration (optional - enables OAuth if set)
-      # OPS_OAUTH_ENABLED: ${OPS_OAUTH_ENABLED:-false}
-      # OPS_OAUTH_PROVIDER: ${OPS_OAUTH_PROVIDER:-github}
-      # OPS_OAUTH_CLIENT_ID: ${OPS_OAUTH_CLIENT_ID:-}
-      # OPS_OAUTH_CLIENT_SECRET: ${OPS_OAUTH_CLIENT_SECRET:-}
-      # OPS_OAUTH_CALLBACK_URL: ${OPS_OAUTH_CALLBACK_URL:-https://ops.freqkflag.co/auth/callback}
-      # OPS_SESSION_SECRET: ${OPS_SESSION_SECRET:-change-this-secret-in-production}
+      # OAuth Configuration
+      OPS_OAUTH_ENABLED: ${OPS_OAUTH_ENABLED:-true}
+      OPS_OAUTH_PROVIDER: ${OPS_OAUTH_PROVIDER:-github}
+      OPS_OAUTH_CLIENT_ID: ${OPS_OAUTH_CLIENT_ID:-Ov23limlVzKVg7zjVrek}
+      OPS_OAUTH_CLIENT_SECRET: ${OPS_OAUTH_CLIENT_SECRET:-440c697fde6d0a2632831c4863fb6932934f53dc}
+      OPS_OAUTH_CALLBACK_URL: ${OPS_OAUTH_CALLBACK_URL:-https://ops.freqkflag.co/auth/callback}
+      OPS_SESSION_SECRET: ${OPS_SESSION_SECRET:-c7d53fae681e91b1a66bfd83a7441a60b09c8d04b02f29f0e856365ff06b327a}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /root/infra:/root/infra:ro
