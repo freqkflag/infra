@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  cloudflared:
+    extends:
+      file: ../../services/cloudflared/compose.yml
+      service: cloudflared
+    environment:
+      CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_MAC}
+
+  frontend:
+    extends:
+      file: ../../services/frontend/compose.yml
+      service: frontend
+
+  dev-tools:
+    extends:
+      file: ../../services/dev-tools/compose.yml
+      service: dev-tools
+
+networks:
+  edge:
+    external: true
+

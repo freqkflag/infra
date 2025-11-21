@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  wordpress:
+    image: wordpress:6.6-apache
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      WORDPRESS_DB_HOST: ${MARIADB_HOST}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', 'https://${WORDPRESS_DOMAIN}');
+        define('WP_SITEURL', 'https://${WORDPRESS_DOMAIN}');
+    volumes:
+      - wordpress_html:/var/www/html
+    depends_on:
+      - mariadb
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1/wp-login.php || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wordpress.rule=Host(`${WORDPRESS_DOMAIN}`)"
+      - "traefik.http.routers.wordpress.entrypoints=websecure"
+      - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
+      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+      - "traefik.http.routers.wordpress.middlewares=secure-headers@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  wordpress_html:

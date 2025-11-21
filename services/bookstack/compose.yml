@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  bookstack:
+    image: lscr.io/linuxserver/bookstack:latest
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      PUID: ${BOOKSTACK_PUID}
+      PGID: ${BOOKSTACK_PGID}
+      APP_URL: https://${BOOKSTACK_DOMAIN}
+      DB_HOST: ${MARIADB_HOST}
+      DB_PORT: 3306
+      DB_DATABASE: ${BOOKSTACK_DB_NAME}
+      DB_USERNAME: ${BOOKSTACK_DB_USER}
+      DB_PASSWORD: ${BOOKSTACK_DB_PASSWORD}
+    volumes:
+      - bookstack_data:/config
+    depends_on:
+      - mariadb
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:80/login || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bookstack.rule=Host(`${BOOKSTACK_DOMAIN}`)"
+      - "traefik.http.routers.bookstack.entrypoints=websecure"
+      - "traefik.http.routers.bookstack.tls.certresolver=letsencrypt"
+      - "traefik.http.services.bookstack.loadbalancer.server.port=80"
+      - "traefik.http.routers.bookstack.middlewares=secure-headers@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  bookstack_data:

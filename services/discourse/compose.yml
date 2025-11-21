@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  discourse:
+    image: bitnami/discourse:3.3.0
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      DISCOURSE_HOST: ${DISCOURSE_DOMAIN}
+      DISCOURSE_USERNAME: ${DISCOURSE_ADMIN_USER}
+      DISCOURSE_PASSWORD: ${DISCOURSE_ADMIN_PASSWORD}
+      DISCOURSE_EMAIL: ${DISCOURSE_ADMIN_EMAIL}
+      DISCOURSE_SMTP_HOST: ${DISCOURSE_SMTP_HOST}
+      DISCOURSE_SMTP_PORT: ${DISCOURSE_SMTP_PORT}
+      DISCOURSE_SMTP_USER: ${DISCOURSE_SMTP_USER}
+      DISCOURSE_SMTP_PASSWORD: ${DISCOURSE_SMTP_PASSWORD}
+      DISCOURSE_DATABASE_HOST: ${POSTGRES_HOST}
+      DISCOURSE_DATABASE_PORT_NUMBER: ${POSTGRES_PORT}
+      DISCOURSE_DATABASE_USER: ${DISCOURSE_DB_USER}
+      DISCOURSE_DATABASE_PASSWORD: ${DISCOURSE_DB_PASSWORD}
+      DISCOURSE_DATABASE_NAME: ${DISCOURSE_DB_NAME}
+      DISCOURSE_REDIS_HOST: ${REDIS_HOST}
+      DISCOURSE_REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - discourse_data:/bitnami
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:3000/ || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.discourse.rule=Host(`${DISCOURSE_DOMAIN}`)"
+      - "traefik.http.routers.discourse.entrypoints=websecure"
+      - "traefik.http.routers.discourse.tls.certresolver=letsencrypt"
+      - "traefik.http.services.discourse.loadbalancer.server.port=3000"
+      - "traefik.http.routers.discourse.middlewares=secure-headers@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  discourse_data:

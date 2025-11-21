@@ -1,0 +1,9 @@
+networks:
+  - name: edge
+    scope: external
+    purpose: shared overlay network for all nodes
+tunnels:
+  - name: cloudflared-vps
+    token_env: CF_TUNNEL_TOKEN_VPS
+    description: Cloudflare tunnel anchoring freqkflag.co ingress
+

@@ -1,0 +1,9 @@
+networks:
+  - name: edge
+    scope: external
+    purpose: shared overlay network for all nodes
+tunnels:
+  - name: cloudflared-mac
+    token_env: CF_TUNNEL_TOKEN_MAC
+    description: Cloudflare tunnel for twist3dkink.online dev entrypoints
+

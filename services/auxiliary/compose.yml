@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  auxiliary:
+    image: lscr.io/linuxserver/heimdall:latest
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      PUID: ${AUXILIARY_PUID}
+      PGID: ${AUXILIARY_PGID}
+      TZ: ${TIMEZONE}
+    volumes:
+      - auxiliary_config:/config
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:80 || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auxiliary.rule=Host(`${AUXILIARY_DOMAIN}`)"
+      - "traefik.http.routers.auxiliary.entrypoints=websecure"
+      - "traefik.http.routers.auxiliary.tls.certresolver=letsencrypt"
+      - "traefik.http.services.auxiliary.loadbalancer.server.port=80"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  auxiliary_config:

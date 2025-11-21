@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  cloudflared:
+    extends:
+      file: ../../services/cloudflared/compose.yml
+      service: cloudflared
+    environment:
+      CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_LINUX}
+
+  vaultwarden:
+    extends:
+      file: ../../services/vaultwarden/compose.yml
+      service: vaultwarden
+
+  bookstack:
+    extends:
+      file: ../../services/bookstack/compose.yml
+      service: bookstack
+
+  auxiliary:
+    extends:
+      file: ../../services/auxiliary/compose.yml
+      service: auxiliary
+
+networks:
+  edge:
+    external: true
+

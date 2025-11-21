@@ -1,0 +1,9 @@
+name: "Cult of Joey Infra"
+root: "./"
+scripts:
+  deploy: "./scripts/deploy.sh"
+  backup: "./scripts/backup.sh"
+  sync: "./scripts/sync.sh"
+env:
+  file: ".workspace/.env"
+

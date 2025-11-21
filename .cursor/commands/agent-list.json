@@ -1,0 +1,7 @@
+{
+  "name": "agent-list",
+  "description": "List automation agents registered for Cursor.",
+  "usage": "agent-list",
+  "command": "bash -lc '\nset -euo pipefail\ncd /Users/freqkflag/Projects/GitHub/infra\npython3 scripts/agents/run-agent.py list\n'"
+}
+

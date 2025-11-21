@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  localai:
+    image: localai/localai:latest
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      MODELS_PATH: /models
+      OPENAI_BASE_URL: https://${LOCALAI_DOMAIN}
+    volumes:
+      - localai_models:/models
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:8080/readyz || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.localai.rule=Host(`${LOCALAI_DOMAIN}`)"
+      - "traefik.http.routers.localai.entrypoints=websecure"
+      - "traefik.http.routers.localai.tls.certresolver=letsencrypt"
+      - "traefik.http.services.localai.loadbalancer.server.port=8080"
+      - "traefik.http.routers.localai.middlewares=cf-access@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  localai_models:

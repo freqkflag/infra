@@ -1,3 +1,18 @@
+# Environment and secrets
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+.infisical*
+infisical*.json
+/Users/freqkflag/Projects/.workspace/.env
+secrets/
+.secrets/
+*.secret
+*.secrets
+nodes/*/env/.env
+
 # Logs
 *.log
 *.log.*
@@ -9,6 +24,7 @@ log/
 **/logs/
 **/log/
 **/*.log
+.logs/
 
 # Application logs
 npm-debug.log*
@@ -56,6 +72,8 @@ data/*/log/
 *.swp
 *.swo
 *~
+tmp/
+run/
 
 # OS files
 .DS_Store
@@ -66,15 +84,11 @@ data/*/log/
 ehthumbs.db
 Thumbs.db
 
-# Environment files
-.env
-.env.local
-.env.*.local
-*.env
-
 # IDE files
 .vscode/
 .idea/
+.fleet/
+.history/
 *.sublime-project
 *.sublime-workspace
 
@@ -90,17 +104,26 @@ build/
 node_modules/
 vendor/
 .bundle/
+__pycache__/
+*.pyc
 
 # Coverage reports
 coverage/
 *.cover
 .nyc_output/
+.coverage
+htmlcov/
 
 # Backup files
 *.bak
 *.backup
 *.old
-*~
+.backup/
+backup/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
 
 # Database data directories (runtime data - should not be tracked)
 **/data/postgres/
@@ -116,6 +139,8 @@ coverage/
 *.db
 *.sqlite
 *.sqlite3
+*.sql
+*.sql.gz
 pg_wal/
 pg_xact/
 pg_internal.init
@@ -126,3 +151,25 @@ pg_control
 **/chunks/
 **/tsdb-shipper-active/
 
+# Certificates and private keys
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.p12
+*.pfx
+
+# Runtime artifacts
+docker-compose.override.yml
+docker-compose.override.yaml
+*.override.yml
+*.override.yaml
+**/docker-compose.override.*
+*.pid
+*.sock
+
+# Harvest artifacts and sensitive outputs
+harvest/
+harvest_*/
+harvest_*

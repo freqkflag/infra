@@ -1,0 +1,277 @@
+project: "Cult of Joey Infra Deployment"
+version: "2025-11-09"
+
+environments:
+  - name: vps.host
+    profile: production
+    domain: freqkflag.co
+    node_directory: nodes/vps.host
+    compose_bundle: nodes/vps.host/compose.yml
+    harvest_script: scripts/harvest_vps.host.sh
+    redeploy_script: scripts/redeploy_vps.host.sh
+    deploy_script: nodes/vps.host/deploy.sh
+    health_check: nodes/vps.host/health-check.sh
+    teardown_script: nodes/vps.host/teardown.sh
+    cloudflared_tunnel:
+      name: cloudflared-vps
+      token_env: CF_TUNNEL_TOKEN_VPS
+      description: Cloudflare tunnel anchoring freqkflag.co ingress
+    services:
+      - traefik
+      - cloudflared
+      - postgres
+      - mariadb
+      - redis
+      - infisical
+      - kong
+      - clamav
+      - gitea
+      - ghost
+      - wordpress
+      - discourse
+      - wikijs
+      - linkstack
+      - localai
+      - openwebui
+      - node-red
+    domain_envs:
+      - TRAEFIK_DASHBOARD_HOST
+      - KONG_PROXY_HOST
+      - KONG_ADMIN_HOST
+      - INFISICAL_HOST
+      - INFISICAL_PUBLIC_URL
+      - GITEA_DOMAIN
+      - GITEA_SSH_DOMAIN
+      - GHOST_DOMAIN
+      - WORDPRESS_DOMAIN
+      - DISCOURSE_DOMAIN
+      - WIKIJS_DOMAIN
+      - LINKSTACK_DOMAIN
+      - LOCALAI_DOMAIN
+      - OPENWEBUI_DOMAIN
+      - NODE_RED_DOMAIN
+  - name: home.macmini
+    profile: development
+    domain: twist3dkink.online
+    node_directory: nodes/home.macmini
+    compose_bundle: nodes/home.macmini/compose.yml
+    harvest_script: scripts/harvest_home.macmini.sh
+    redeploy_script: scripts/redeploy_home.macmini.sh
+    deploy_script: nodes/home.macmini/deploy.sh
+    health_check: nodes/home.macmini/health-check.sh
+    teardown_script: nodes/home.macmini/teardown.sh
+    cloudflared_tunnel:
+      name: cloudflared-mac
+      token_env: CF_TUNNEL_TOKEN_MAC
+      description: Cloudflare tunnel for twist3dkink.online dev entrypoints
+    services:
+      - cloudflared
+      - frontend
+      - dev-tools
+    domain_envs:
+      - FRONTEND_DOMAIN
+      - DEVTOOLS_DOMAIN
+  - name: home.linux
+    profile: homelab
+    domain: cult-of-joey.com
+    node_directory: nodes/home.linux
+    compose_bundle: nodes/home.linux/compose.yml
+    harvest_script: scripts/harvest_home.linux.sh
+    redeploy_script: scripts/redeploy_home.linux.sh
+    deploy_script: nodes/home.linux/deploy.sh
+    health_check: nodes/home.linux/health-check.sh
+    teardown_script: nodes/home.linux/teardown.sh
+    cloudflared_tunnel:
+      name: cloudflared-linux
+      token_env: CF_TUNNEL_TOKEN_LINUX
+      description: Cloudflare tunnel for cult-of-joey.com ingress
+    services:
+      - cloudflared
+      - vaultwarden
+      - bookstack
+      - auxiliary
+    domain_envs:
+      - VAULTWARDEN_DOMAIN
+      - BOOKSTACK_DOMAIN
+      - AUXILIARY_DOMAIN
+
+domains:
+  freqkflag.co:
+    zone_variable: CF_ZONE_FREQKFLAG_CO
+    records:
+      - service: traefik-dashboard
+        env: TRAEFIK_DASHBOARD_HOST
+        host: traefik.freqkflag.co
+      - service: kong-proxy
+        env: KONG_PROXY_HOST
+        host: api.freqkflag.co
+      - service: kong-admin
+        env: KONG_ADMIN_HOST
+        host: api-admin.freqkflag.co
+      - service: infisical-core
+        env: INFISICAL_HOST
+        host: infisical.freqkflag.co
+      - service: infisical-ui
+        env: INFISICAL_PUBLIC_URL
+        host: https://infisical.freqkflag.co
+      - service: gitea-ui
+        env: GITEA_DOMAIN
+        host: git.freqkflag.co
+      - service: gitea-ssh
+        env: GITEA_SSH_DOMAIN
+        host: git.freqkflag.co
+      - service: ghost
+        env: GHOST_DOMAIN
+        host: ghost.freqkflag.co
+      - service: wordpress
+        env: WORDPRESS_DOMAIN
+        host: wp.freqkflag.co
+      - service: discourse
+        env: DISCOURSE_DOMAIN
+        host: forum.freqkflag.co
+      - service: wikijs
+        env: WIKIJS_DOMAIN
+        host: wiki.freqkflag.co
+      - service: linkstack
+        env: LINKSTACK_DOMAIN
+        host: links.freqkflag.co
+      - service: localai
+        env: LOCALAI_DOMAIN
+        host: localai.freqkflag.co
+      - service: openwebui
+        env: OPENWEBUI_DOMAIN
+        host: openwebui.freqkflag.co
+      - service: node-red
+        env: NODE_RED_DOMAIN
+        host: automation.freqkflag.co
+  twist3dkink.online:
+    zone_variable: CF_ZONE_TWIST3DKINK_ONLINE
+    records:
+      - service: frontend
+        env: FRONTEND_DOMAIN
+        host: dev.twist3dkink.online
+      - service: dev-tools
+        env: DEVTOOLS_DOMAIN
+        host: tools.twist3dkink.online
+  cult-of-joey.com:
+    zone_variable: CF_ZONE_CULT_OF_JOEY_COM
+    records:
+      - service: vaultwarden
+        env: VAULTWARDEN_DOMAIN
+        host: vault.cult-of-joey.com
+      - service: bookstack
+        env: BOOKSTACK_DOMAIN
+        host: notes.cult-of-joey.com
+      - service: auxiliary
+        env: AUXILIARY_DOMAIN
+        host: aux.cult-of-joey.com
+
+networks:
+  edge:
+    scope: external
+    description: Shared overlay network attaching all nodes
+    required_on_hosts:
+      - vps.host
+      - home.macmini
+      - home.linux
+
+service_dependencies:
+  foundations:
+    services:
+      - postgres
+      - mariadb
+      - redis
+    notes: Provides persistent data stores and backing services for higher layers.
+  secrets:
+    services:
+      - infisical
+    depends_on: foundations
+    notes: Requires Postgres and Redis from the foundation layer.
+  ingress:
+    services:
+      - traefik
+      - cloudflared
+    depends_on: secrets
+    notes: Traefik issues certificates via Cloudflare DNS; cloudflared exposes tunnels.
+  api_gateway:
+    services:
+      - kong
+    depends_on:
+      - ingress
+      - secrets
+    notes: Kong requires Traefik routing and Infisical-managed credentials.
+  security:
+    services:
+      - clamav
+    depends_on:
+      - foundations
+    notes: Scans shared storage for malware; integrates with logging.
+  applications:
+    services:
+      - ghost
+      - wordpress
+      - discourse
+      - wikijs
+      - gitea
+      - linkstack
+      - localai
+      - openwebui
+      - node-red
+      - vaultwarden
+      - bookstack
+      - auxiliary
+      - frontend
+      - dev-tools
+    depends_on:
+      - api_gateway
+      - security
+      - foundations
+    notes: Application workloads rely on ingress, secrets, and data stores.
+
+deployment:
+  global_workflow:
+    - "./scripts/preflight.sh"
+    - "infisical run --env=<env> -- ./scripts/deploy.ah <target>"
+    - "./scripts/status.sh"
+    - "./scripts/health-check.sh <target>"
+    - "./scripts/sync.sh"
+  node_workflows:
+    vps.host:
+      environment: production
+      commands:
+        - "infisical run --env=production -- ./nodes/vps.host/deploy.sh"
+        - "infisical run --env=production -- ./nodes/vps.host/health-check.sh"
+        - "infisical run --env=production -- ./nodes/vps.host/teardown.sh <services...>"
+    home.macmini:
+      environment: development
+      commands:
+        - "infisical run --env=development -- ./nodes/home.macmini/deploy.sh"
+        - "infisical run --env=development -- ./nodes/home.macmini/health-check.sh"
+        - "infisical run --env=development -- ./nodes/home.macmini/teardown.sh <services...>"
+    home.linux:
+      environment: homelab
+      commands:
+        - "infisical run --env=homelab -- ./nodes/home.linux/deploy.sh"
+        - "infisical run --env=homelab -- ./nodes/home.linux/health-check.sh"
+        - "infisical run --env=homelab -- ./nodes/home.linux/teardown.sh <services...>"
+
+workflows:
+  deploy:
+    - preflight-check
+    - load-secrets
+    - compose-up
+    - verify-health
+    - log-changelog
+  backup:
+    - backup-databases
+    - sync-to-homelab
+  security:
+    - scan-malware
+    - rotate-keys
+    - firewall-audit
+
+policies:
+  secrets: infisical-only
+  databases: centralized-on-vps
+  ingress: cloudflare-tunnels
+  network: edge-shared

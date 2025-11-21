@@ -1,0 +1,131 @@
+# nodes/vps.host/compose.yml  (fixed)
+services:
+  traefik:
+    extends:
+      file: ../../services/traefik/compose.yml
+      service: traefik
+    networks: [edge]
+
+  cloudflared:
+    extends:
+      file: ../../services/cloudflared/compose.yml
+      service: cloudflared
+    environment:
+      CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN_VPS}
+    networks: [edge]
+
+  postgres:
+    extends:
+      file: ../../services/postgres/compose.yml
+      service: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks: [edge]
+
+  mariadb:
+    extends:
+      file: ../../services/mariadb/compose.yml
+      service: mariadb
+    networks: [edge]
+
+  redis:
+    extends:
+      file: ../../services/redis/compose.yml
+      service: redis
+    networks: [edge]
+
+  infisical:
+    extends:
+      file: ../../services/infisical/compose.yml
+      service: infisical
+    networks: [edge]
+
+  kong:
+    extends:
+      file: ../../services/kong/compose.yml
+      service: kong
+    networks: [edge]
+
+  clamav:
+    extends:
+      file: ../../services/clamav/compose.yml
+      service: clamav
+    networks: [edge]
+
+  gitea:
+    extends:
+      file: ../../services/gitea/compose.yml
+      service: gitea
+    networks: [edge]
+
+  ghost:
+    extends:
+      file: ../../services/ghost/compose.yml
+      service: ghost
+    networks: [edge]
+
+  wordpress:
+    extends:
+      file: ../../services/wordpress/compose.yml
+      service: wordpress
+    networks: [edge]
+
+  discourse:
+    extends:
+      file: ../../services/discourse/compose.yml
+      service: discourse
+    networks: [edge]
+
+  wikijs:
+    extends:
+      file: ../../services/wikijs/compose.yml
+      service: wikijs
+    networks: [edge]
+
+  linkstack:
+    extends:
+      file: ../../services/linkstack/compose.yml
+      service: linkstack
+    networks: [edge]
+
+  localai:
+    extends:
+      file: ../../services/localai/compose.yml
+      service: localai
+    networks: [edge]
+
+  openwebui:
+    extends:
+      file: ../../services/openwebui/compose.yml
+      service: openwebui
+    networks: [edge]
+
+  node-red:
+    extends:
+      file: ../../services/node-red/compose.yml
+      service: node-red
+    volumes:
+      - node_red_data:/data
+    networks: [edge]
+
+volumes:
+  node_red_data: {}
+  postgres_data: {}
+  mariadb_data: {}
+  redis_data: {}
+  traefik_letsencrypt: {}
+  cloudflared_etc: {}
+  gitea_data: {}
+  ghost_content: {}
+  wordpress_html: {}
+  discourse_data: {}
+  linkstack_data: {}
+  localai_models: {}
+  openwebui_data: {}
+  clamav_data: {}
+  clamav_logs: {}
+  kong_tmp: {}
+
+networks:
+  edge:
+    external: true

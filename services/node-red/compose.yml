@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  node-red:
+    image: nodered/node-red:3.1
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      TZ: ${TIMEZONE}
+      NODE_RED_ENABLE_SAFE_MODE: "false"
+    volumes:
+      - node_red_data:/data
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:1880/healthz || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.node-red.rule=Host(`${NODE_RED_DOMAIN}`)"
+      - "traefik.http.routers.node-red.entrypoints=websecure"
+      - "traefik.http.routers.node-red.tls.certresolver=letsencrypt"
+      - "traefik.http.services.node-red.loadbalancer.server.port=1880"
+      - "traefik.http.routers.node-red.middlewares=cf-access@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  node_red_data:

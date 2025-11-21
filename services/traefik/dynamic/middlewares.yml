@@ -1,0 +1,14 @@
+http:
+  middlewares:
+    secure-headers:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        stsSeconds: 15552000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "same-origin"
+        permissionsPolicy: "camera=(), geolocation=(), microphone=()"
+

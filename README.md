@@ -133,4 +133,3 @@ Each service has backup procedures documented in its README.
 ---
 
 **Last Updated:** 2025-11-20
-

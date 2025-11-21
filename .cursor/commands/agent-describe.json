@@ -1,0 +1,7 @@
+{
+  "name": "agent-describe",
+  "description": "Describe a registered automation agent. Usage: agent-describe agent=<name>",
+  "usage": "agent-describe agent=logger-agent",
+  "command": "bash -lc '\nset -euo pipefail\nAGENT=\"${agent:-}\" || true\nFORMAT=\"${format:-text}\"\nif [ -z \"$AGENT\" ]; then\n  echo \"agent parameter is required (agent=<name>)\" >&2\n  exit 2\nfi\ncd /Users/freqkflag/Projects/GitHub/infra\npython3 scripts/agents/run-agent.py describe \"$AGENT\" --format \"$FORMAT\"\n'"
+}
+

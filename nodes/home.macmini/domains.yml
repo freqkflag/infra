@@ -1,0 +1,10 @@
+zone: twist3dkink.online
+cloudflare_zone_variable: CF_ZONE_TWIST3DKINK_ONLINE
+domains:
+  - env: FRONTEND_DOMAIN
+    host: dev.twist3dkink.online
+    service: frontend
+  - env: DEVTOOLS_DOMAIN
+    host: tools.twist3dkink.online
+    service: dev-tools
+

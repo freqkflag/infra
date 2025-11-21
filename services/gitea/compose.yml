@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  gitea:
+    image: gitea/gitea:1.21.11
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      USER_UID: ${GITEA_UID}
+      USER_GID: ${GITEA_GID}
+      GITEA__database__DB_TYPE: postgres
+      GITEA__database__HOST: ${POSTGRES_HOST}:${POSTGRES_PORT}
+      GITEA__database__NAME: ${GITEA_DB_NAME}
+      GITEA__database__USER: ${GITEA_DB_USER}
+      GITEA__database__PASSWD: ${GITEA_DB_PASSWORD}
+      GITEA__server__DOMAIN: ${GITEA_DOMAIN}
+      GITEA__server__ROOT_URL: https://${GITEA_DOMAIN}/
+      GITEA__server__SSH_DOMAIN: ${GITEA_SSH_DOMAIN}
+      GITEA__server__SSH_PORT: ${GITEA_SSH_PORT}
+      GITEA__mailer__ENABLED: ${GITEA_MAILER_ENABLED}
+      GITEA__mailer__PROTOCOL: ${GITEA_MAILER_PROTOCOL}
+      GITEA__mailer__SMTP_ADDR: ${GITEA_MAILER_HOST}
+      GITEA__mailer__SMTP_PORT: ${GITEA_MAILER_PORT}
+      GITEA__mailer__USER: ${GITEA_MAILER_USER}
+      GITEA__mailer__PASSWD: ${GITEA_MAILER_PASS}
+    volumes:
+      - gitea_data:/data
+    depends_on:
+      - postgres
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsSL http://127.0.0.1:3000/api/healthz || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitea.rule=Host(`${GITEA_DOMAIN}`)"
+      - "traefik.http.routers.gitea.entrypoints=websecure"
+      - "traefik.http.routers.gitea.tls.certresolver=letsencrypt"
+      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
+      - "traefik.http.routers.gitea.middlewares=secure-headers@file"
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  gitea_data:
