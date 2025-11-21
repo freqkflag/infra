@@ -32,7 +32,7 @@ services:
       - "traefik.http.routers.loki.rule=Host(`loki.freqkflag.co`)"
       - "traefik.http.routers.loki.entrypoints=websecure"
       - "traefik.http.routers.loki.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.loki.middlewares=security-headers@file"
+      - "traefik.http.routers.loki.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.services.loki.loadbalancer.server.port=3100"
 
   promtail:

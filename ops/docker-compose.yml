@@ -32,7 +32,7 @@ services:
       - "traefik.http.routers.ops.rule=Host(`ops.freqkflag.co`)"
       - "traefik.http.routers.ops.entrypoints=websecure"
       - "traefik.http.routers.ops.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ops.middlewares=security-headers@file"
+      - "traefik.http.routers.ops.middlewares=security-headers@file,rate-limit-strict@file"
       - "traefik.http.services.ops.loadbalancer.server.port=3000"
 
 networks:

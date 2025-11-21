@@ -29,7 +29,7 @@ services:
       - "traefik.http.routers.adminer.rule=Host(`adminer.freqkflag.co`)"
       - "traefik.http.routers.adminer.entrypoints=websecure"
       - "traefik.http.routers.adminer.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.adminer.middlewares=security-headers@file"
+      - "traefik.http.routers.adminer.middlewares=security-headers@file,rate-limit-strict@file"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 
 networks:

@@ -33,7 +33,7 @@ services:
       - "traefik.http.routers.nodered.rule=Host(`nodered.freqkflag.co`)"
       - "traefik.http.routers.nodered.entrypoints=websecure"
       - "traefik.http.routers.nodered.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.nodered.middlewares=security-headers@file"
+      - "traefik.http.routers.nodered.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.services.nodered.loadbalancer.server.port=1880"
       - "prometheus.io/scrape=true"
       - "prometheus.io/port=1880"
