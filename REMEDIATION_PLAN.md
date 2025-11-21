@@ -784,9 +784,9 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 ### Success Criteria
 
 **Phase 1 Complete:**
-- ✅ No plaintext passwords in repository
-- ✅ PostgreSQL authentication enabled
-- ✅ All secrets audited and rotated
+- ✅ No plaintext passwords in repository - **COMPLETED** (2025-11-21)
+- ✅ PostgreSQL authentication enabled - **COMPLETED** (2025-11-21) ⚠️ **RESTART REQUIRED**
+- 🔄 All secrets audited and rotated - **IN PROGRESS** (credentials rotation pending)
 
 **Phase 2 Complete:**
 - ✅ All services reporting healthy
@@ -858,15 +858,60 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 
 ## Next Steps
 
-1. **Review and approve plan** - Infrastructure Lead
-2. **Assign phase owners** - Team leads
-3. **Schedule kickoff meeting** - Project manager
-4. **Begin Phase 1** - Immediate start on security remediation
+### Immediate Actions (Phase 1)
+
+1. **CRITICAL: Rotate exposed credentials**
+   - Warren7882?? (VPS root access) - **MUST ROTATE IMMEDIATELY**
+   - 7882 (Homelab and Mac Mini access) - **MUST ROTATE IMMEDIATELY**
+
+2. **CRITICAL: Restart PostgreSQL** (after verifying passwords in Infisical)
+   ```bash
+   docker compose -f compose.orchestrator.yml restart postgres
+   ```
+   - ⚠️ **All PostgreSQL services will disconnect during restart**
+   - Monitor service reconnections
+   - Test database connections after restart
+
+3. **Update environment templates**
+   - Replace weak default passwords in `env/templates/base.env.example`
+   - Document password requirements
+   - Ensure production uses Infisical exclusively
+
+### Ongoing Actions
+
+4. **Review and approve plan** - Infrastructure Lead
+5. **Assign phase owners** - Team leads
+6. **Schedule kickoff meeting** - Project manager
+7. **Begin Phase 2** - Service health check stabilization (once Phase 1.2 PostgreSQL restart completed)
 
 ---
 
-**Plan Version:** 1.0  
-**Last Updated:** 2025-11-21  
+## Phase 1 Progress Summary
+
+**Status:** 🔄 IN PROGRESS (2025-11-21)  
+**Completion:** 2/3 tasks completed
+
+### Completed Tasks ✅
+1. **Phase 1.1: Remove Plaintext Passwords** - ✅ COMPLETED
+   - Commit: 12b7f17 - `security: remove plaintext passwords from SSH config`
+   - Passwords removed, .ssh added to .gitignore
+   - Git history audited
+
+2. **Phase 1.2: Enable PostgreSQL Authentication** - ✅ COMPLETED (restart pending)
+   - Commit: Pending - `security: enable PostgreSQL scram-sha-256 authentication`
+   - Authentication method changed to scram-sha-256
+   - ⚠️ **PostgreSQL restart required**
+
+### In Progress Tasks 🔄
+3. **Phase 1.3: Secrets Audit and Rotation** - 🔄 IN PROGRESS
+   - Environment files audited
+   - Weak passwords identified in templates
+   - **Action Required:** Replace weak passwords in templates, rotate credentials
+
+---
+
+**Plan Version:** 1.1  
+**Last Updated:** 2025-11-21 (Phase 1 Progress Update)  
 **Owner:** Infrastructure Team  
-**Status:** Active
+**Status:** Active - Phase 1 in progress
 
