@@ -361,7 +361,7 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 - Restore data from `~/.backup/<tier>/` using procedures in `infra-build-plan.md`.
 - Infisical outage steps:
   1. Switch to read-only mode; block deployments.
-  2. `infisical export --format env --path prod/backup > /tmp/infisical-backup.env`
+  2. `infisical run --env=production -- infisical export --format env --path prod/backup > /tmp/infisical-backup.env`
   3. After recovery, shred the cache file and trigger `post-recovery-audit`.
 - Any recovery action that touches tracked files must conclude with a commit/PR.
 
