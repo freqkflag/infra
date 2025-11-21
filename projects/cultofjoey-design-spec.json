@@ -1,0 +1,413 @@
+{
+  "project": {
+    "name": "Cult of Joey \u2014 Dark Neon Cyberpunk Personal Brand Site",
+    "slug": "cultofjoey-dark-neon",
+    "domain": "cultofjoey.com",
+    "description": "A dark-neon cyberpunk personal brand hub blending queer rave culture, mental-health storytelling, technical homelab/IT energy, and creative workshops (cosplay, tattoos, DIY, tech)."
+  },
+  "brand": {
+    "pillars": [
+      "Raw + honest: mental health, lived experience, queer identity, scars and recovery.",
+      "Technical: homelab/IT/coding presence should be visible in UI and content.",
+      "Occult-but-playful: ritual, sigils, neon mysticism, \u2018cult\u2019 as community and ritual, not horror-gore."
+    ],
+    "tone_voice": [
+      "neon",
+      "ritual",
+      "raw",
+      "queer",
+      "glitch",
+      "intimate",
+      "playful",
+      "personal",
+      "readable",
+      "accessible"
+    ],
+    "key_tone_words": [
+      "neon",
+      "ritual",
+      "raw",
+      "queer",
+      "glitch",
+      "intimate",
+      "cybernetic",
+      "honest",
+      "survival",
+      "signal-in-the-static"
+    ]
+  },
+  "audience": {
+    "primary": [
+      "queer community and queer alt/kink-adjacent audiences",
+      "people interested in mental health and lived experience storytelling",
+      "creative DIY makers: cosplay, tattoos, crafting, photography, art",
+      "technical/IT/coding/homelab curious visitors",
+      "fans of cyberpunk, neon, occult-adjacent aesthetics"
+    ],
+    "age_range": [
+      "18-25",
+      "26-35",
+      "36-50"
+    ],
+    "language": "English"
+  },
+  "goals": {
+    "primary": [
+      "Build a strong, recognizable personal brand.",
+      "Engage community and collaborators.",
+      "Showcase creative projects (journal, workshops, gallery)."
+    ],
+    "secondary": [
+      "Increase newsletter sign-ups."
+    ]
+  },
+  "features": [
+    "Journal/blog",
+    "Workshop showcase",
+    "Filterable gallery",
+    "Collaboration/contact form",
+    "Interactive RV life timeline",
+    "Newsletter signup",
+    "Social media integration",
+    "Custom filters (mood/era, category)",
+    "Lightbox for media",
+    "Responsive design across devices",
+    "Accessibility support, including reduced motion"
+  ],
+  "color_palette": {
+    "base_hexes": {
+      "background": "#05040A",
+      "surface": "#0E0B1A",
+      "surface_alt": "#151027",
+      "primary": "#E600FF",
+      "primary_soft": "#FF7BFF",
+      "accent": "#00FFFF",
+      "accent_soft": "#66FFFF",
+      "warning": "#FFB347",
+      "danger": "#FF3366",
+      "text": "#F5F5FA",
+      "text_muted": "#9B92BB",
+      "border": "#2B2540",
+      "glow": "#7D3CFF"
+    },
+    "semantic_mapping": {
+      "primary_bg": "primary",
+      "primary_fg": "background",
+      "accent_bg": "accent",
+      "accent_fg": "background",
+      "body_bg": "background",
+      "body_text": "text",
+      "muted_text": "text_muted",
+      "chip_bg": "surface_alt"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "display": "Orbitron",
+      "headings_ui": "Oxanium",
+      "body": "Space Grotesk",
+      "mono": [
+        "JetBrains Mono",
+        "Fira Code"
+      ]
+    },
+    "scale": {
+      "fs_xs": "clamp(0.75rem, 0.7rem + 0.2vw, 0.8rem)",
+      "fs_sm": "clamp(0.85rem, 0.8rem + 0.3vw, 0.95rem)",
+      "fs_md": "clamp(1rem, 0.95rem + 0.3vw, 1.1rem)",
+      "fs_lg": "clamp(1.3rem, 1.1rem + 0.6vw, 1.6rem)",
+      "fs_xl": "clamp(1.6rem, 1.4rem + 0.8vw, 2rem)",
+      "fs_2xl": "clamp(2.3rem, 2rem + 1.3vw, 3rem)",
+      "fs_hero": "clamp(2.8rem, 2.4rem + 2vw, 3.8rem)"
+    },
+    "weights": {
+      "display": "700-900",
+      "headings": "600-800",
+      "body": "400-500",
+      "emphasis": "500-600 italic"
+    }
+  },
+  "layout": {
+    "spacing_scale_rem": {
+      "sp_1": 0.25,
+      "sp_2": 0.5,
+      "sp_3": 0.75,
+      "sp_4": 1.0,
+      "sp_6": 1.5,
+      "sp_8": 2.0,
+      "sp_10": 2.5,
+      "sp_12": 3.0
+    },
+    "containers": {
+      "content_narrow": "min(680px, 100% - 2rem)",
+      "content_default": "min(960px, 100% - 2.5rem)",
+      "content_wide": "min(1180px, 100% - 3rem)"
+    },
+    "grid": {
+      "mobile": "1-column, full bleed sections where appropriate",
+      "tablet": "6-column grid",
+      "desktop": "12-column grid with 24px gutters"
+    },
+    "breakpoints": {
+      "bp_xs": "0\u2013479px",
+      "bp_sm": "480px",
+      "bp_md": "768px",
+      "bp_lg": "1024px",
+      "bp_xl": "1440px"
+    }
+  },
+  "shape_borders_shadows": {
+    "radius": {
+      "xs": "4px",
+      "md": "10px",
+      "lg": "18px",
+      "pill": "999px"
+    },
+    "borders": {
+      "subtle": "1px solid var(--c-border)",
+      "strong": "1px solid var(--c-primary-soft)"
+    },
+    "shadows": {
+      "soft": "0 0 18px rgba(0, 0, 0, 0.7)",
+      "primary_glow": "0 0 32px rgba(230, 0, 255, 0.45)",
+      "accent_glow": "0 0 32px rgba(0, 255, 255, 0.38)"
+    }
+  },
+  "motion_interaction": {
+    "easing_global": "cubic-bezier(0.18, 0.89, 0.32, 1.28)",
+    "durations_ms": {
+      "micro": "120\u2013180",
+      "hover_glow": "200\u2013260",
+      "page_transitions": "280\u2013320"
+    },
+    "patterns": {
+      "button_hover": "scale 1.02, glow shadow, color shift to primary_soft",
+      "link_hover": "underline grows from center, color shifts from muted to accent",
+      "glitch_headings": "small horizontal jitter via pseudo-elements on hover/focus, disabled for reduced-motion"
+    },
+    "accessibility": {
+      "respect_prefers_reduced_motion": true
+    }
+  },
+  "components": {
+    "header": {
+      "structure": "Sticky top bar over blurred background",
+      "areas": {
+        "left": "logo/wordmark 'Cult of Joey'",
+        "center": "main navigation (desktop)",
+        "right": "social icons (Mastodon, GitHub, etc.)"
+      },
+      "states": {
+        "default": "translucent surface with subtle bottom border",
+        "on_scroll": "slightly darker, height shrinks from 72px to ~60px"
+      },
+      "nav_style": "neon underline, cyan on hover, magenta glow on active"
+    },
+    "hero": {
+      "background": "gradient #05040A \u2192 #151027 with optional overlay image",
+      "layout": {
+        "left": "hero title, subtitle, primary CTA, meta line",
+        "right": "Now Broadcasting card (latest post or project)"
+      },
+      "tokens": {
+        "heading": "fs_hero, Orbitron, magenta with cyan glow",
+        "subtitle": "fs_md, muted text"
+      }
+    },
+    "buttons": {
+      "primary": {
+        "bg": "primary",
+        "text": "background",
+        "radius": "pill",
+        "padding": "sp_2 sp_6",
+        "hover": "bg primary_soft, primary_glow shadow"
+      },
+      "secondary": {
+        "bg": "transparent",
+        "border": "accent",
+        "text": "accent",
+        "hover": "bg rgba(0,255,255,0.1)"
+      },
+      "ghost": {
+        "text_only": true,
+        "hover": "neon underline"
+      }
+    },
+    "cards": {
+      "base": {
+        "background": "surface",
+        "radius": "lg",
+        "border": "subtle",
+        "shadow": "soft",
+        "layout": "image top, meta row, title, excerpt, footer actions",
+        "hover": "slight lift, border moves toward primary_soft, optional glow"
+      },
+      "variants": {
+        "journal": "includes mood chips",
+        "workshop": "includes tech/material spec chips",
+        "gallery": "full-bleed image with overlay title/meta"
+      }
+    },
+    "chips_tags": {
+      "base": {
+        "background": "chip_bg",
+        "text": "fs_xs, muted",
+        "radius": "pill"
+      },
+      "mood_variants": {
+        "calm": "teal tint",
+        "manic": "magenta tint",
+        "reflective": "indigo tint",
+        "defiant": "orange tint"
+      }
+    },
+    "post_layouts": {
+      "blog_post": {
+        "title": "fs_2xl Orbitron",
+        "meta_bar": "date \u00b7 mood chip \u00b7 reading time",
+        "body": "Space Grotesk fs_md, line-height ~1.7",
+        "pull_quotes": "left border primary, slight glow, fs_lg",
+        "code_blocks": "dark surface, mono font, cyan caret accent"
+      },
+      "workshop_project": {
+        "sections": [
+          "summary",
+          "specs",
+          "process",
+          "gallery"
+        ],
+        "acf_style": "definition list with neon dividers"
+      }
+    },
+    "forms": {
+      "summon_me": {
+        "layout": "two-column desktop, stacked mobile",
+        "inputs": {
+          "bg": "surface_alt",
+          "border": "subtle",
+          "focus": "accent",
+          "radius": "md",
+          "labels": "fs_sm, muted"
+        },
+        "submit_button": "primary style, full-width on mobile",
+        "validation": "warning color"
+      }
+    },
+    "gallery": {
+      "layout": "justified or masonry",
+      "hover": "slight zoom, overlay gradient, metadata text",
+      "lightbox": "dark background, caption fs_sm bottom"
+    },
+    "meta_components": {
+      "breadcrumbs": "small uppercase muted links with accent hover",
+      "pagination": "pill-style buttons, active page magenta bg",
+      "site_notice": "full-width strip, surface_alt, used for external peer support notice"
+    }
+  },
+  "pages": {
+    "home": {
+      "purpose": "Neon-cyberpunk landing hub for Cult of Joey.",
+      "sections": [
+        "Hero section (full width, Now Broadcasting card)",
+        "Currently Broadcasting row (latest post + latest project)",
+        "Journal feed strip (3 journal cards)",
+        "Workshop highlight strip (2 project cards)",
+        "Gallery band strip (image row)",
+        "Footer with condensed links + peer support external link"
+      ]
+    },
+    "book_of_joey": {
+      "type": "blog_index",
+      "sections": [
+        "Intro block paragraph",
+        "Filter row with mood/era chips",
+        "Masonry/grid of journal cards",
+        "Pagination row"
+      ]
+    },
+    "single_post": {
+      "type": "post_template",
+      "sections": [
+        "Post header with title, mood chip, date, reading time",
+        "Main article content (narrow width, Space Grotesk)",
+        "Pull quote styling for emphasis",
+        "Related posts row titled 'More from this Era'"
+      ]
+    },
+    "workshop_index": {
+      "type": "projects_index",
+      "filters": [
+        "Cosplay",
+        "Tech",
+        "Tattoo",
+        "DIY"
+      ],
+      "layout": "grid of workshop cards with spec chips"
+    },
+    "gallery": {
+      "type": "media_grid",
+      "filters": [
+        "Photography",
+        "Art",
+        "Events",
+        "Self"
+      ],
+      "layout": "full-grid gallery with optional story overlays on large screens"
+    },
+    "rv_life": {
+      "type": "timeline",
+      "sections": [
+        "Intro section",
+        "Alternating left/right timeline cards with date, route, tags",
+        "Map embed band with border + glow"
+      ]
+    },
+    "summon_me": {
+      "type": "contact",
+      "sections": [
+        "Big heading and concise copy",
+        "Form component (name, email, message, etc.)",
+        "Safety note + external portal link for peer support"
+      ]
+    }
+  },
+  "elementor_prompts": {
+    "wireframes": {
+      "home": "Create a full-page wireframe for a dark-neon cyberpunk personal brand site. Section 1 \u2014 Hero: full-width gradient #05040A \u2192 #151027, left: giant Orbitron title, subtitle, primary CTA; right: 'Now Broadcasting' card showing latest post/project. Section 2 \u2014 Journal Strip: 3-card grid showing latest entries with mood chips and excerpts. Section 3 \u2014 Workshop Showcase: 2 featured project cards with full-bleed images and spec chips. Section 4 \u2014 Gallery Band: 6-image strip with hover zoom and gradient overlays. Section 5 \u2014 Footer: minimal links, neon-accent divider, peer-support note.",
+      "book_of_joey": "Create a blog index wireframe. Section 1 \u2014 Intro: short paragraph describing the journal. Section 2 \u2014 Filter Chips: mood/era filter chips in pill style. Section 3 \u2014 Masonry Grid: 3-column responsive masonry for posts (card layout with title/mood/excerpt).",
+      "single_post": "Create a single post template wireframe. Section 1 \u2014 Header: Orbitron title, mood chip, date, reading time. Section 2 \u2014 Article: narrow reading container using Space Grotesk. Section 3 \u2014 Pull Quotes: glow-bordered callouts. Section 4 \u2014 Related Posts: 3 related posts titled 'More from this Era'.",
+      "workshop_index": "Create a workshop index wireframe. Section 1 \u2014 Category Filters: Cosplay, Tech, Tattoo, DIY chips. Section 2 \u2014 3-Column Grid: cards with image, title, summary, and spec chips.",
+      "gallery": "Create a filterable gallery wireframe. Section 1 \u2014 Filters: Photography, Art, Events, Self. Section 2 \u2014 Image Grid: masonry or justified gallery with lightbox.",
+      "rv_life": "Create a timeline page wireframe. Section 1 \u2014 Intro text. Section 2 \u2014 Timeline: alternating left/right entries with date, title, description, and image. Section 3 \u2014 Optional Map Band: simple map embed with neon border.",
+      "summon_me": "Create a contact page wireframe. Section 1 \u2014 Heading: large neon Orbitron title. Section 2 \u2014 Two-Column Form: name, email, message, checkboxes. Section 3 \u2014 Disclaimer: external safety disclaimer with link."
+    },
+    "sections": {
+      "hero": "Create a full-width hero section in a dark-neon cyberpunk style. Background: gradient #05040A \u2192 #151027 with soft magenta and cyan glow accents. Left column: large Orbitron title with neon magenta glow, subtitle in Space Grotesk. Primary CTA button: magenta pill, cyan hover glow. Right column: card titled 'Now Broadcasting' showing a featured post or project with neon border and soft glow. Add subtle glitch accent on the hero title. Spacing: generous, cinematic.",
+      "journal_strip": "Create a 3-card grid showcasing journal entries. Each card: dark surface background (#0E0B1A), thin violet border, soft neon glow on hover. Include: title (Oxanium), mood chip (teal/magenta/indigo/orange), short excerpt, and 'Read \u2192' link. Cards lift slightly on hover with cyan glow. Spacing should be airy and readable.",
+      "workshop_strip": "Build a 2-card row for workshop projects. Each card: full-bleed image with gradient overlay (magenta\u2192cyan), title in Orbitron, small spec chips (e.g., Docker \u00b7 Traefik \u00b7 EVA Foam). Hover interaction: slight zoom + neon glow. Include a 'View Details' button in cyan outline with neon hover.",
+      "gallery_strip": "Create a full-width gallery strip with 6 images in a responsive grid. Use dark background, neon-hover zoom, gradient overlay on hover with title text. Enable lightbox. Keep it highly visual and minimal text.",
+      "blog_index": "Create a blog index layout with intro paragraph at top, mood/era filter chips (pills with glow), and a masonry grid of posts (3 columns desktop). Post cards include: mood chip, title, excerpt, neon hover glow. Use Space Grotesk for body, Oxanium for headings.",
+      "single_post": "Build a single-post layout: narrow content width, Orbitron neon-glow title, mood chip + date + reading time, Space Grotesk body text, glow-border pull quotes, code blocks in dark neon theme, and a 'More from this Era' section at bottom with 3 related posts.",
+      "workshop_index": "Create a workshop index with category filter chips and a 3-column grid of workshop cards. Each card includes image, title, short summary, and spec chips. Add neon hover glow and card lift effect.",
+      "rv_life": "Build a timeline layout with alternating left-right entries. Each entry includes date, title, description, and small image. Background: dark violet with neon dividers. Add optional map band with cyan glow border.",
+      "summon_me": "Create a bold neon contact section with large Orbitron heading, two-column form (name/email/message + checkboxes), neon-accent focus rings, cyan outline button with magenta glow on hover, and a safety disclaimer below linking externally."
+    },
+    "header_footer": {
+      "header": "Create a sticky translucent header with blurred background. Left: site title in Orbitron. Right: nav menu with neon underline hover (cyan). Active link glows magenta. Add a subtle bottom neon divider line.",
+      "footer": "Create a minimalist neon footer. Left: small logo/title. Center: inline links. Right: social icons (Mastodon, GitHub). Add a faint neon top divider glow."
+    },
+    "global_styles": {
+      "colors": "Create a global color system with: Background #05040A, Surface #0E0B1A, Surface Alt #151027, Primary Magenta #E600FF, Primary Soft #FF7BFF, Accent Cyan #00FFFF, Accent Soft #66FFFF, Text #F5F5FA, Muted Text #9B92BB, Border #2B2540, Glow #7D3CFF.",
+      "typography": "Set global typography: Headings in Oxanium (bold, neon magenta accent), Display/Hero in Orbitron (large fluid size), Body in Space Grotesk (comfortable line-height), and Mono in JetBrains Mono for code or UI elements.",
+      "buttons": "Create button system: Primary magenta pill with cyan glow hover, secondary transparent with cyan outline, ghost with underline from center on hover. Use cyberpunk easing (0.18,0.89,0.32,1.28).",
+      "containers": "Set container widths: narrow 680px, standard 960px, wide 1180px. Use 12-column grid on desktop, 6-column on tablet, single-column on mobile.",
+      "motion": "Use neon cyberpunk motion: hover glows (200\u2013260ms), slight scale-up (1.02) on interactive elements, underline animations for links, soft glitch effects for selected headings, and respect reduced-motion accessibility."
+    },
+    "custom_css_snippets": {
+      "neon_glow_hover": "selector:hover { box-shadow: 0 0 12px #E600FF, 0 0 22px #00FFFF; transform: translateY(-2px); }",
+      "glitch_text": "selector { position: relative; } selector::before, selector::after { content: attr(data-text); position: absolute; left: 0; top: 0; opacity: 0.7; } selector::before { color: #E600FF; transform: translate(2px, -2px); } selector::after { color: #00FFFF; transform: translate(-2px, 2px); }",
+      "neon_border": "selector { border: 1px solid #2B2540; box-shadow: 0 0 12px #7D3CFF inset; }",
+      "underline_animation": "selector { position: relative; } selector::after { content: ''; position: absolute; bottom: 0; left: 50%; width: 0%; height: 2px; background: #00FFFF; transition: 0.3s ease; } selector:hover::after { left: 0; width: 100%; }"
+    }
+  }
+}

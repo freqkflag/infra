@@ -1,0 +1,26 @@
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="{{@site.url}}" class="site-logo">
+            <span class="logo-part-1">CULT</span>
+            <span class="logo-part-2">OF</span>
+            <span class="logo-part-3">JOEY</span>
+        </a>
+        
+        <nav class="site-nav">
+            {{navigation}}
+            <a href="/contact" class="btn btn-primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Summon Me</a>
+        </nav>
+        
+        <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+    
+    <nav id="mobile-menu" class="mobile-menu">
+        {{navigation}}
+        <a href="/contact" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Summon Me</a>
+    </nav>
+</header>
+

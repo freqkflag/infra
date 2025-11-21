@@ -1,0 +1,21 @@
+<article class="post-card" data-mood="{{#if primary_tag}}{{primary_tag.name}}{{/if}}" data-category="{{#if primary_tag}}{{primary_tag.name}}{{/if}}">
+    <a href="{{url}}" style="text-decoration: none; color: inherit;">
+        <div class="post-card-content">
+            <div class="post-card-meta">
+                {{#if primary_tag}}
+                    <span class="chip{{#if primary_tag.slug}} chip-mood-{{primary_tag.slug}}{{/if}}">{{primary_tag.name}}</span>
+                {{/if}}
+                <span class="mono-font" style="font-size: 0.75rem; color: var(--c-text-muted);">{{date format="MMM D, YYYY"}}</span>
+            </div>
+            
+            <h3 class="post-card-title">{{title}}</h3>
+            
+            <p class="post-card-excerpt">{{excerpt words="25"}}</p>
+            
+            <div class="post-card-footer">
+                Read Transmission
+            </div>
+        </div>
+    </a>
+</article>
+

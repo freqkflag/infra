@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "cursor-agent": "^1.0.3",
+    "node": "^25.2.1",
+    "node.js": "^0.0.1-security",
+    "nodejs": "^0.0.0",
+    "npx": "^10.2.2",
+    "uv": "^1.4.0",
+    "ux": "^0.3.0"
+  }
+}

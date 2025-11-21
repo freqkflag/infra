@@ -1,0 +1,41 @@
+services:
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    environment:
+      ADMINER_DEFAULT_SERVER: ${ADMINER_DEFAULT_SERVER:-}
+    networks:
+      - adminer-network
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=Host(`adminer.freqkflag.co`)"
+      - "traefik.http.routers.adminer.entrypoints=websecure"
+      - "traefik.http.routers.adminer.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.adminer.middlewares=security-headers@file"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+
+networks:
+  adminer-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+

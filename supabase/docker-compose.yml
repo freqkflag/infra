@@ -1,0 +1,155 @@
+services:
+  supabase-db:
+    image: supabase/postgres:15.1.0.147
+    container_name: supabase-db
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: 5432
+      POSTGRES_PORT: 5432
+      PGDATABASE: postgres
+      POSTGRES_DB: postgres
+      PGUSER: supabase_admin
+      POSTGRES_USER: supabase_admin
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: ${JWT_EXP:-3600}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - supabase-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supabase_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  supabase-studio:
+    image: supabase/studio:20231127-0b8c85f
+    container_name: supabase-studio
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      STUDIO_PG_META_URL: http://supabase-meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DEFAULT_ORGANIZATION_NAME: ${ORG_NAME:-Default Org}
+      DEFAULT_PROJECT_NAME: ${PROJECT_NAME:-Default Project}
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_PUBLIC_URL: https://${SUPABASE_HOST:-supabase.freqkflag.co}
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+    networks:
+      - supabase-network
+      - traefik-network
+    depends_on:
+      - supabase-db
+      - supabase-meta
+      - supabase-kong
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase-studio.rule=Host(`supabase.freqkflag.co`)"
+      - "traefik.http.routers.supabase-studio.entrypoints=websecure"
+      - "traefik.http.routers.supabase-studio.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.supabase-studio.middlewares=security-headers@file"
+      - "traefik.http.services.supabase-studio.loadbalancer.server.port=3000"
+
+  supabase-meta:
+    image: supabase/postgres-meta:v0.80.0
+    container_name: supabase-meta
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: supabase_admin
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - supabase-network
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+  supabase-kong:
+    image: kong:2.8.1
+    container_name: supabase-kong
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./data/kong:/var/lib/kong
+    networks:
+      - supabase-network
+      - traefik-network
+    ports:
+      - "8000:8000"  # Kong API Gateway
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase-api.rule=Host(`api.supabase.freqkflag.co`)"
+      - "traefik.http.routers.supabase-api.entrypoints=websecure"
+      - "traefik.http.routers.supabase-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.supabase-api.middlewares=security-headers@file"
+      - "traefik.http.services.supabase-api.loadbalancer.server.port=8000"
+
+networks:
+  supabase-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+

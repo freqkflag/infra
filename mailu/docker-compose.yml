@@ -1,0 +1,188 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: mailu-redis
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - mailu-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  admin:
+    image: mailu/admin:latest
+    container_name: mailu-admin
+    restart: unless-stopped
+    volumes:
+      - ./data/mail:/data
+      - ./data/overrides:/overrides
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DOMAIN=${DOMAIN}
+      - DB_FLAVOR=sqlite
+      - DB_NAME=/data/mailu.db
+      - INSTANCE_ID_PATH=/data/instance
+      - STATS_ENDPOINT_ADDRESS=0.0.0.0
+      - LOG_LEVEL=INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - mailu-network
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailu-admin.rule=Host(`mail.freqkflag.co`)"
+      - "traefik.http.routers.mailu-admin.entrypoints=websecure"
+      - "traefik.http.routers.mailu-admin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mailu-admin.middlewares=security-headers@file"
+      - "traefik.http.services.mailu-admin.loadbalancer.server.port=80"
+
+  imap:
+    image: mailu/dovecot:latest
+    container_name: mailu-imap
+    restart: unless-stopped
+    volumes:
+      - ./data/mail:/data
+      - ./data/overrides:/overrides
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DOMAIN=${DOMAIN}
+      - DB_FLAVOR=sqlite
+      - DB_NAME=/data/mailu.db
+      - LOG_LEVEL=INFO
+    networks:
+      - mailu-network
+    ports:
+      - "143:143"   # IMAP
+      - "993:993"   # IMAPS
+
+  smtp:
+    image: mailu/postfix:latest
+    container_name: mailu-smtp
+    restart: unless-stopped
+    volumes:
+      - ./data/mail:/data
+      - ./data/overrides:/overrides
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DOMAIN=${DOMAIN}
+      - DB_FLAVOR=sqlite
+      - DB_NAME=/data/mailu.db
+      - LOG_LEVEL=INFO
+    networks:
+      - mailu-network
+    ports:
+      - "25:25"     # SMTP
+      - "465:465"   # SMTPS
+      - "587:587"   # Submission
+
+  webmail:
+    image: mailu/roundcube:latest
+    container_name: mailu-webmail
+    restart: unless-stopped
+    volumes:
+      - ./data/mail:/data
+      - ./data/overrides:/overrides
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DOMAIN=${DOMAIN}
+      - DB_FLAVOR=sqlite
+      - DB_NAME=/data/mailu.db
+      - LOG_LEVEL=INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - mailu-network
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailu-webmail.rule=Host(`webmail.freqkflag.co`)"
+      - "traefik.http.routers.mailu-webmail.entrypoints=websecure"
+      - "traefik.http.routers.mailu-webmail.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mailu-webmail.middlewares=security-headers@file"
+      - "traefik.http.services.mailu-webmail.loadbalancer.server.port=80"
+
+  front:
+    image: mailu/nginx:latest
+    container_name: mailu-front
+    restart: unless-stopped
+    volumes:
+      - ./data/mail:/data
+      - ./data/overrides:/overrides
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DOMAIN=${DOMAIN}
+      - DB_FLAVOR=sqlite
+      - DB_NAME=/data/mailu.db
+      - LOG_LEVEL=INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - mailu-network
+      - traefik-network
+    depends_on:
+      - admin
+      - webmail
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailu-front.rule=Host(`mail.freqkflag.co`)"
+      - "traefik.http.routers.mailu-front.entrypoints=websecure"
+      - "traefik.http.routers.mailu-front.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mailu-front.middlewares=security-headers@file"
+      - "traefik.http.services.mailu-front.loadbalancer.server.port=80"
+
+networks:
+  mailu-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+

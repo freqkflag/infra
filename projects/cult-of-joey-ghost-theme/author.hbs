@@ -1,0 +1,24 @@
+{{!< default}}
+
+<header class="post-header">
+    <div class="post-header-inner">
+        {{#if profile_image}}
+            <img src="{{img_url profile_image}}" alt="{{name}}" style="width: 120px; height: 120px; border-radius: 50%; margin-bottom: 2rem; border: 2px solid var(--c-primary); box-shadow: var(--shadow-primary-glow);">
+        {{/if}}
+        <h1 class="post-title glitch-hover">{{name}}</h1>
+        {{#if bio}}
+            <p class="post-excerpt">{{bio}}</p>
+        {{/if}}
+    </div>
+</header>
+
+<div class="container py-12" style="padding: 3rem 0;">
+    <div class="post-grid">
+        {{#foreach posts}}
+            {{> "post-card"}}
+        {{/foreach}}
+    </div>
+    
+    {{pagination}}
+</div>
+

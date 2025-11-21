@@ -1,0 +1,112 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint and Validate
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Validate YAML files
+        run: |
+          echo "Validating YAML syntax..."
+          find . -name "*.yml" -o -name "*.yaml" | while read file; do
+            python3 -c "import yaml; yaml.safe_load(open('$file'))" || {
+              echo "❌ Invalid YAML: $file"
+              exit 1
+            }
+            echo "✓ Valid: $file"
+          done
+      
+      - name: Validate docker-compose files
+        run: |
+          echo "Validating docker-compose configurations..."
+          find . -name "docker-compose.yml" | while read file; do
+            echo "Validating: $file"
+            docker compose -f "$file" config > /dev/null || {
+              echo "❌ Invalid: $file"
+              exit 1
+            }
+          done
+      
+      - name: Check file structure
+        run: |
+          echo "Checking required files..."
+          required_files=(
+            "AGENTS.md"
+            "PREFERENCES.md"
+            "README.md"
+            "traefik/docker-compose.yml"
+            "vault/docker-compose.yml"
+          )
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Missing required file: $file"
+              exit 1
+            fi
+            echo "✓ Found: $file"
+          done
+
+  security:
+    runs-on: ubuntu-latest
+    name: Security Scan
+    needs: lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  test:
+    runs-on: ubuntu-latest
+    name: Test Configurations
+    needs: lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Test service health checks
+        run: |
+          echo "Testing health check configurations..."
+          find . -name "docker-compose.yml" | while read file; do
+            if grep -q "healthcheck:" "$file"; then
+              echo "✓ Health checks found in: $file"
+            else
+              echo "⚠ No health checks in: $file"
+            fi
+          done
+      
+      - name: Test resource limits
+        run: |
+          echo "Checking resource limits..."
+          find . -name "docker-compose.yml" | while read file; do
+            if grep -q "deploy:" "$file" && grep -q "resources:" "$file"; then
+              echo "✓ Resource limits found in: $file"
+            else
+              echo "⚠ No resource limits in: $file"
+            fi
+          done
+

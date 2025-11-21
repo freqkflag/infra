@@ -1,0 +1,49 @@
+{
+  "name": "Ghost CMS Theme Development",
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "ghost",
+  "workspaceFolder": "/var/lib/ghost/content/themes/cult-of-joey",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-json",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      "settings": {
+        "files.associations": {
+          "*.hbs": "handlebars"
+        },
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  },
+  
+  "forwardPorts": [2368, 2369],
+  "portsAttributes": {
+    "2368": {
+      "label": "Ghost Site",
+      "onAutoForward": "openBrowser"
+    },
+    "2369": {
+      "label": "Ghost Admin",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  
+  "postCreateCommand": "npm install -g gscan && echo 'Ghost development environment ready!'",
+  
+  "remoteUser": "node"
+}
+

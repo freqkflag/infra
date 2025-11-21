@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "exported_on": 1700000000000,
+    "version": "5.0.0"
+  },
+  "data": {
+    "posts": [
+      {
+        "id": 1,
+        "title": "Signal in the Static",
+        "slug": "signal-in-the-static",
+        "mobiledoc": "{\"version\":\"0.3.1\",\"atoms\":[],\"cards\":[],\"markups\":[],\"sections\":[[1,\"p\",[[0,[],0,\"The hum of the server rack is a comfort. It's a consistent, white noise that drowns out the chaotic frequency of the outside world. Yesterday, I tore down the entire cluster.\"]]],[1,\"p\",[[0,[],0,\"Why? Because sometimes you need to burn it down to build it right. The dependencies were tangled, the legacy configurations were haunting the logs, and frankly, it just didn't feel clean anymore.\"]]],[1,\"p\",[[0,[],0,\"Recovery isn't a straight line. It's a recursive function with no exit condition sometimes.\"]]],[1,\"p\",[[0,[],0,\"Rebuilding the Kubernetes cluster felt like a ritual. Flashing the ISOs, bootstrapping the nodes, watching the pods come alive one by one. Green status lights in the dark.\"]]]]}",
+        "html": "<p>The hum of the server rack is a comfort. It's a consistent, white noise that drowns out the chaotic frequency of the outside world. Yesterday, I tore down the entire cluster.</p><p>Why? Because sometimes you need to burn it down to build it right. The dependencies were tangled, the legacy configurations were haunting the logs, and frankly, it just didn't feel clean anymore.</p><p>Recovery isn't a straight line. It's a recursive function with no exit condition sometimes.</p><p>Rebuilding the Kubernetes cluster felt like a ritual. Flashing the ISOs, bootstrapping the nodes, watching the pods come alive one by one. Green status lights in the dark.</p>",
+        "status": "published",
+        "published_at": 1700000000000,
+        "custom_excerpt": "Navigating the noise of modern existence while rebuilding a homelab from scratch. A metaphor for mental recovery.",
+        "featured": false,
+        "tags": [
+          {"name": "reflective", "slug": "reflective"},
+          {"name": "Tech", "slug": "tech"}
+        ],
+        "authors": [{"name": "Cult of Joey", "slug": "cult-of-joey"}]
+      },
+      {
+        "id": 2,
+        "title": "Cyber-Samurai Armor V2",
+        "slug": "cyber-samurai-armor-v2",
+        "mobiledoc": "{\"version\":\"0.3.1\",\"atoms\":[],\"cards\":[],\"markups\":[],\"sections\":[[1,\"h2\",[[0,[],0,\"Summary\"]]],[1,\"p\",[[0,[],0,\"This project combines traditional cosplay fabrication with modern electronics to create a fully illuminated armor set.\"]]],[1,\"h2\",[[0,[],0,\"Specs\"]]],[1,\"ul\",[[[0,[],0,\"EVA Foam base structure\"]],[[0,[],0,\"Arduino Nano for control\"]],[[0,[],0,\"WS2812B LED strips\"]],[[0,[],0,\"Custom C++ firmware\"]],[[0,[],0,\"Battery-powered for portability\"]]]],[1,\"h2\",[[0,[],0,\"Process\"]]],[1,\"p\",[[0,[],0,\"Your process documentation here\"]]]]}",
+        "html": "<h2>Summary</h2><p>This project combines traditional cosplay fabrication with modern electronics to create a fully illuminated armor set.</p><h2>Specs</h2><ul><li>EVA Foam base structure</li><li>Arduino Nano for control</li><li>WS2812B LED strips</li><li>Custom C++ firmware</li><li>Battery-powered for portability</li></ul><h2>Process</h2><p>Your process documentation here</p>",
+        "status": "published",
+        "published_at": 1699910000000,
+        "custom_excerpt": "Full body EVA foam armor with integrated Arduino-controlled RGB lighting.",
+        "featured": false,
+        "tags": [
+          {"name": "workshop", "slug": "workshop"},
+          {"name": "Cosplay", "slug": "cosplay"},
+          {"name": "EVA Foam", "slug": "eva-foam"},
+          {"name": "Arduino", "slug": "arduino"}
+        ],
+        "authors": [{"name": "Cult of Joey", "slug": "cult-of-joey"}]
+      },
+      {
+        "id": 3,
+        "title": "Welcome to the Signal",
+        "slug": "welcome-to-the-signal",
+        "mobiledoc": "{\"version\":\"0.3.1\",\"atoms\":[],\"cards\":[],\"markups\":[],\"sections\":[[1,\"p\",[[0,[],0,\"This is your space. A place where queer rave culture meets technical homelab energy, where mental health storytelling finds its voice, and where creative workshops come to life.\"]]],[1,\"p\",[[0,[],0,\"The Cult of Joey isn't a cult—it's a community. It's a frequency. It's the static between channels where the real signal lives.\"]]]]}",
+        "html": "<p>This is your space. A place where queer rave culture meets technical homelab energy, where mental health storytelling finds its voice, and where creative workshops come to life.</p><p>The Cult of Joey isn't a cult—it's a community. It's a frequency. It's the static between channels where the real signal lives.</p>",
+        "status": "published",
+        "published_at": 1699820000000,
+        "custom_excerpt": "Your first transmission. Welcome to the frequency.",
+        "featured": true,
+        "tags": [
+          {"name": "calm", "slug": "calm"}
+        ],
+        "authors": [{"name": "Cult of Joey", "slug": "cult-of-joey"}]
+      }
+    ],
+    "tags": [
+      {"name": "calm", "slug": "calm", "description": "For calm, peaceful posts (teal tint)"},
+      {"name": "manic", "slug": "manic", "description": "For energetic, intense posts (magenta tint)"},
+      {"name": "reflective", "slug": "reflective", "description": "For thoughtful, introspective posts (indigo tint)"},
+      {"name": "defiant", "slug": "defiant", "description": "For bold, rebellious posts (orange tint)"},
+      {"name": "workshop", "slug": "workshop", "description": "For workshop/project posts"},
+      {"name": "gallery", "slug": "gallery", "description": "For gallery posts"},
+      {"name": "Tech", "slug": "tech", "description": "Technology and homelab content"},
+      {"name": "Cosplay", "slug": "cosplay", "description": "Cosplay projects"},
+      {"name": "EVA Foam", "slug": "eva-foam", "description": "EVA foam crafting"},
+      {"name": "Arduino", "slug": "arduino", "description": "Arduino projects"}
+    ],
+    "pages": [
+      {
+        "id": 1,
+        "title": "Summon Me",
+        "slug": "contact",
+        "mobiledoc": "{\"version\":\"0.3.1\",\"atoms\":[],\"cards\":[],\"markups\":[],\"sections\":[[1,\"h2\",[[0,[],0,\"SUMMON ME\"]]],[1,\"p\",[[0,[],0,\"Open for collaborations on:\"]]],[1,\"ul\",[[[0,[],0,\"Creative Coding / Web Dev\"]],[[0,[],0,\"Cosplay fabrication advice\"]],[[0,[],0,\"Homelab architecture\"]],[[0,[],0,\"Speaking on mental health & tech\"]]]],[1,\"h3\",[[0,[],0,\"SECURE CHANNEL:\"]]],[1,\"p\",[[0,[],0,\"joey@cultofjoey.com\"]]]]}",
+        "html": "<h2>SUMMON ME</h2><p>Open for collaborations on:</p><ul><li>Creative Coding / Web Dev</li><li>Cosplay fabrication advice</li><li>Homelab architecture</li><li>Speaking on mental health & tech</li></ul><h3>SECURE CHANNEL:</h3><p>joey@cultofjoey.com</p>",
+        "status": "published",
+        "authors": [{"name": "Cult of Joey", "slug": "cult-of-joey"}]
+      }
+    ],
+    "users": [
+      {
+        "id": 1,
+        "name": "Cult of Joey",
+        "slug": "cult-of-joey",
+        "email": "joey@cultofjoey.com",
+        "status": "active"
+      }
+    ]
+  }
+}
+

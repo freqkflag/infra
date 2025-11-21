@@ -1,0 +1,111 @@
+{{!< default}}
+
+{{! Hero Section }}
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-content">
+            <div class="inline-flex items-center gap-2 mb-4" style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <span style="width: 8px; height: 8px; background: var(--c-accent); border-radius: 50%; box-shadow: 0 0 10px var(--c-accent);"></span>
+                <span class="mono-font" style="color: var(--c-accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em;">Signal Online</span>
+            </div>
+            
+            <h1 class="glitch-hover">
+                WE ARE THE <br>
+                <span class="hero-title-gradient">GLITCH</span> <br>
+                IN THE SYSTEM.
+            </h1>
+            
+            <p>A digital sanctuary for queer resilience, homelab mysticism, and creative survival. Welcome to the Cult.</p>
+            
+            <div class="hero-cta">
+                <a href="/journal" class="btn btn-primary">Enter the Archive</a>
+                <a href="/workshops" class="btn btn-secondary">View Projects</a>
+            </div>
+        </div>
+        
+        {{! Now Broadcasting Card }}
+        {{#get "posts" limit="1"}}
+            {{#foreach posts}}
+            <div class="broadcasting-card">
+                <div class="broadcasting-header">
+                    <span class="broadcasting-label">LIVE TRANSMISSION</span>
+                    <span class="broadcasting-date">{{date format="MMM D, YYYY"}}</span>
+                </div>
+                <h3 class="glitch-hover mb-3">{{title}}</h3>
+                <p class="text-muted mb-6" style="color: var(--c-text-muted); margin-bottom: 1.5rem;">{{excerpt words="30"}}</p>
+                <a href="{{url}}" class="btn btn-outline" style="width: 100%;">Read Full Transmission</a>
+            </div>
+            {{/foreach}}
+        {{/get}}
+    </div>
+</section>
+
+{{! Journal Strip }}
+{{#get "posts" limit="3"}}
+<section class="section">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+            <div>
+                <h2 class="section-title glitch-hover">Recent Signals</h2>
+                <p class="section-subtitle">Lore from the recovery arc.</p>
+            </div>
+            <a href="/journal" class="btn btn-ghost" style="display: none;" data-desktop-only>View All →</a>
+        </div>
+        
+        <div class="post-grid">
+            {{#foreach posts}}
+                {{> "post-card"}}
+            {{/foreach}}
+        </div>
+        
+        <div class="text-center mt-12" style="display: block;" data-mobile-only>
+            <a href="/journal" class="btn btn-ghost">View All Signals →</a>
+        </div>
+    </div>
+</section>
+{{/get}}
+
+{{! Workshop Strip }}
+{{#get "posts" filter="tag:workshop" limit="2"}}
+<section class="section" style="background-color: var(--c-surface); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; right: 0; width: 66.666%; height: 100%; background: rgba(21, 16, 39, 0.3); transform: skewX(-12deg); transform-origin: top right; pointer-events: none; z-index: 0;"></div>
+    
+    <div class="container" style="position: relative; z-index: 10;">
+        <div style="display: flex; flex-direction: column; gap: 3rem;">
+            <div style="max-width: 33.333%;">
+                <h2 class="section-title glitch-hover mb-6">The Workshop</h2>
+                <p class="section-subtitle mb-8">Where silicon meets skin. Explore the fabrication logs, from 42U server racks to EVA foam armor and geometric ink.</p>
+                <a href="/workshops" class="btn btn-outline">Explore Projects</a>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                {{#foreach posts}}
+                    {{> "workshop-card"}}
+                {{/foreach}}
+            </div>
+        </div>
+    </div>
+</section>
+{{/get}}
+
+{{! Gallery Band }}
+{{#get "posts" filter="tag:gallery" limit="6"}}
+<section class="section">
+    <div class="container mb-6">
+        <h2 class="section-title glitch-hover">Visual Database</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); height: 256px;">
+        {{#foreach posts}}
+            {{#if feature_image}}
+            <a href="{{url}}" class="gallery-item" style="height: 100%;">
+                <img src="{{img_url feature_image size="s"}}" alt="{{title}}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
+                <div class="gallery-item-overlay">
+                    <span class="gallery-item-category">{{primary_tag.name}}</span>
+                    <h3 class="gallery-item-title">{{title}}</h3>
+                </div>
+            </a>
+            {{/if}}
+        {{/foreach}}
+    </div>
+</section>
+{{/get}}
+

@@ -1,0 +1,26 @@
+{
+  "name": "cult-of-joey",
+  "description": "A dark-neon cyberpunk personal brand hub blending queer rave culture, mental-health storytelling, technical homelab/IT energy, and creative workshops.",
+  "version": "1.0.0",
+  "engines": {
+    "ghost": ">=5.0.0"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Cult of Joey",
+    "email": "joey@cultofjoey.com"
+  },
+  "keywords": [
+    "ghost",
+    "ghost-theme",
+    "cyberpunk",
+    "neon",
+    "dark"
+  ],
+  "scripts": {
+    "validate": "node validate-theme.js",
+    "zip": "./build-zip.sh",
+    "build": "./build-zip.sh",
+    "import-content": "node import-starter-content.js"
+  }
+}

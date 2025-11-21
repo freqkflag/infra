@@ -1,0 +1,19 @@
+{{!< default}}
+
+<article class="page">
+    {{#match @page.show_title_and_feature_image true}}
+    <header class="post-header">
+        <div class="post-header-inner">
+            <h1 class="post-title glitch-hover">{{title}}</h1>
+            {{#if feature_image}}
+            <img src="{{img_url feature_image}}" alt="{{title}}" class="post-feature-image" style="width: 100%; height: auto; border-radius: var(--radius-lg); margin: 2rem 0; border: 1px solid var(--c-border); box-shadow: var(--shadow-soft);">                                                                             
+            {{/if}}
+        </div>
+    </header>
+    {{/match}}
+    
+    <div class="post-content">
+        {{content}}
+    </div>
+</article>
+

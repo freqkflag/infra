@@ -1,0 +1,44 @@
+{{!< default}}
+
+{{#get "posts" limit="3"}}
+<section class="section">
+    <div class="container">
+        <div class="section-header mb-12">
+            <h2 class="section-title glitch-hover">Recent Signals</h2>
+            <p class="section-subtitle">Lore from the recovery arc.</p>
+        </div>
+        
+        <div class="post-grid">
+            {{#foreach posts}}
+                {{> "post-card"}}
+            {{/foreach}}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="/journal" class="btn btn-secondary">View All Signals →</a>
+        </div>
+    </div>
+</section>
+{{/get}}
+
+{{#get "posts" filter="tag:workshop" limit="2"}}
+<section class="section" style="background-color: var(--c-surface);">
+    <div class="container">
+        <div class="section-header mb-12">
+            <h2 class="section-title glitch-hover">The Workshop</h2>
+            <p class="section-subtitle">Where silicon meets skin. Explore the fabrication logs.</p>
+        </div>
+        
+        <div class="post-grid">
+            {{#foreach posts}}
+                {{> "workshop-card"}}
+            {{/foreach}}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="/workshops" class="btn btn-outline">Explore Projects</a>
+        </div>
+    </div>
+</section>
+{{/get}}
+

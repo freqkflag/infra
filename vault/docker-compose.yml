@@ -1,0 +1,51 @@
+services:
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "32772:8200"
+    volumes:
+      - ./data:/vault/file
+      - ./logs:/vault/logs
+      - ./config/vault.hcl:/vault/config/vault.hcl:ro
+      - ./scripts:/vault/scripts:ro
+      - ./init:/vault/init
+    entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
+    command: ["server", "-config=/vault/config/vault.hcl"]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8200/v1/sys/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vault.rule=Host(`vault.freqkflag.co`)"
+      - "traefik.http.routers.vault.entrypoints=websecure"
+      - "traefik.http.routers.vault.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.vault.middlewares=security-headers@file"
+      - "traefik.http.services.vault.loadbalancer.server.port=8200"
+    networks:
+      - vault-network
+      - traefik-network
+
+networks:
+  vault-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+

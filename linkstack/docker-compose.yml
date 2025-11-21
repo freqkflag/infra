@@ -1,0 +1,85 @@
+services:
+  linkstack-db:
+    image: mysql:8.0
+    container_name: linkstack-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    networks:
+      - linkstack-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  linkstack:
+    image: linkstackorg/linkstack:latest
+    container_name: linkstack
+    environment:
+      TZ: ${TZ:-America/New_York}
+      SERVER_ADMIN: ${SERVER_ADMIN}
+      HTTP_SERVER_NAME: ${HTTP_SERVER_NAME}
+      HTTPS_SERVER_NAME: ${HTTPS_SERVER_NAME}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PHP_MEMORY_LIMIT: ${PHP_MEMORY_LIMIT:-256M}
+      UPLOAD_MAX_FILESIZE: ${UPLOAD_MAX_FILESIZE:-8M}
+      DB_HOST: linkstack-db
+      DB_DATABASE: ${MYSQL_DATABASE}
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./data/linkstack:/htdocs
+    networks:
+      - linkstack-network
+      - traefik-network
+    depends_on:
+      linkstack-db:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkstack.rule=Host(`link.cultofjoey.com`)"
+      - "traefik.http.routers.linkstack.entrypoints=websecure"
+      - "traefik.http.routers.linkstack.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.linkstack.middlewares=security-headers@file"
+      - "traefik.http.services.linkstack.loadbalancer.server.port=80"
+
+networks:
+  linkstack-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+

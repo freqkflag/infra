@@ -1,0 +1,38 @@
+# Override file for local development
+# Copy this to docker-compose.override.yml and customize as needed
+
+version: '3.8'
+
+services:
+  mastodon-web:
+    # Uncomment for development with live reload
+    # command: bundle exec puma -C config/puma.rb
+    # volumes:
+    #   - ./mastodon-source:/app
+    ports:
+      # Add additional ports for development
+      - "3000:3000"  # Rails development server
+    environment:
+      - RAILS_ENV=development
+      - NODE_ENV=development
+
+  mastodon-sidekiq:
+    environment:
+      - RAILS_ENV=development
+
+  # Development database (uncomment if you want separate dev DB)
+  # mastodon-db:
+  #   image: postgres:14
+  #   environment:
+  #     - POSTGRES_USER=mastodon_dev
+  #     - POSTGRES_PASSWORD=mastodon_dev
+  #     - POSTGRES_DB=mastodon_dev
+  #   volumes:
+  #     - mastodon_dev_db:/var/lib/postgresql/data
+  #   networks:
+  #     - mastodon-network
+  #   ports:
+  #     - "5433:5432"
+
+# volumes:
+#   mastodon_dev_db:

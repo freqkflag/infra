@@ -1,0 +1,1780 @@
+# Translation of Themes - Twenty Twenty-Four in Gujarati
+# This file is distributed under the same license as the Themes - Twenty Twenty-Four package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2025-06-20 05:29:56+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.0.1\n"
+"Language: gu\n"
+"Project-Id-Version: Themes - Twenty Twenty-Four\n"
+
+#. Description of the theme
+#: style.css
+#, gp-priority: high
+msgid "Twenty Twenty-Four is designed to be flexible, versatile and applicable to any website. Its collection of templates and patterns tailor to different needs, such as presenting a business, blogging and writing or showcasing work. A multitude of possibilities open up with just a few adjustments to color and typography. Twenty Twenty-Four comes with style variations and full page designs to help speed up the site building process, is fully compatible with the site editor, and takes advantage of new design tools introduced in WordPress 6.4."
+msgstr "Twenty Twenty-Four એ લવચીક, બહુમુખી અને કોઈપણ વેબસાઈટને લાગુ પડે તે રીતે ડિઝાઇન કરવામાં આવી છે. તેના નમૂનાઓ અને પેટર્નનો સંગ્રહ વિવિધ જરૂરિયાતોને અનુરૂપ છે, જેમ કે વ્યવસાયને પ્રસ્તુત કરવા, બ્લોગિંગ અને લેખન અથવા કાર્યનું પ્રદર્શન. રંગ અને ટાઇપોગ્રાફીમાં માત્ર થોડા ગોઠવણો સાથે ઘણી બધી શક્યતાઓ ખુલે છે. Twenty Twenty-Four એ સાઇટ બનાવવાની પ્રક્રિયાને ઝડપી બનાવવા માટે શૈલીની વિવિધતાઓ અને સંપૂર્ણ પૃષ્ઠ ડિઝાઇન સાથે આવે છે, તે સાઇટ સંપાદક સાથે સંપૂર્ણ રીતે સુસંગત છે, અને વર્ડપ્રેસ 6.4 માં રજૂ કરાયેલા નવા ડિઝાઇન સાધનોનો લાભ લે છે."
+
+#. Theme Name of the theme
+#: style.css
+#, gp-priority: high
+msgid "Twenty Twenty-Four"
+msgstr "ટવેન્ટી ટવેન્ટી-ફોર"
+
+#: patterns/text-centered-statement.php
+msgctxt "Pattern description"
+msgid "A centered text statement with a large amount of padding on all sides."
+msgstr "એક કેન્દ્રિત ટેક્સ્ટ નિવેદન જેમાં દરેક બાજુ પર વિશાળ પેડિંગ છે."
+
+#: patterns/hidden-posts-heading.php
+msgctxt "Pattern title"
+msgid "Posts heading"
+msgstr "પોસ્ટ્સનું શીર્ષક"
+
+#: patterns/text-title-left-image-right.php
+msgctxt "Pattern description"
+msgid "A title, a paragraph and a CTA button on the left with an image on the right."
+msgstr "ડાબી બાજુ પર શીર્ષક, પરિચ્છેદ અને CTA બટન, જમણી બાજુ પર ચિત્ર."
+
+#: patterns/text-project-details.php
+msgctxt "Pattern description"
+msgid "A text-only section for project details."
+msgstr "અ ટેક્સ્ટ ઓનલી સેક્શન ફોર પ્રોજેક્ટ ડિટેઇલ્સ."
+
+#: patterns/text-feature-grid-3-col.php
+msgctxt "Pattern description"
+msgid "A feature grid of 2 rows and 3 columns with headings and text."
+msgstr "અ ફીચર ગ્રીડ ઑફ ૨ રોઝ એન્ડ ૩ કોલમ્સ વિથ હેડિંગ્સ એન્ડ ટેક્સ્ટ."
+
+#: patterns/text-faq.php:35
+msgctxt "Question in the FAQ pattern"
+msgid "Who is behind Études?"
+msgstr "Études પાછળ કોણ છે?"
+
+#: patterns/text-faq.php
+msgctxt "Pattern description"
+msgid "A FAQ section with a large FAQ heading and a group of questions and answers."
+msgstr "FAQ વિભાગ સાથે મોટું FAQ શીર્ષક અને પ્રશ્નો અને જવાબોનો જૂથ."
+
+#: patterns/text-centered-statement-small.php
+msgctxt "Pattern description"
+msgid "A centered italic text statement with compact padding."
+msgstr "કોમ્પેક્ટ પેડિંગ સાથે કેન્દ્રિત ઇટાલિક ટેક્સ્ટ સ્ટેટમેન્ટ."
+
+#: patterns/text-alternating-images.php
+msgctxt "Pattern description"
+msgid "A text section, then a two-column section with text in one column and an image in the other."
+msgstr "ટેક્સ્ટ વિભાગ, પછી એક બે-કોલમ વિભાગ જેમાં એક કોલમમાં ટેક્સ્ટ અને બીજું કોલમમાં છબી."
+
+#: patterns/testimonial-centered.php
+msgctxt "Pattern description"
+msgid "A centered testimonial section with an avatar, name, and job title."
+msgstr "અવતાર, નામ અને નોકરીનું શીર્ષક સાથેનો કેન્દ્રિત પ્રશંસાપત્ર વિભાગ."
+
+#: patterns/team-4-col.php
+msgctxt "Pattern description"
+msgid "A team section, with a heading, a paragraph, and 4 columns for team members."
+msgstr "ટીમ વિભાગ, જેમાં શીર્ષક, પરિચ્છેદ અને 4 કૉલમમાં ટીમના સભ્યો છે."
+
+#: patterns/posts-list.php
+msgctxt "Pattern description"
+msgid "A list of posts without images, 1 column."
+msgstr "છબીઓ વિનાની પોસ્ટ્સની સૂચિ, 1 કૉલમ."
+
+#: patterns/posts-images-only-offset-4-col.php
+msgctxt "Pattern description"
+msgid "A list of posts with featured images only, 4 columns."
+msgstr "ફીચર્ડ ઇમેજેસ સાથે પોસ્ટ્સની યાદી, 4 કૉલમ."
+
+#: patterns/posts-images-only-3-col.php
+msgctxt "Pattern description"
+msgid "A list of posts with featured images only, 3 columns."
+msgstr "ફીચર્ડ ઇમેજેસ સાથે પોસ્ટ્સની યાદી, 3 કૉલમ."
+
+#: patterns/posts-grid-2-col.php
+msgctxt "Pattern description"
+msgid "A grid of posts featuring the first post, 2 columns."
+msgstr "પોસ્ટ્સનો ગ્રિડ જેમાં પહેલી પોસ્ટ દર્શાવાઈ છે, 2 કૉલમ."
+
+#: patterns/posts-3-col.php
+msgctxt "Pattern description"
+msgid "A list of posts, 3 columns."
+msgstr "પોસ્ટ્સની સૂચિ, 3 કૉલમ"
+
+#: patterns/posts-1-col.php
+msgctxt "Pattern description"
+msgid "A list of posts, 1 column."
+msgstr "પોસ્ટ્સની યાદી, 1 કૉલમ."
+
+#: patterns/page-portfolio-overview.php
+msgctxt "Pattern description"
+msgid "A full portfolio page with a section for project description, project details, a full screen image, and a gallery section with two images."
+msgstr "પ્રોજેક્ટ વર્ણન, પ્રોજેક્ટ વિગતો, સંપૂર્ણ સ્ક્રીન છબી અને બે છબીઓ સાથે ગેલેરી વિભાગ માટેના વિભાગ સાથેનું સંપૂર્ણ પોર્ટફોલિયો પેજ."
+
+#: patterns/page-newsletter-landing.php
+msgctxt "Pattern description"
+msgid "A block with a newsletter subscription CTA for a landing page."
+msgstr "લેન્ડિંગ પૃષ્ઠ માટે ન્યૂઝલેટર સબ્સ્ક્રિપ્શન CTA સાથેનો બ્લોક."
+
+#: patterns/page-home-portfolio.php
+msgctxt "Pattern description"
+msgid "A portfolio home page with a description and a 4-column post section with only feature images."
+msgstr "વર્ણન સાથેનું પોર્ટફોલિયો હોમ પેજ અને માત્ર ફીચર ઈમેજીસ સાથે 4-કૉલમ પોસ્ટ વિભાગ."
+
+#: patterns/page-home-portfolio-gallery.php
+msgctxt "Pattern description"
+msgid "A portfolio home page that features a gallery."
+msgstr "એક પોર્ટફોલિયો હોમ પેજ જે ગેલેરી દર્શાવે છે."
+
+#: patterns/page-home-business.php
+msgctxt "Pattern description"
+msgid "A business home page with a hero section, a text section, a services section, a team section, a clients section, a FAQ section, and a CTA section."
+msgstr "હીરો સેક્શન, ટેક્સ્ટ સેક્શન, સર્વિસ સેક્શન, ટીમ સેક્શન, ક્લાયન્ટ સેક્શન, FAQ સેક્શન અને CTA સેક્શન સાથેનું બિઝનેસ હોમ પેજ."
+
+#: patterns/page-home-blogging.php
+msgctxt "Pattern description"
+msgid "A blogging home page with a hero section, a text section, a blog section, and a CTA section."
+msgstr "હીરો વિભાગ, ટેક્સ્ટ વિભાગ, બ્લોગ વિભાગ અને CTA વિભાગ સાથેનું બ્લોગિંગ હોમ પેજ."
+
+#: patterns/page-about-business.php
+msgctxt "Pattern description"
+msgid "A business about page with a hero section, a text section, a services section, a team section, a clients section, a FAQ section, and a CTA section."
+msgstr "હીરો સેક્શન, ટેક્સ્ટ સેક્શન, સર્વિસ સેક્શન, ટીમ સેક્શન, ક્લાયન્ટ સેક્શન, FAQ સેક્શન અને CTA સેક્શન સાથેના પેજ વિશે બિઝનેસ."
+
+#: patterns/gallery-project-layout.php
+msgctxt "Pattern description"
+msgid "A gallery section with a project layout with 2 images."
+msgstr "2 છબીઓ સાથે પ્રોજેક્ટ લેઆઉટ સાથે એક ગેલેરી વિભાગ."
+
+#: patterns/gallery-offset-images-grid-4-col.php
+msgctxt "Pattern description"
+msgid "A gallery section with 4 columns and offset images."
+msgstr "4 કૉલમ અને ઑફસેટ છબીઓ સાથેનો ગેલેરી વિભાગ."
+
+#: patterns/gallery-offset-images-grid-3-col.php
+msgctxt "Pattern description"
+msgid "A gallery section with 3 columns and offset images."
+msgstr "3 કૉલમ અને ઑફસેટ છબીઓ સાથેનો ગેલેરી વિભાગ."
+
+#: patterns/gallery-offset-images-grid-2-col.php
+msgctxt "Pattern description"
+msgid "A gallery section with 2 columns and offset images."
+msgstr "2 કૉલમ અને ઑફસેટ છબીઓ સાથેનો ગેલેરી વિભાગ."
+
+#: patterns/gallery-full-screen-image.php
+msgctxt "Pattern description"
+msgid "A cover image section that covers the entire width."
+msgstr "અ કવર ઇમેજ સેક્શન ધેટ કવરસ ધ એન્ટાયર વિડ્થ."
+
+#: patterns/footer.php
+msgctxt "Pattern description"
+msgid "A footer section with a colophon and 4 columns."
+msgstr "અ ફૂટર સેક્શન વિથ અ કોલોફોન અને ૪ કોલમ્સ."
+
+#: patterns/footer-colophon-3-col.php
+msgctxt "Pattern description"
+msgid "A footer section with a colophon and 3 columns."
+msgstr "અ ફૂટર સેક્શન વિથ અ કોલોફોન અને ૩ કોલમ્સ."
+
+#: patterns/footer-centered-logo-nav.php
+msgctxt "Pattern description"
+msgid "A footer section with a centered logo, navigation, and WordPress credits."
+msgstr "અ ફૂટર સેક્શન વિથ અ સેન્ટરડ લોગો, નેવિગેશન, અને વર્ડપ્રેસ ક્રેડિટ્સ."
+
+#: patterns/cta-subscribe-centered.php
+msgctxt "Pattern description"
+msgid "Subscribers CTA section with a title, a paragraph and a CTA button."
+msgstr "શીર્ષક, ફકરો અને CTA બટન સાથે સબ્સ્ક્રાઇબર્સ CTA વિભાગ."
+
+#: patterns/cta-services-image-left.php
+msgctxt "Pattern description"
+msgid "An image, title, paragraph and a CTA button to describe services."
+msgstr "સેવાઓનું વર્ણન કરવા માટે એક છબી, શીર્ષક, ફકરો અને CTA બટન."
+
+#: patterns/cta-rsvp.php patterns/page-rsvp-landing.php
+msgctxt "Pattern description"
+msgid "A large RSVP heading sideways, a description, and a CTA button."
+msgstr "એક વિશાળ RSVP મથાળું બાજુમાં, વર્ણન અને CTA બટન."
+
+#: patterns/cta-pricing.php
+msgctxt "Pattern description"
+msgid "A pricing section with a title, a paragraph and three pricing levels."
+msgstr "શીર્ષક, એક ફકરો અને ત્રણ કિંમતના સ્તરો સાથેનો ભાવ વિભાગ."
+
+#: patterns/cta-content-image-on-right.php
+msgctxt "Pattern description"
+msgid "A title, paragraph, two CTA buttons, and an image for a general CTA section."
+msgstr "એક શીર્ષક, ફકરો, બે CTA બટનો અને સામાન્ય CTA વિભાગ માટે એક છબી."
+
+#: patterns/banner-project-description.php
+msgctxt "Pattern description"
+msgid "Project description section with title, paragraph, and an image."
+msgstr "શીર્ષક, ફકરો અને છબી સાથે પ્રોજેક્ટ વર્ણન વિભાગ."
+
+#: patterns/banner-hero.php
+msgctxt "Pattern description"
+msgid "A hero section with a title, a paragraph, a CTA button, and an image."
+msgstr "શીર્ષક, ફકરો, CTA બટન અને છબી સાથેનો હીરો વિભાગ."
+
+#: patterns/footer.php:96
+msgid "Twitter/X"
+msgstr "ટ્વિટર/એક્સ"
+
+#: patterns/footer.php:74
+msgid "Contact Us"
+msgstr "અમારો સંપર્ક કરો"
+
+#: patterns/footer.php:73
+msgid "Terms and Conditions"
+msgstr "ટર્મ અને શરત"
+
+#: patterns/footer.php:72
+msgid "Privacy Policy"
+msgstr "ગોપનીયતા નીતિ"
+
+#: patterns/footer.php:51
+msgid "Careers"
+msgstr "કારકિર્દી"
+
+#: patterns/footer.php:50
+msgid "History"
+msgstr "ઇતિહાસ"
+
+#: patterns/footer.php:49
+msgid "Team"
+msgstr "ટીમ"
+
+#: patterns/posts-list.php
+msgctxt "Pattern title"
+msgid "List of posts without images, 1 column"
+msgstr "છબીઓ વિનાની પોસ્ટ્સની સૂચિ, 1 કૉલમ"
+
+#: patterns/hidden-portfolio-hero.php:16
+msgid "I’m <em>Leia Acosta</em>, a passionate photographer who finds inspiration in capturing the fleeting beauty of life."
+msgstr "હું <em>લિયા એકોસ્ટા</em> છું, એક પ્રખર ફોટોગ્રાફર જે જીવનની ક્ષણિક સુંદરતાને કેપ્ચર કરવામાં પ્રેરણા મેળવે છે."
+
+#: functions.php:200
+msgid "A collection of full page layouts."
+msgstr "સંપૂર્ણ પૃષ્ઠ લેઆઉટનો સંગ્રહ."
+
+#: functions.php:199
+msgctxt "Block pattern category"
+msgid "Pages"
+msgstr "પૃષ્ઠો"
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Single with Sidebar"
+msgstr "સિંગલ સાઇડબાર સાથે"
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Page with Wide Image"
+msgstr "વિશાળ ચિત્ર  સાથે પૃષ્ઠ"
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Page with Sidebar"
+msgstr "પૃષ્ઠ સાઇડબાર સાથે"
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Page No Title"
+msgstr "પૃષ્ઠ કોઈ શીર્ષક નથી"
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Post Meta"
+msgstr "પોસ્ટ મેટા"
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Sidebar"
+msgstr "સાઇડબાર"
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Footer"
+msgstr "ફૂટર"
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Header"
+msgstr "હેડર"
+
+#: theme.json
+msgctxt "Space size name"
+msgid "6"
+msgstr "૬"
+
+#: theme.json
+msgctxt "Space size name"
+msgid "5"
+msgstr "૫"
+
+#: theme.json
+msgctxt "Space size name"
+msgid "4"
+msgstr "૪"
+
+#: theme.json
+msgctxt "Space size name"
+msgid "3"
+msgstr "૩"
+
+#: theme.json
+msgctxt "Space size name"
+msgid "2"
+msgstr "૨"
+
+#: theme.json
+msgctxt "Space size name"
+msgid "1"
+msgstr "૧"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical hard pewter to white"
+msgstr "વર્ટિકલ હાર્ડ પીટરથી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical hard mint to white"
+msgstr "વર્ટિકલ સખત ટંકશાળથી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical hard sage to white"
+msgstr "વર્ટિકલ કઠણ ઋષિ થી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical hard rust to white"
+msgstr "વર્ટિકલ હાર્ડ રસ્ટ થી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical hard sandstone to white"
+msgstr "વર્ટિકલ હાર્ડ સેન્ડસ્ટોનથી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical hard beige to white"
+msgstr "વર્ટિકલ હાર્ડ ન રંગેલું ઊની કાપડ થી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical soft pewter to white"
+msgstr "વર્ટિકલ સોફ્ટ પીટરથી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical soft mint to white"
+msgstr "વર્ટિકલ સોફ્ટ ફુદીનો થી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical soft sage to white"
+msgstr "વર્ટિકલ સોફ્ટ ઋષિ થી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical soft rust to white"
+msgstr "વર્ટિકલ સોફ્ટ રસ્ટ થી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical soft sandstone to white"
+msgstr "વર્ટિકલ સોફ્ટ સેન્ડસ્ટોનથી સફેદ"
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Vertical soft beige to white"
+msgstr "વર્ટિકલ સોફ્ટ ન રંગેલું ઊની કાપડ થી સફેદ"
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Black and pastel blue"
+msgstr "કાળો અને પેસ્ટલ વાદળી"
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Black and sage"
+msgstr "કાળો અને સેગ"
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Black and rust"
+msgstr "કાળો અને કાટ"
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Black and sandstone"
+msgstr "કાળો અને સેંડસ્ટોન"
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Black and white"
+msgstr "Black and white"
+
+#: styles/rust.json
+msgctxt "Color name"
+msgid "Base / 2"
+msgstr "આધાર / 2"
+
+#: styles/rust.json
+msgctxt "Gradient name"
+msgid "Vertical hard rust to beige"
+msgstr "વર્ટિકલ હાર્ડ રસ્ટ થી સફેદ"
+
+#: styles/rust.json
+msgctxt "Gradient name"
+msgid "Vertical rust to beige"
+msgstr "વર્ટિકલ નીલમ થી બરફ"
+
+#: styles/rust.json
+msgctxt "Gradient name"
+msgid "Vertical hard transparent rust to beige"
+msgstr "ન રંગેલું ઊની કાપડ માટે ઊભી હાર્ડ પારદર્શક રસ્ટ"
+
+#: styles/rust.json
+msgctxt "Gradient name"
+msgid "Vertical transparent rust to beige"
+msgstr "વર્ટિકલ હાર્ડ રસ્ટ થી સફેદ"
+
+#: styles/rust.json
+msgctxt "Duotone name"
+msgid "Dark rust to beige"
+msgstr "ન રંગેલું ઊની કાપડ માટે ડાર્ક રસ્ટ"
+
+#: styles/rust.json
+msgctxt "Style variation name"
+msgid "Rust"
+msgstr "કાટ"
+
+#: styles/onyx.json theme.json
+msgctxt "Color name"
+msgid "Accent / Five"
+msgstr "ઉચ્ચાર / પાંચ"
+
+#: styles/onyx.json theme.json
+msgctxt "Color name"
+msgid "Accent / Four"
+msgstr "ઉચ્ચાર / ચાર"
+
+#: styles/onyx.json theme.json
+msgctxt "Color name"
+msgid "Accent / Three"
+msgstr "ઉચ્ચાર / ત્રણ"
+
+#: styles/onyx.json theme.json
+msgctxt "Color name"
+msgid "Accent / Two"
+msgstr "ઉચ્ચાર / બે"
+
+#: styles/onyx.json theme.json
+msgctxt "Color name"
+msgid "Accent"
+msgstr "ઉચ્ચાર"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical hard pewter to dark gray"
+msgstr "વર્ટિકલ હાર્ડ પીટરથી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical hard steel to dark gray"
+msgstr "વર્ટિકલ હાર્ડ સ્ટીલથી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical hard olive to dark gray"
+msgstr "વર્ટિકલ સખત ઓલિવથી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical hard cinnamon to dark gray"
+msgstr "વર્ટિકલ સખત તજથી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical hard walnut to dark gray"
+msgstr "વર્ટિકલ હાર્ડ અખરોટથી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical hard beige to dark gray"
+msgstr "વર્ટિકલ સખત રંગેલું ઊની કાપડ થી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical soft pewter to dark gray"
+msgstr "વર્ટિકલ નરમ પીટરથી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical soft steel to dark gray"
+msgstr "વર્ટિકલ સોફ્ટ સ્ટીલથી ડાર્ક ગ્રે"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical soft olive to dark gray"
+msgstr "વર્ટિકલ સોફ્ટ ઓલિવ થી ડાર્ક ગ્રે"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical soft cinnamon to dark gray"
+msgstr "વર્ટિકલ સોફ્ટ તજ થી ડાર્ક ગ્રે"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical soft walnut to dark gray"
+msgstr "વર્ટિકલ સોફ્ટ અખરોટથી ઘેરા રાખોડી"
+
+#: styles/onyx.json
+msgctxt "Gradient name"
+msgid "Vertical soft driftwood to dark gray"
+msgstr "વર્ટિકલ સોફ્ટ ડ્રિફ્ટવુડ થી ડાર્ક ગ્રે"
+
+#: styles/onyx.json
+msgctxt "Duotone name"
+msgid "Dark gray and steel"
+msgstr "ડાર્ક ગ્રે અને સ્ટીલ"
+
+#: styles/onyx.json
+msgctxt "Duotone name"
+msgid "Dark gray and olive"
+msgstr "ડાર્ક ગ્રે અને ઓલિવ"
+
+#: styles/onyx.json
+msgctxt "Duotone name"
+msgid "Dark gray and cinnamon"
+msgstr "ડાર્ક ગ્રે અને તજ"
+
+#: styles/onyx.json
+msgctxt "Duotone name"
+msgid "Dark gray and walnut"
+msgstr "ડાર્ક ગ્રે અને અખરોટ"
+
+#: styles/onyx.json
+msgctxt "Duotone name"
+msgid "Dark gray and white"
+msgstr "ઘેરો રાખોડી અને સફેદ"
+
+#: styles/onyx.json
+msgctxt "Style variation name"
+msgid "Onyx"
+msgstr "ઓનીક્સ"
+
+#: styles/mint.json
+msgctxt "Style variation name"
+msgid "Mint"
+msgstr "ટંકશાળ"
+
+#: styles/maelstrom.json
+msgctxt "Color name"
+msgid "Contrast / 3"
+msgstr "કોન્ટ્રાસ્ટ / 3"
+
+#: styles/maelstrom.json
+msgctxt "Style variation name"
+msgid "Maelstrom"
+msgstr "મેલ્સ્ટ્રોમ"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical hard ink to ocean"
+msgstr "સમુદ્રમાં ઊભી સખત શાહી"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical hard ocean to slate"
+msgstr "સ્લેટ માટે વર્ટિકલ હાર્ડ સમુદ્ર"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical hard ink to ice"
+msgstr "બરફ માટે ઊભી સખત શાહી"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical hard ocean to ice"
+msgstr "વર્ટિકલ હાર્ડ સમુદ્ર થી બરફ"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical hard slate to ice"
+msgstr "વર્ટિકલ હાર્ડ સ્લેટ થી બરફ"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical hard ice to azure"
+msgstr "વર્ટિકલ સખત બરફથી નીલમ"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical ink to ocean"
+msgstr "સમુદ્રમાં ઊભી શાહી"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical ocean to slate"
+msgstr "સ્લેટ માટે વર્ટિકલ સમુદ્ર"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical ink to ice"
+msgstr "બરફ માટે ઊભી શાહી"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical ocean to ice"
+msgstr "વર્ટિકલ સમુદ્ર થી બરફ"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical slate to ice"
+msgstr "બરફથી ઊભી સ્લેટ"
+
+#: styles/ice.json
+msgctxt "Gradient name"
+msgid "Vertical azure to ice"
+msgstr "વર્ટિકલ નીલમ થી બરફ"
+
+#: styles/ice.json
+msgctxt "Style variation name"
+msgid "Ice"
+msgstr "બરફ"
+
+#: styles/fossil.json styles/ice.json styles/maelstrom.json theme.json
+msgctxt "Font size name"
+msgid "Extra Extra Large"
+msgstr "ઘણું વધારે મોટું"
+
+#: styles/fossil.json styles/ice.json styles/maelstrom.json theme.json
+msgctxt "Font size name"
+msgid "Extra Large"
+msgstr "વધારાનું મોટું"
+
+#: styles/fossil.json styles/ice.json styles/maelstrom.json theme.json
+msgctxt "Font size name"
+msgid "Large"
+msgstr "વિશાળ"
+
+#: styles/fossil.json styles/ice.json styles/maelstrom.json theme.json
+msgctxt "Font size name"
+msgid "Medium"
+msgstr "મધ્યમ"
+
+#: styles/fossil.json styles/ice.json styles/maelstrom.json theme.json
+msgctxt "Font size name"
+msgid "Small"
+msgstr "નાનું"
+
+#: styles/fossil.json styles/maelstrom.json theme.json
+msgctxt "Font family name"
+msgid "Cardo"
+msgstr "કાર્ડો"
+
+#: styles/fossil.json styles/ice.json theme.json
+msgctxt "Font family name"
+msgid "Inter"
+msgstr "ઈન્ટર"
+
+#: styles/fossil.json styles/ice.json styles/mint.json styles/onyx.json
+#: theme.json
+msgctxt "Color name"
+msgid "Contrast / Three"
+msgstr "કોન્ટ્રાસ્ટ / ત્રણ"
+
+#: styles/fossil.json styles/ice.json styles/mint.json styles/onyx.json
+#: theme.json
+msgctxt "Color name"
+msgid "Contrast / Two"
+msgstr "કોન્ટ્રાસ્ટ / બે"
+
+#: styles/fossil.json
+msgctxt "Style variation name"
+msgid "Fossil"
+msgstr "અશ્મિ"
+
+#: styles/ember.json styles/fossil.json styles/ice.json styles/maelstrom.json
+#: styles/mint.json theme.json
+msgctxt "Font family name"
+msgid "System Serif"
+msgstr "સિસ્ટમ સેરિફ"
+
+#: styles/ember.json styles/fossil.json styles/ice.json styles/maelstrom.json
+#: styles/mint.json theme.json
+msgctxt "Font family name"
+msgid "System Sans-serif"
+msgstr "સિસ્ટમ સેન્સ-સેરિફ"
+
+#: styles/ember.json styles/ice.json styles/maelstrom.json styles/mint.json
+msgctxt "Font family name"
+msgid "Jost"
+msgstr "જોસ્ટ"
+
+#: styles/ember.json styles/mint.json
+msgctxt "Font family name"
+msgid "Instrument Sans"
+msgstr "ઇન્સ્ટ્રુમેન્ટ સેન્સ"
+
+#: styles/ember.json styles/fossil.json styles/ice.json styles/maelstrom.json
+#: styles/mint.json styles/onyx.json theme.json
+msgctxt "Color name"
+msgid "Base / Two"
+msgstr "આધાર / બે"
+
+#: styles/ember.json styles/fossil.json styles/ice.json styles/maelstrom.json
+#: styles/mint.json styles/onyx.json styles/rust.json theme.json
+msgctxt "Color name"
+msgid "Contrast"
+msgstr "કોન્ટ્રાસ્ટ"
+
+#: styles/ember.json styles/maelstrom.json
+msgctxt "Color name"
+msgid "Contrast / 2"
+msgstr "કોન્ટ્રાસ્ટ / 2"
+
+#: styles/ember.json styles/fossil.json styles/ice.json styles/maelstrom.json
+#: styles/mint.json styles/onyx.json styles/rust.json theme.json
+msgctxt "Color name"
+msgid "Base"
+msgstr "પ્રાથમિક"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical hard ebony to sable"
+msgstr "વર્ટિકલ હાર્ડ ઇબોની ટુ સેબલ"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical hard sable to taupe"
+msgstr "ટૉપ માટે વર્ટિકલ હાર્ડ સેબલ"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical hard ebony to beige"
+msgstr "ન રંગેલું ઊની કાપડ માટે વર્ટિકલ હાર્ડ ઇબોની"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical hard sable to beige"
+msgstr "ન રંગેલું ઊની કાપડ માટે વર્ટિકલ હાર્ડ સેબલ"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical hard taupe to beige"
+msgstr "મજબૂત ભૂરા રંગથી ફિક્કા પોળમટા રંગ સુધીનો ઊભો ગાઢ ફેરફાર."
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical hard beige to linen"
+msgstr "ખડી રેખામાં કઠોર પોળમટા રંગ માંથી હળવા લિનન રંગ સુધીનો ગાઢ ફેરફાર."
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical ebony to sable"
+msgstr "ઊભી ઇબોની થી સેબલ"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical ebony to beige"
+msgstr "ન રંગેલું ઊની કાપડ માટે વર્ટિકલ ઇબોની"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical sable to beige"
+msgstr "વર્ટિકલ સેબલ થી બેજ"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical taupe to beige"
+msgstr "વર્ટિકલ ટોપ ટુ બેજ"
+
+#: styles/ember.json styles/fossil.json
+msgctxt "Gradient name"
+msgid "Vertical linen to beige"
+msgstr "વર્ટિકલ લિનન ટુ બેજ"
+
+#: styles/ember.json
+msgctxt "Duotone name"
+msgid "Orange and white"
+msgstr "નારંગી અને સફેદ"
+
+#: styles/ember.json
+msgctxt "Style variation name"
+msgid "Ember"
+msgstr "એમ્બર"
+
+#: patterns/text-title-left-image-right.php:35
+msgctxt "Call to Action button text"
+msgid "About us"
+msgstr "અમારા વિશે"
+
+#: patterns/text-title-left-image-right.php:28
+msgctxt "Description for the About pattern"
+msgid "Leaving an indelible mark on the landscape of tomorrow."
+msgstr "આવતી કાલના લેન્ડસ્કેપ પર અમીટ છાપ છોડીને."
+
+#: patterns/text-title-left-image-right.php:21
+msgctxt "Headline for the About pattern"
+msgid "Études offers comprehensive consulting, management, design, and research solutions. Every architectural endeavor is an opportunity to shape the future."
+msgstr "અભ્યાસ વ્યાપક કન્સલ્ટિંગ, મેનેજમેન્ટ, ડિઝાઇન અને સંશોધન ઉકેલો પ્રદાન કરે છે. દરેક આર્કિટેક્ચરલ પ્રયાસ એ ભવિષ્યને આકાર આપવાની તક છે."
+
+#: patterns/text-title-left-image-right.php
+msgctxt "Pattern title"
+msgid "Title text and button on left with image on right"
+msgstr "જમણી બાજુની છબી સાથે ડાબી બાજુએ શીર્ષક ટેક્સ્ટ અને બટન"
+
+#: patterns/text-project-details.php:35 patterns/text-project-details.php:43
+msgctxt "Descriptive text for the feature area"
+msgid "The revitalized Art Gallery is set to redefine the cultural landscape of Toronto, serving as a nexus of artistic expression, community engagement, and architectural marvel. The expansion and renovation project pay homage to the Art Gallery's rich history while embracing the future, ensuring that the gallery remains a beacon of inspiration."
+msgstr "પુનર્જીવિત આર્ટ ગેલેરી ટોરોન્ટોના સાંસ્કૃતિક લેન્ડસ્કેપને પુનઃવ્યાખ્યાયિત કરવા માટે સુયોજિત છે, જે કલાત્મક અભિવ્યક્તિ, સમુદાયની સગાઈ અને આર્કિટેક્ચરલ અજાયબીના જોડાણ તરીકે સેવા આપે છે. વિસ્તરણ અને નવીનીકરણ પ્રોજેક્ટ આર્ટ ગેલેરીના સમૃદ્ધ ઇતિહાસને શ્રદ્ધાંજલિ આપે છે અને ભવિષ્યને સ્વીકારે છે, ખાતરી કરે છે કે ગેલેરી પ્રેરણાનું દીવાદાંડી બની રહે."
+
+#: patterns/text-project-details.php:27
+msgctxt "Descriptive title for the feature area"
+msgid "With meticulous attention to detail and a commitment to excellence, we create spaces that inspire, elevate, and enrich the lives of those who inhabit them."
+msgstr "વિગત પર ઝીણવટભર્યા ધ્યાન અને શ્રેષ્ઠતા પ્રત્યે પ્રતિબદ્ધતા સાથે, અમે એવી જગ્યાઓ બનાવીએ છીએ જે તેમાં વસતા લોકોના જીવનને પ્રેરણા આપે, ઉન્નત બનાવે અને સમૃદ્ધ બનાવે."
+
+#: patterns/text-project-details.php:18
+msgctxt "Title text for the feature area"
+msgid "The revitalized art gallery is set to redefine cultural landscape."
+msgstr "પુનર્જીવિત આર્ટ ગેલેરી સાંસ્કૃતિક લેન્ડસ્કેપને ફરીથી વ્યાખ્યાયિત કરવા માટે સુયોજિત છે."
+
+#: patterns/text-project-details.php
+msgctxt "Pattern title"
+msgid "Project details"
+msgstr "પ્રોજેક્ટ વિગતો"
+
+#: patterns/text-feature-grid-3-col.php:112
+msgctxt "Sample content"
+msgid "Experience the fusion of imagination and expertise with Études Architectural Solutions."
+msgstr "આર્કિટેક્ચરલ સોલ્યુશન્સ સ્ટડીઝ સાથે કલ્પના અને કુશળતાના મિશ્રણનો અનુભવ કરો."
+
+#: patterns/text-feature-grid-3-col.php:108
+msgctxt "Sample heading"
+msgid "Architectural Solutions"
+msgstr "આર્કિટેક્ચરલ સોલ્યુશન્સ"
+
+#: patterns/text-feature-grid-3-col.php:96
+msgctxt "Sample feature heading"
+msgid "Project Management"
+msgstr "યોજના સંચાલન"
+
+#: patterns/text-feature-grid-3-col.php:84
+msgctxt "Sample feature heading"
+msgid "Consulting"
+msgstr "કન્સલ્ટિંગ"
+
+#: patterns/text-feature-grid-3-col.php:63
+msgctxt "Sample feature heading"
+msgid "App Access"
+msgstr "એપ્લિકેશન ઍક્સેસ"
+
+#: patterns/text-feature-grid-3-col.php:51
+msgctxt "Sample feature heading"
+msgid "Continuous Support"
+msgstr "સતત આધાર"
+
+#: patterns/text-feature-grid-3-col.php:43
+#: patterns/text-feature-grid-3-col.php:55
+#: patterns/text-feature-grid-3-col.php:67
+#: patterns/text-feature-grid-3-col.php:88
+#: patterns/text-feature-grid-3-col.php:100
+msgctxt "Sample feature content"
+msgid "Experience the fusion of imagination and expertise with Études Architectural Solutions."
+msgstr "અભ્યાસ આર્કિટેક્ચરલ સોલ્યુશન્સ સાથે કલ્પના અને કુશળતાના મિશ્રણનો અનુભવ કરો."
+
+#: patterns/text-feature-grid-3-col.php:39
+msgctxt "Sample feature heading"
+msgid "Renovation and restoration"
+msgstr "નવીનીકરણ અને પુનઃસંગ્રહ"
+
+#: patterns/text-feature-grid-3-col.php:24
+msgctxt "Sub-heading of the features"
+msgid "Our comprehensive suite of professional services caters to a diverse clientele, ranging from homeowners to commercial developers."
+msgstr "વ્યાવસાયિક સેવાઓનો અમારો વ્યાપક સમૂહ ઘરમાલિકોથી લઈને વ્યાવસાયિક વિકાસકર્તાઓ સુધીના વિવિધ ગ્રાહકોને પૂરો પાડે છે."
+
+#: patterns/text-feature-grid-3-col.php:16
+msgctxt "Heading of the features"
+msgid "A passion for creating spaces"
+msgstr "જગ્યાઓ બનાવવાનો જુસ્સો"
+
+#: patterns/text-feature-grid-3-col.php
+msgctxt "Pattern title"
+msgid "Feature grid, 3 columns"
+msgstr "ફીચર ગ્રીડ, 3 કૉલમ"
+
+#: patterns/text-faq.php:57
+msgctxt "Question in the FAQ pattern"
+msgid "Can I apply to be a part of the team or work as a contractor?"
+msgstr "શું હું ટીમનો ભાગ બનવા અથવા કોન્ટ્રાક્ટર તરીકે કામ કરવા માટે અરજી કરી શકું?"
+
+#: patterns/text-faq.php:46
+msgctxt "Question in the FAQ pattern"
+msgid "I'd like to get to meet fellow architects, how can I do that?"
+msgstr "હું સાથી આર્કિટેક્ટ્સને મળવા માંગુ છું, હું તે કેવી રીતે કરી શકું?"
+
+#: patterns/text-faq.php:27 patterns/text-faq.php:38 patterns/text-faq.php:49
+#: patterns/text-faq.php:60
+msgctxt "Answer in the FAQ pattern"
+msgid "Études offers comprehensive consulting, management, design, and research solutions. Our vision is to be at the forefront of architectural innovation, fostering a global community of architects and enthusiasts united by a passion for creating spaces. Every architectural endeavor is an opportunity to shape the future."
+msgstr "અભ્યાસ વ્યાપક કન્સલ્ટિંગ, મેનેજમેન્ટ, ડિઝાઇન અને સંશોધન ઉકેલો પ્રદાન કરે છે. અમારું વિઝન આર્કિટેક્ચરલ ઇનોવેશનમાં મોખરે રહેવાનું છે, આર્કિટેક્ટ્સ અને ઉત્સાહીઓના વૈશ્વિક સમુદાયને ઉત્તેજન આપવાનું છે અને જગ્યાઓ બનાવવાના જુસ્સાથી એક થઈને. દરેક આર્કિટેક્ચરલ પ્રયાસ એ ભવિષ્યને આકાર આપવાની તક છે."
+
+#: patterns/text-faq.php:24
+msgctxt "Question in the FAQ pattern"
+msgid "What is your process working in smaller projects?"
+msgstr "નાના પ્રોજેક્ટ્સમાં કામ કરવાની તમારી પ્રક્રિયા શું છે?"
+
+#: patterns/text-faq.php:15
+msgctxt "Heading of the FAQs"
+msgid "FAQs"
+msgstr "પ્રશ્નો"
+
+#: patterns/text-faq.php:12
+msgctxt "Name of the FAQ pattern"
+msgid "FAQs"
+msgstr "પ્રશ્નો"
+
+#: patterns/text-faq.php
+msgctxt "Pattern title"
+msgid "FAQ"
+msgstr "FAQ"
+
+#: patterns/text-centered-statement.php:21
+msgid "<em>Études</em> is not confined to the past—we are passionate about the cutting edge designs shaping our world today."
+msgstr "<em>Études</em> એ ભૂતકાળ સુધી સીમિત નથી-આપણે આજે આપણા વિશ્વને આકાર આપતી અદ્યતન ડિઝાઇન વિશે ઉત્સાહી છીએ."
+
+#: patterns/text-centered-statement.php
+msgctxt "Pattern title"
+msgid "Centered statement"
+msgstr "કેન્દ્રિત નિવેદન"
+
+#. Translators: About text placeholder
+#: patterns/text-centered-statement-small.php:23
+msgid "I write about finance, management and economy, my book “%1$s” is out now."
+msgstr "હું ફાઇનાન્સ, મેનેજમેન્ટ અને અર્થતંત્ર વિશે લખું છું, મારું પુસ્તક “%1$s” હવે બહાર આવ્યું છે."
+
+#. Translators: About link placeholder
+#: patterns/text-centered-statement-small.php:20
+msgid "Money Studies"
+msgstr "મની સ્ટડીઝ"
+
+#: patterns/text-centered-statement-small.php
+msgctxt "Pattern title"
+msgid "Centered statement, small"
+msgstr "કેન્દ્રીય નિવેદન, નાનું"
+
+#: patterns/text-alternating-images.php:105
+msgctxt "Sample list item"
+msgid "Exclusive access to design insights."
+msgstr "ડિઝાઇન આંતરદૃષ્ટિ માટે વિશિષ્ટ ઍક્સેસ."
+
+#: patterns/text-alternating-images.php:101
+msgctxt "Sample list item"
+msgid "Case studies that celebrate architecture."
+msgstr "કેસ સ્ટડીઝ જે આર્કિટેક્ચરની ઉજવણી કરે છે."
+
+#: patterns/text-alternating-images.php:97
+msgctxt "Sample list item"
+msgid "A world of thought-provoking articles."
+msgstr "વિચારપ્રેરક લેખોની દુનિયા."
+
+#: patterns/text-alternating-images.php:91
+msgctxt "Sample heading"
+msgid "Études Newsletter"
+msgstr "સ્ટડીઝ ન્યૂઝલેટર"
+
+#: patterns/text-alternating-images.php:82
+msgid "Windows of a building in Nuremberg, Germany"
+msgstr "ન્યુરેમબર્ગ, જર્મનીમાં બિલ્ડિંગની બારીઓ"
+
+#: patterns/text-alternating-images.php:64
+msgid "Tourist taking photo of a building"
+msgstr "ઇમારતનો ફોટો લેતા પ્રવાસી"
+
+#: patterns/text-alternating-images.php:37
+msgctxt "Sample list heading"
+msgid "Études Architect App"
+msgstr "અભ્યાસ આર્કિટેક્ટ એપ્લિકેશન"
+
+#: patterns/text-alternating-images.php:23
+msgctxt "Sample subheading content"
+msgid "Our comprehensive suite of professional services caters to a diverse clientele, ranging from homeowners to commercial developers."
+msgstr "વ્યાવસાયિક સેવાઓનો અમારો વ્યાપક સમૂહ ઘરમાલિકોથી લઈને વ્યાવસાયિક વિકાસકર્તાઓ સુધીના વિવિધ ગ્રાહકોને પૂરો પાડે છે."
+
+#: patterns/text-alternating-images.php:19
+msgctxt "Sample heading content"
+msgid "An array of resources"
+msgstr "સંસાધનોની શ્રેણી"
+
+#: patterns/text-alternating-images.php
+msgctxt "Pattern title"
+msgid "Text with alternating images"
+msgstr "વૈકલ્પિક છબીઓ સાથેનો મૂળ લખાણ"
+
+#: patterns/testimonial-centered.php:39
+msgctxt "Designation of Person Provided Testimonial"
+msgid "CEO, Greenprint"
+msgstr "સીઇઓ, ગ્રીનપ્રિન્ટ"
+
+#: patterns/testimonial-centered.php:35
+msgctxt "Name of Person Provided the Testimonial"
+msgid "Annie Steiner"
+msgstr "એની સ્ટેઈનર"
+
+#: patterns/testimonial-centered.php:26
+msgctxt "Name of testimonial citation group"
+msgid "Testimonial source"
+msgstr "પ્રશંસાપત્ર સ્ત્રોત"
+
+#: patterns/testimonial-centered.php:18
+msgctxt "Testimonial Text or Review Text Got From the Person"
+msgid "“Études has saved us thousands of hours of work and has unlocked insights we never thought possible.”"
+msgstr "\"અભ્યાસ અમને હજારો કલાકોના કામ બચાવ્યા છે અને અમે ક્યારેય વિચાર્યું પણ ન હોય તેવી આંતરદૃષ્ટિને અનલૉક કરી છે.\""
+
+#: patterns/testimonial-centered.php:12
+msgctxt "Name of testimonial pattern"
+msgid "Testimonial"
+msgstr "ટેસ્ટીમોનીઅલ"
+
+#: patterns/testimonial-centered.php
+msgctxt "Pattern title"
+msgid "Centered testimonial"
+msgstr "કેન્દ્રિત પ્રશંસાપત્ર"
+
+#: patterns/template-single-portfolio.php
+msgctxt "Pattern title"
+msgid "Portfolio single post template"
+msgstr "પોર્ટફોલિયો એક પોસ્ટ નમૂનો"
+
+#: patterns/template-search-blogging.php
+msgctxt "Pattern title"
+msgid "Blogging search template"
+msgstr "બ્લોગિંગ શોધ નમૂનો"
+
+#: patterns/template-search-portfolio.php
+msgctxt "Pattern title"
+msgid "Portfolio search template"
+msgstr "પોર્ટફોલિયો શોધ નમૂનો"
+
+#: patterns/template-index-portfolio.php
+msgctxt "Pattern title"
+msgid "Portfolio index template"
+msgstr "પોર્ટફોલિયો ઇન્ડેક્સ ટેમ્પલેટ"
+
+#: patterns/template-index-blogging.php
+msgctxt "Pattern title"
+msgid "Blogging index template"
+msgstr "બ્લોગિંગ ઇન્ડેક્સ ટેમ્પલેટ"
+
+#: patterns/template-home-portfolio.php
+msgctxt "Pattern title"
+msgid "Portfolio home template with post featured images"
+msgstr "પોસ્ટ ફીચર્ડ છબીઓ સાથે પોર્ટફોલિયો ઘર નમૂનો"
+
+#: patterns/template-home-business.php
+msgctxt "Pattern title"
+msgid "Business home template"
+msgstr "બિઝનેસ હોમ ટેમ્પલેટ"
+
+#: patterns/template-home-blogging.php
+msgctxt "Pattern title"
+msgid "Blogging home template"
+msgstr "બ્લોગિંગ હોમ ટેમ્પલેટ"
+
+#: patterns/template-archive-portfolio.php
+msgctxt "Pattern title"
+msgid "Portfolio archive template"
+msgstr "પોર્ટફોલિયો આર્કાઇવ નમૂનો"
+
+#: patterns/template-archive-blogging.php
+msgctxt "Pattern title"
+msgid "Blogging archive template"
+msgstr "બ્લોગિંગ આર્કાઇવ ટેમ્પલેટ"
+
+#: patterns/team-4-col.php:121
+msgctxt "Sample role of a team member"
+msgid "Project Manager"
+msgstr "પ્રોજેક્ટ મેનેજર"
+
+#: patterns/team-4-col.php:116
+msgctxt "Sample name of a team member"
+msgid "Ivan Lawrence"
+msgstr "ઇવાન લોરેન્સ"
+
+#: patterns/team-4-col.php:97
+msgctxt "Sample role of a team member"
+msgid "Architect"
+msgstr "આર્કિટેક્ટ"
+
+#: patterns/team-4-col.php:92
+msgctxt "Sample name of a team member"
+msgid "Helga Steiner"
+msgstr "હેલ્ગા સ્ટીનર"
+
+#: patterns/team-4-col.php:73
+msgctxt "Sample role of a team member"
+msgid "Engineering Manager"
+msgstr "એન્જિનિયરિંગ મેનેજર"
+
+#: patterns/team-4-col.php:68
+msgctxt "Sample name of a team member"
+msgid "Rhye Moore"
+msgstr "રાય મૂર"
+
+#: patterns/team-4-col.php:49
+msgctxt "Sample role of a team member"
+msgid "Founder, CEO & Architect"
+msgstr "સ્થાપક, સીઇઓ અને આર્કિટેક્ટ"
+
+#: patterns/team-4-col.php:44
+msgctxt "Sample name of a team member"
+msgid "Francesca Piovani"
+msgstr "ફ્રાન્સેસ્કા પિયોવાની"
+
+#: patterns/team-4-col.php:20
+msgctxt "Sample descriptive text of the team pattern"
+msgid "Our comprehensive suite of professionals caters to a diverse team, ranging from seasoned architects to renowned engineers."
+msgstr "વ્યાવસાયિકોનો અમારો વ્યાપક સ્યુટ અનુભવી આર્કિટેક્ટથી લઈને પ્રખ્યાત એન્જિનિયરો સુધીની વિવિધ ટીમને પૂરી પાડે છે."
+
+#: patterns/team-4-col.php:16
+msgctxt "Sample heading for the team pattern"
+msgid "Meet our team"
+msgstr "અમારી ટીમને મળો"
+
+#: patterns/team-4-col.php:11
+msgctxt "Name of team pattern"
+msgid "Team members"
+msgstr "ટુકડી સભ્યો"
+
+#: patterns/team-4-col.php
+msgctxt "Pattern title"
+msgid "Team members, 4 columns"
+msgstr "ટીમના સભ્યો, 4 કૉલમ"
+
+#: patterns/posts-images-only-offset-4-col.php
+msgctxt "Pattern title"
+msgid "Offset posts with featured images only, 4 columns"
+msgstr "માત્ર વૈશિષ્ટિકૃત છબીઓ, 4 કૉલમ્સ સાથે ઑફસેટ પોસ્ટ્સ"
+
+#: patterns/posts-images-only-3-col.php
+msgctxt "Pattern title"
+msgid "Posts with featured images only, 3 columns"
+msgstr "માત્ર વૈશિષ્ટિકૃત છબીઓ સાથેની પોસ્ટ, 3 કૉલમ"
+
+#: patterns/posts-grid-2-col.php:14 patterns/posts-list.php:14
+#: patterns/template-index-blogging.php:16
+msgid "Watch, Read, Listen"
+msgstr "જુઓ, વાંચો, સાંભળો"
+
+#: patterns/posts-grid-2-col.php
+msgctxt "Pattern title"
+msgid "Grid of posts featuring the first post, 2 columns"
+msgstr "પ્રથમ પોસ્ટ, 2 કૉલમ દર્શાવતી પોસ્ટ્સની ગ્રીડ"
+
+#: patterns/posts-3-col.php
+msgctxt "Pattern title"
+msgid "List of posts, 3 columns"
+msgstr "પોસ્ટ્સની સૂચિ, 3 કૉલમ"
+
+#: patterns/posts-1-col.php
+msgctxt "Pattern title"
+msgid "List of posts, 1 column"
+msgstr "પોસ્ટ્સની સૂચિ, 1 કૉલમ"
+
+#: patterns/page-rsvp-landing.php:49
+msgid "Green staircase at Western University, London, Canada"
+msgstr "વેસ્ટર્ન યુનિવર્સિટી, લંડન, કેનેડા ખાતે લીલી સીડી"
+
+#: patterns/page-rsvp-landing.php:14
+msgctxt "Name of RSVP landing page pattern"
+msgid "RSVP Landing Page"
+msgstr "RSVP લેન્ડિંગ પૃષ્ઠ"
+
+#: patterns/page-rsvp-landing.php
+msgctxt "Pattern title"
+msgid "RSVP landing"
+msgstr "RSVP લેન્ડિંગ"
+
+#: patterns/page-portfolio-overview.php
+msgctxt "Pattern title"
+msgid "Portfolio project overview"
+msgstr "પોર્ટફોલિયો પ્રોજેક્ટ ઝાંખી"
+
+#: patterns/page-newsletter-landing.php:40
+msgctxt "Sample content for newsletter subscribe button"
+msgid "Sign up"
+msgstr "સાઇન અપ કરો"
+
+#: patterns/page-newsletter-landing.php:29
+msgctxt "sample content for newsletter subscription"
+msgid "Subscribe to the newsletter and stay connected with our community"
+msgstr "ન્યૂઝલેટર પર સબ્સ્ક્રાઇબ કરો અને અમારા સમુદાય સાથે જોડાયેલા રહો"
+
+#: patterns/page-newsletter-landing.php
+msgctxt "Pattern title"
+msgid "Newsletter landing"
+msgstr "ન્યૂઝલેટર ઉતરાણ"
+
+#: patterns/page-home-portfolio.php
+msgctxt "Pattern title"
+msgid "Portfolio home with post featured images"
+msgstr "પોસ્ટ ફીચર્ડ ઈમેજો સાથે પોર્ટફોલિયો હોમ"
+
+#: patterns/page-home-portfolio-gallery.php
+msgctxt "Pattern title"
+msgid "Portfolio home image gallery"
+msgstr "પોર્ટફોલિયો હોમ ઇમેજ ગેલેરી"
+
+#: patterns/page-home-business.php
+msgctxt "Pattern title"
+msgid "Business home"
+msgstr "વ્યાપાર ઘર"
+
+#: patterns/page-home-blogging.php
+msgctxt "Pattern title"
+msgid "Blogging home"
+msgstr "ઘર બ્લોગિંગ"
+
+#: patterns/page-about-business.php
+msgctxt "Pattern title"
+msgid "About"
+msgstr "વિશે"
+
+#: patterns/hidden-sidebar.php:75
+msgctxt "search form placeholder"
+msgid "Search..."
+msgstr "શોધો"
+
+#: patterns/hidden-sidebar.php:72
+msgid "Search the website"
+msgstr "વેબસાઇટ શોધો"
+
+#: patterns/hidden-sidebar.php:60
+msgid "Financial apps for families"
+msgstr "પરિવારો માટે નાણાકીય એપ્લિકેશનો"
+
+#: patterns/hidden-sidebar.php:59
+msgid "Latest inflation report"
+msgstr "તાજેતરનો ફુગાવાનો અહેવાલ"
+
+#: patterns/hidden-sidebar.php:53
+msgid "Links I found useful and wanted to share."
+msgstr "લિંક્સ મને ઉપયોગી લાગી અને શેર કરવા માંગુ છું."
+
+#: patterns/hidden-sidebar.php:49
+msgid "Useful Links"
+msgstr "ઉપયોગી લિંક્સ"
+
+#: patterns/hidden-sidebar.php:33
+msgid "Popular Categories"
+msgstr "લોકપ્રિય શ્રેણીઓ"
+
+#: patterns/hidden-sidebar.php:17
+msgid "About the author"
+msgstr "લેખક વિશે"
+
+#: patterns/hidden-sidebar.php
+msgctxt "Pattern title"
+msgid "Sidebar"
+msgstr "સાઈડબાર"
+
+#: patterns/hidden-search.php:9
+msgctxt "search button text"
+msgid "Search"
+msgstr "શોધો"
+
+#: patterns/hidden-search.php:9 patterns/hidden-sidebar.php:75
+msgctxt "search form label"
+msgid "Search"
+msgstr "શોધો"
+
+#: patterns/hidden-search.php
+msgctxt "Pattern title"
+msgid "Search"
+msgstr "શોધો"
+
+#: patterns/hidden-post-navigation.php:12
+msgctxt "Label before the title of the next post. There is a space after the colon."
+msgid "Next: "
+msgstr "આગળના: "
+
+#: patterns/hidden-post-navigation.php:11
+msgctxt "Label before the title of the previous post. There is a space after the colon."
+msgid "Previous: "
+msgstr "અગાઉના: "
+
+#: patterns/hidden-post-navigation.php:9 patterns/hidden-post-navigation.php:10
+#: patterns/hidden-posts-heading.php:10
+#: patterns/template-index-portfolio.php:16
+msgid "Posts"
+msgstr "પોસ્ટ્સ"
+
+#: patterns/hidden-post-navigation.php
+msgctxt "Pattern title"
+msgid "Post navigation"
+msgstr "પોસ્ટ સંશોધક"
+
+#: patterns/hidden-post-meta.php:25
+msgctxt "Prefix for the post category block: in category name"
+msgid "in "
+msgstr "માં "
+
+#: patterns/hidden-post-meta.php:20
+msgctxt "Prefix for the post author block: By author name"
+msgid "by"
+msgstr "દ્વારા"
+
+#: patterns/hidden-post-meta.php
+msgctxt "Pattern title"
+msgid "Post meta"
+msgstr "પોસ્ટ મેટા"
+
+#: patterns/hidden-portfolio-hero.php
+msgctxt "Pattern title"
+msgid "Portfolio hero"
+msgstr "પોર્ટફોલિયો હીરો"
+
+#: patterns/hidden-no-results.php:9
+msgctxt "Message explaining that there are no results returned from a search"
+msgid "No posts were found."
+msgstr "કોઈ પોસ્ટ્સ મળી નથી."
+
+#: patterns/hidden-no-results.php
+msgctxt "Pattern title"
+msgid "No results"
+msgstr "કોઈ પરિણામ નથી"
+
+#: patterns/hidden-comments.php:12
+msgid "Comments"
+msgstr "ટિપ્પણીઓ"
+
+#: patterns/hidden-comments.php
+msgctxt "Pattern title"
+msgid "Comments"
+msgstr "ટિપ્પણીઓ"
+
+#: patterns/hidden-404.php:13
+msgctxt "Message to convey that a webpage could not be found"
+msgid "The page you are looking for does not exist, or it has been moved. Please try searching using the form below."
+msgstr "તમે જે પૃષ્ઠ શોધી રહ્યાં છો તે અસ્તિત્વમાં નથી, અથવા તેને ખસેડવામાં આવ્યું છે. કૃપા કરીને નીચેના ફોર્મનો ઉપયોગ કરીને શોધવાનો પ્રયાસ કરો."
+
+#: patterns/hidden-404.php:10
+msgctxt "Heading for a webpage that is not found"
+msgid "Page Not Found"
+msgstr "પેજ મળ્યું નથી"
+
+#: patterns/hidden-404.php
+msgctxt "Pattern title"
+msgid "404"
+msgstr "404"
+
+#: patterns/gallery-project-layout.php:54
+msgid "Art Gallery of Ontario, Toronto, Canada"
+msgstr "ઑન્ટારિયોની આર્ટ ગેલેરી, ટોરોન્ટો, કેનેડા"
+
+#: patterns/gallery-project-layout.php:49
+msgctxt "Sample text for the feature area"
+msgid "2. Case studies that celebrate the artistry can fuel curiosity and ignite inspiration."
+msgstr "2. કલાત્મકતાની ઉજવણી કરતા કેસ સ્ટડીઝ જિજ્ઞાસાને ઉત્તેજન આપી શકે છે અને પ્રેરણાને ઉત્તેજિત કરી શકે છે."
+
+#: patterns/gallery-project-layout.php:38
+msgctxt "Sample text for the feature area"
+msgid "Our comprehensive suite of professional services caters to a diverse clientele, ranging from homeowners to commercial developers. With a commitment to innovation and sustainability, Études is the bridge that transforms architectural dreams into remarkable built realities."
+msgstr "વ્યાવસાયિક સેવાઓનો અમારો વ્યાપક સમૂહ ઘરમાલિકોથી લઈને વ્યાવસાયિક વિકાસકર્તાઓ સુધીના વિવિધ ગ્રાહકોને પૂરો પાડે છે. નવીનતા અને ટકાઉપણાની પ્રતિબદ્ધતા સાથે, અભ્યાસ એ પુલ છે જે આર્કિટેક્ચરલ સપનાને નોંધપાત્ર બિલ્ટ વાસ્તવિકતાઓમાં પરિવર્તિત કરે છે."
+
+#: patterns/gallery-project-layout.php:26
+msgctxt "Sample text for the feature area"
+msgid "1. Through Études, we aspire to redefine architectural boundaries and usher in a new era of design excellence that leaves an indelible mark on the built environment."
+msgstr "1. અભ્યાસ દ્વારા, અમે આર્કિટેક્ચરલ સીમાઓને પુનઃવ્યાખ્યાયિત કરવાની અને ડિઝાઇન શ્રેષ્ઠતાના નવા યુગની શરૂઆત કરવાની ઇચ્છા રાખીએ છીએ જે બિલ્ટ પર્યાવરણ પર અવિશ્વસનીય છાપ છોડી જાય છે."
+
+#: patterns/gallery-project-layout.php:21
+msgid "An empty staircase under an angular roof in Darling Harbour, Sydney, Australia"
+msgstr "ડાર્લિંગ હાર્બર, સિડની, ઓસ્ટ્રેલિયામાં કોણીય છત હેઠળ ખાલી સીડી"
+
+#: patterns/gallery-project-layout.php
+msgctxt "Pattern title"
+msgid "Project layout"
+msgstr "પ્રોજેક્ટ લેઆઉટ"
+
+#: patterns/gallery-offset-images-grid-4-col.php
+msgctxt "Pattern title"
+msgid "Offset gallery, 4 columns"
+msgstr "ઑફસેટ ગેલેરી, 4 કૉલમ"
+
+#: patterns/gallery-offset-images-grid-3-col.php
+msgctxt "Pattern title"
+msgid "Offset gallery, 3 columns"
+msgstr "ઑફસેટ ગેલેરી, 3 કૉલમ"
+
+#: patterns/gallery-offset-images-grid-2-col.php
+msgctxt "Pattern title"
+msgid "Offset gallery, 2 columns"
+msgstr "ઑફસેટ ગેલેરી, 2 કૉલમ"
+
+#: patterns/gallery-full-screen-image.php
+msgctxt "Pattern title"
+msgid "Full screen image"
+msgstr "પૂર્ણ સ્ક્રીન છબી"
+
+#: patterns/footer.php:92
+msgid "Social Media"
+msgstr "સામાજિક મીડિયા"
+
+#: patterns/footer.php:86
+msgid "Social"
+msgstr "સામાજિક"
+
+#: patterns/footer.php:64 patterns/footer.php:70
+msgid "Privacy"
+msgstr "ગોપનીયતા"
+
+#: patterns/footer.php:41 patterns/footer.php:47
+msgid "About"
+msgstr "વિશે"
+
+#: patterns/footer.php
+msgctxt "Pattern title"
+msgid "Footer with colophon, 4 columns"
+msgstr "કોલોફોન સાથે ફૂટર, 4 કૉલમ"
+
+#: patterns/footer-colophon-3-col.php:82
+msgid "&copy;"
+msgstr "&કોપી;"
+
+#: patterns/footer-colophon-3-col.php:60 patterns/footer.php:94
+msgid "Facebook"
+msgstr "ફેસબુક"
+
+#: patterns/footer-colophon-3-col.php:60 patterns/footer.php:95
+msgid "Instagram"
+msgstr "ઇન્સ્ટાગ્રામ"
+
+#: patterns/footer-colophon-3-col.php:57
+msgid "Follow"
+msgstr "અનુસરો"
+
+#: patterns/footer-colophon-3-col.php:42
+msgctxt "Example email in site footer"
+msgid "info@example.com"
+msgstr "info@example.com"
+
+#: patterns/footer-colophon-3-col.php:39
+msgid "Contact"
+msgstr "સંપર્ક"
+
+#: patterns/footer-colophon-3-col.php:30
+msgid "Keep up, get in touch."
+msgstr "ચાલુ રાખો, સંપર્કમાં રહો."
+
+#: patterns/footer-colophon-3-col.php
+msgctxt "Pattern title"
+msgid "Footer with colophon, 3 columns"
+msgstr "કોલોફોન સાથે ફૂટર, 3 કૉલમ"
+
+#. Translators: Designed with WordPress
+#: patterns/footer-centered-logo-nav.php:25
+#: patterns/footer-colophon-3-col.php:94 patterns/footer.php:120
+msgid "Designed with %1$s"
+msgstr "%1$s સાથે ડિઝાઇન કરેલ"
+
+#: patterns/footer-centered-logo-nav.php
+msgctxt "Pattern title"
+msgid "Footer with centered logo and navigation"
+msgstr "કેન્દ્રિત લોગો અને નેવિગેશન સાથે ફૂટર"
+
+#: patterns/cta-subscribe-centered.php:31
+msgctxt "Sample text for Sign Up Button"
+msgid "Sign up"
+msgstr "સાઇન અપ કરો"
+
+#: patterns/cta-subscribe-centered.php:24
+msgctxt "Sample text for Subscriber Description"
+msgid "Stay in the loop with everything you need to know."
+msgstr "તમારે જે જાણવાની જરૂર છે તેની સાથે લૂપમાં રહો."
+
+#: patterns/cta-subscribe-centered.php:20
+msgctxt "Sample text for Subscriber Heading with numbers"
+msgid "Join 900+ subscribers"
+msgstr "900+ સબ્સ્ક્રાઇબર્સમાં જોડાઓ"
+
+#: patterns/cta-subscribe-centered.php
+msgctxt "Pattern title"
+msgid "Centered call to action"
+msgstr "કેન્દ્રીય કૉલ ટુ એક્શન"
+
+#: patterns/cta-services-image-left.php:39
+msgctxt "Sample button text to view the services"
+msgid "Our services"
+msgstr "અમારી સેવાઓ"
+
+#: patterns/cta-services-image-left.php:32
+msgctxt "Sample description of the services pattern"
+msgid "Experience the fusion of imagination and expertise with Études—the catalyst for architectural transformations that enrich the world around us."
+msgstr "અભ્યાસ સાથે કલ્પના અને કુશળતાના સંમિશ્રણનો અનુભવ કરો - આર્કિટેક્ચરલ પરિવર્તન માટે ઉત્પ્રેરક જે આપણી આસપાસની દુનિયાને સમૃદ્ધ બનાવે છે."
+
+#: patterns/cta-services-image-left.php:28
+msgctxt "Sample heading of the services pattern"
+msgid "Guiding your business through the project"
+msgstr "પ્રોજેક્ટ દ્વારા તમારા વ્યવસાયને માર્ગદર્શન આપવું"
+
+#: patterns/cta-services-image-left.php
+msgctxt "Pattern title"
+msgid "Services call to action with image on left"
+msgstr "સેવાઓ ડાબી બાજુની છબી સાથે એક્શન માટે કૉલ કરે છે"
+
+#: patterns/cta-rsvp.php:50 patterns/text-title-left-image-right.php:51
+msgid "A ramp along a curved wall in the Kiasma Museu, Helsinki, Finland"
+msgstr "ફિનલેન્ડના હેલસિંકી, કિઆસ્મા મ્યુઝ્યુમાં વક્ર દિવાલ સાથેનો રસ્તો"
+
+#: patterns/cta-rsvp.php:34 patterns/page-rsvp-landing.php:34
+msgctxt "Call to action button text for the reservation button"
+msgid "Reserve your spot"
+msgstr "તમારી જગ્યા આરક્ષિત કરો"
+
+#: patterns/cta-rsvp.php:27 patterns/page-rsvp-landing.php:28
+msgctxt "RSVP call to action description"
+msgid "Experience the fusion of imagination and expertise with Études Arch Summit, February 2025."
+msgstr "અભ્યાસ આર્કિટેક્ચરલ સોલ્યુશન્સ સાથે કલ્પના અને કુશળતાના મિશ્રણનો અનુભવ કરો."
+
+#: patterns/cta-rsvp.php:21 patterns/page-rsvp-landing.php:23
+msgctxt "Initials for ´please respond´"
+msgid "RSVP"
+msgstr "આરએસવીપી"
+
+#: patterns/cta-rsvp.php:11
+msgctxt "Name of RSVP pattern"
+msgid "RSVP"
+msgstr "આરએસવીપી"
+
+#: patterns/cta-rsvp.php
+msgctxt "Pattern title"
+msgid "RSVP"
+msgstr "આરએસવીપી"
+
+#: patterns/cta-pricing.php:203
+msgctxt "Button text for the third pricing level"
+msgid "Subscribe"
+msgstr "સબ્સ્ક્રાઇબ"
+
+#: patterns/cta-pricing.php:189
+msgctxt "Feature for pricing level"
+msgid "Exclusive access to the <em>Études</em> app for iOS and Android"
+msgstr "એન્ડ્રોઇડ અને iOS માટે <em>અભ્યાસ</em> એપ્લિકેશનની વિશિષ્ટ ઍક્સેસ"
+
+#: patterns/cta-pricing.php:173
+msgctxt "Feature for pricing level"
+msgid "Exclusive, unlimited access to <em>Études Articles</em>."
+msgstr "<em>અભ્યાસ લેખો</em> માટે વિશિષ્ટ, અમર્યાદિત ઍક્સેસ."
+
+#: patterns/cta-pricing.php:162
+msgctxt "Sample price for the third pricing level"
+msgid "$28"
+msgstr "$28"
+
+#: patterns/cta-pricing.php:157
+msgctxt "Sample heading for the third pricing level"
+msgid "Expert"
+msgstr "નિષ્ણાત"
+
+#: patterns/cta-pricing.php:145
+msgctxt "Button text for the second pricing level"
+msgid "Subscribe"
+msgstr "સબ્સ્ક્રાઇબ"
+
+#: patterns/cta-pricing.php:115
+msgctxt "Feature for pricing level"
+msgid "Access to 20 exclusive <em>Études Articles</em> per month."
+msgstr "દર મહિને 20 વિશિષ્ટ <em>અભ્યાસ લેખો</em>ની ઍક્સેસ."
+
+#: patterns/cta-pricing.php:104
+msgctxt "Sample price for the second pricing level"
+msgid "$12"
+msgstr "$12"
+
+#: patterns/cta-pricing.php:99
+msgctxt "Sample heading for the second pricing level"
+msgid "Connoisseur"
+msgstr "ગુણજ્ઞ"
+
+#: patterns/cta-pricing.php:87
+msgctxt "Button text for the first pricing level"
+msgid "Subscribe"
+msgstr "સબ્સ્ક્રાઇબ"
+
+#: patterns/cta-pricing.php:72 patterns/cta-pricing.php:131
+msgctxt "Feature for pricing level"
+msgid "Exclusive access to the <em>Études</em> app for iOS and Android."
+msgstr "એન્ડ્રોઇડ અને iOS માટે <em>અભ્યાસ</em> એપ્લિકેશનની વિશિષ્ટ ઍક્સેસ."
+
+#: patterns/cta-pricing.php:62 patterns/cta-pricing.php:123
+#: patterns/cta-pricing.php:181
+msgctxt "Feature for pricing level"
+msgid "Weekly print edition."
+msgstr "સાપ્તાહિક પ્રિન્ટ આવૃત્તિ."
+
+#: patterns/cta-pricing.php:53
+msgctxt "Feature for pricing level"
+msgid "Access to 5 exclusive <em>Études Articles</em> per month."
+msgstr "દર મહિને 5 વિશિષ્ટ <em>અભ્યાસ લેખો</em>ની ઍક્સેસ."
+
+#: patterns/cta-pricing.php:42
+msgctxt "Sample price for the first pricing level"
+msgid "$0"
+msgstr "$0"
+
+#: patterns/cta-pricing.php:37
+msgctxt "Sample heading for the first pricing level"
+msgid "Free"
+msgstr "મફત"
+
+#: patterns/cta-pricing.php:22
+msgctxt "Sample description for a pricing table"
+msgid "We offer flexible options, which you can adapt to the different needs of each project."
+msgstr "અમે લવચીક વિકલ્પો પ્રદાન કરીએ છીએ, જેને તમે દરેક પ્રોજેક્ટની વિવિધ જરૂરિયાતોને અનુરૂપ બનાવી શકો છો."
+
+#: patterns/cta-pricing.php:18
+msgctxt "Sample heading for pricing pattern"
+msgid "Our Services"
+msgstr "અમારી સેવા"
+
+#: patterns/cta-pricing.php:11
+msgctxt "Name for the pricing pattern"
+msgid "Pricing Table"
+msgstr "કિંમત ટેબલ"
+
+#: patterns/cta-pricing.php
+msgctxt "Pattern title"
+msgid "Pricing"
+msgstr "કિંમત નિર્ધારણ"
+
+#: patterns/cta-content-image-on-right.php:59
+#: patterns/cta-services-image-left.php:19
+msgid "White abstract geometric artwork from Dresden, Germany"
+msgstr "ડ્રેસ્ડન, જર્મનીથી સફેદ અમૂર્ત ભૌમિતિક આર્ટવર્ક"
+
+#: patterns/cta-content-image-on-right.php:47
+msgctxt "Button text of this section"
+msgid "How it works"
+msgstr "તે કેવી રીતે કામ કરે છે"
+
+#: patterns/cta-content-image-on-right.php:41
+msgctxt "Button text of this section"
+msgid "Download app"
+msgstr "એપ્લિકેશન ડાઉનલોડ કરો"
+
+#: patterns/cta-content-image-on-right.php:32
+#: patterns/text-alternating-images.php:52
+msgctxt "Sample list item"
+msgid "Experience the world of architecture."
+msgstr "આર્કિટેક્ચરની દુનિયાનો અનુભવ કરો."
+
+#: patterns/cta-content-image-on-right.php:28
+#: patterns/text-alternating-images.php:48
+msgctxt "Sample list item"
+msgid "Showcase your projects."
+msgstr "તમારા પ્રોજેક્ટ્સનું પ્રદર્શન કરો."
+
+#: patterns/cta-content-image-on-right.php:24
+#: patterns/text-alternating-images.php:44
+msgctxt "Sample list item"
+msgid "Collaborate with fellow architects."
+msgstr "સાથી આર્કિટેક્ટ્સ સાથે સહયોગ કરો."
+
+#: patterns/cta-content-image-on-right.php:18
+msgctxt "Sample heading"
+msgid "Enhance your architectural journey with the Études Architect app."
+msgstr "આર્કિટેક્ટ સ્ટડીઝ એપ્લિકેશન વડે તમારી આર્કિટેક્ચરલ સફરને બહેતર બનાવો."
+
+#: patterns/cta-content-image-on-right.php
+msgctxt "Pattern title"
+msgid "Call to action with image on right"
+msgstr "જમણી બાજુની છબી સાથે એક્શન માટે કૉલ કરો"
+
+#: patterns/banner-project-description.php:41
+msgid "Hyatt Regency San Francisco, San Francisco, United States"
+msgstr "હયાત રીજન્સી સાન ફ્રાન્સિસ્કો, સાન ફ્રાન્સિસ્કો, યુનાઇટેડ સ્ટેટ્સ"
+
+#: patterns/banner-project-description.php:26
+msgctxt "Sample descriptive text for a project or post."
+msgid "This transformative project seeks to enhance the gallery's infrastructure, accessibility, and exhibition spaces while preserving its rich cultural heritage."
+msgstr "આ પરિવર્તનકારી પ્રોજેક્ટ તેના સમૃદ્ધ સાંસ્કૃતિક વારસાને સાચવીને ગેલેરીની માળખાકીય સુવિધા, સુલભતા અને પ્રદર્શન સ્થાનોને વધારવાનો પ્રયાસ કરે છે."
+
+#: patterns/banner-project-description.php:17
+msgctxt "Sample title for a project or post"
+msgid "Art Gallery — Overview"
+msgstr "આર્ટ ગેલેરી - વિહંગાવલોકન"
+
+#: patterns/banner-project-description.php
+msgctxt "Pattern title"
+msgid "Project description"
+msgstr "પરિયોજના નું વર્ણન"
+
+#: patterns/banner-hero.php:52
+msgid "Building exterior in Toronto, Canada"
+msgstr "ટોરોન્ટો, કેનેડામાં બાહ્ય મકાન"
+
+#: patterns/banner-hero.php:37
+msgctxt "Button text of the hero section"
+msgid "About us"
+msgstr "અમારા વિશે"
+
+#: patterns/banner-hero.php:26
+msgctxt "Content of the hero section"
+msgid "Études is a pioneering firm that seamlessly merges creativity and functionality to redefine architectural excellence."
+msgstr "અભ્યાસ એ એક અગ્રણી પેઢી છે જે સ્થાપત્ય શ્રેષ્ઠતાને ફરીથી વ્યાખ્યાયિત કરવા માટે સર્જનાત્મકતા અને કાર્યક્ષમતાને એકીકૃત રીતે મર્જ કરે છે."
+
+#: patterns/banner-hero.php:18
+msgctxt "Heading of the hero section"
+msgid "A commitment to innovation and sustainability"
+msgstr "નવીનતા અને ટકાઉપણું માટે પ્રતિબદ્ધતા"
+
+#: patterns/banner-hero.php
+msgctxt "Pattern title"
+msgid "Hero"
+msgstr "હીરો"
+
+#: functions.php:111
+msgid "With asterisk"
+msgstr "ફૂદડી સાથે"
+
+#: functions.php:93
+msgid "With arrow"
+msgstr "તીર સાથે"
+
+#: functions.php:74
+msgid "Checkmark"
+msgstr "ચેકમાર્ક"
+
+#: functions.php:51
+msgid "Pill"
+msgstr "ગોળી"
+
+#: functions.php:28
+msgid "Arrow icon"
+msgstr "એરો આઇકન"
+
+#. Author URI of the theme
+#. Translators: WordPress link.
+#: style.css patterns/footer-centered-logo-nav.php:22
+#: patterns/footer-colophon-3-col.php:91 patterns/footer.php:117
+msgid "https://wordpress.org"
+msgstr "https://wordpress.org"
+
+#. Author of the theme
+#: style.css
+#, gp-priority: low
+msgid "the WordPress team"
+msgstr "ધ વર્ડપ્રેસ ટીમ."
+
+#. Theme URI of the theme
+#: style.css
+#, gp-priority: low
+msgid "https://wordpress.org/themes/twentytwentyfour/"
+msgstr "https://wordpress.org/themes/twentytwentyfour/"

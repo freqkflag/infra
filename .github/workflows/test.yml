@@ -1,0 +1,59 @@
+name: Configuration Validation
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Docker Compose Configurations
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Validate docker-compose.yml files
+        run: |
+          echo "Validating all docker-compose.yml files..."
+          find . -name "docker-compose.yml" -type f | while read file; do
+            echo "Validating: $file"
+            docker compose -f "$file" config > /dev/null || {
+              echo "❌ Validation failed: $file"
+              exit 1
+            }
+            echo "✓ Valid: $file"
+          done
+      
+      - name: Check for required files
+        run: |
+          echo "Checking for required files..."
+          services=("traefik" "vault" "wikijs" "wordpress" "linkstack")
+          for service in "${services[@]}"; do
+            if [ ! -f "$service/docker-compose.yml" ]; then
+              echo "❌ Missing: $service/docker-compose.yml"
+              exit 1
+            fi
+            echo "✓ Found: $service/docker-compose.yml"
+          done
+      
+      - name: Validate environment variable references
+        run: |
+          echo "Checking for undefined environment variables..."
+          # This is a basic check - in production, use a proper validator
+          find . -name "docker-compose.yml" -exec grep -l '\${.*}' {} \; | \
+            while read file; do
+              echo "Checking env vars in: $file"
+              # Check if .env.example exists
+              dir=$(dirname "$file")
+              if [ ! -f "$dir/.env.example" ] && [ ! -f "$dir/.env" ]; then
+                echo "⚠ Warning: No .env or .env.example in $dir"
+              fi
+            done
+

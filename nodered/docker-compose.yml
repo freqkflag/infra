@@ -1,0 +1,46 @@
+services:
+  nodered:
+    image: nodered/node-red:latest
+    container_name: nodered
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ:-America/New_York}
+      - NODE_OPTIONS=--max_old_space_size=512
+    volumes:
+      - ./data:/data
+    networks:
+      - nodered-network
+      - traefik-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:1880"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nodered.rule=Host(`nodered.freqkflag.co`)"
+      - "traefik.http.routers.nodered.entrypoints=websecure"
+      - "traefik.http.routers.nodered.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.nodered.middlewares=security-headers@file"
+      - "traefik.http.services.nodered.loadbalancer.server.port=1880"
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=1880"
+
+networks:
+  nodered-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+

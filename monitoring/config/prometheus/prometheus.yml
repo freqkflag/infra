@@ -1,0 +1,81 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'infra'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Traefik
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['traefik:8080']
+    metrics_path: '/metrics'
+
+  # Docker containers (via cAdvisor or Docker exporter)
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['host.docker.internal:9323']
+    # Note: Requires Docker metrics endpoint enabled
+
+  # PostgreSQL databases
+  - job_name: 'postgres'
+    static_configs:
+      - targets:
+          - 'wikijs-db:5432'
+          - 'n8n-db:5432'
+          - 'mastodon-db:5432'
+          - 'supabase-db:5432'
+    # Note: Requires postgres_exporter sidecar containers
+
+  # MySQL databases
+  - job_name: 'mysql'
+    static_configs:
+      - targets:
+          - 'wordpress-db:3306'
+          - 'linkstack-db:3306'
+    # Note: Requires mysqld_exporter sidecar containers
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets:
+          - 'mastodon-redis:6379'
+          - 'mailu-redis:6379'
+    # Note: Requires redis_exporter sidecar containers
+
+  # Application services (if they expose metrics)
+  - job_name: 'n8n'
+    static_configs:
+      - targets: ['n8n:5678']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Grafana
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+    metrics_path: '/metrics'
+

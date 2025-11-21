@@ -1,0 +1,37 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: infra-devcontainer
+    volumes:
+      - ../:/workspace:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+      - devcontainer-data:/home/devuser/.local
+      - devcontainer-cache:/home/devuser/.cache
+    networks:
+      - devcontainer-network
+      - traefik-network
+    environment:
+      - TZ=${TZ:-America/New_York}
+      - VAULT_ADDR=http://vault:8200
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+networks:
+  devcontainer-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+
+volumes:
+  devcontainer-data:
+  devcontainer-cache:
+

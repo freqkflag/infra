@@ -1,0 +1,169 @@
+/* Custom styles for additional Ghost-specific elements */
+
+/* Ghost navigation active state */
+.site-nav a.active,
+.site-nav a.current {
+  color: var(--c-primary);
+}
+
+.site-nav a.active::after,
+.site-nav a.current::after {
+  left: 0;
+  width: 100%;
+  transform: translateX(0);
+  background: var(--c-primary);
+  box-shadow: 0 0 8px var(--c-primary);
+}
+
+/* Ghost post content styling */
+.post-content p {
+  margin-bottom: var(--sp-6);
+  line-height: 1.8;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  margin-top: var(--sp-12);
+  margin-bottom: var(--sp-6);
+  font-family: var(--font-heading);
+}
+
+.post-content ul,
+.post-content ol {
+  margin: var(--sp-6) 0;
+  padding-left: var(--sp-8);
+}
+
+.post-content li {
+  margin-bottom: var(--sp-2);
+}
+
+.post-content a {
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.post-content a:hover {
+  color: var(--c-accent-soft);
+}
+
+/* Ghost pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: var(--sp-12) 0;
+}
+
+.pagination a,
+.pagination span {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  transition: all var(--duration-hover);
+}
+
+.pagination a {
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+}
+
+.pagination a:hover {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+  box-shadow: var(--shadow-neon-primary);
+}
+
+.pagination .page-number {
+  background-color: var(--c-primary-bg);
+  color: var(--c-primary-fg);
+  border-color: var(--c-primary);
+}
+
+/* Ghost membership forms */
+.gh-subscribe-form {
+  background-color: var(--c-surface);
+  border: var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-8);
+  margin: var(--sp-12) 0;
+}
+
+.gh-subscribe-form input[type="email"] {
+  width: 100%;
+  background-color: var(--c-surface-alt);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--c-body-text);
+  font-family: var(--font-body);
+  margin-bottom: var(--sp-4);
+}
+
+.gh-subscribe-form input[type="email"]:focus {
+  outline: none;
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
+}
+
+.gh-subscribe-form button {
+  width: 100%;
+}
+
+/* Ghost author card */
+.author-card {
+  background-color: var(--c-surface);
+  border: var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6);
+  margin: var(--sp-12) 0;
+}
+
+/* Ghost post tags */
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-6) 0;
+}
+
+.post-tags a {
+  display: inline-block;
+}
+
+/* Ghost reading time */
+.reading-time {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--c-muted-text);
+}
+
+/* Ghost post date */
+.post-date {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--c-accent);
+}
+
+/* Koenig Editor - Required image width classes */
+.kg-width-wide {
+  width: 85vw;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.kg-width-full {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+

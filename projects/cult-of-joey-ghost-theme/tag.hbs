@@ -1,0 +1,30 @@
+{{!< default}}
+
+<header class="post-header">
+    <div class="post-header-inner">
+        <h1 class="post-title glitch-hover">{{tag.name}}</h1>
+        {{#if tag.description}}
+            <p class="post-excerpt">{{tag.description}}</p>
+        {{/if}}
+    </div>
+</header>
+
+<div class="container py-12" style="padding: 3rem 0;">
+    <div class="filter-bar">
+        <span class="filter-label">Filter Frequency:</span>
+        <span class="chip chip-active" data-filter="all">All Signals</span>
+        <span class="chip chip-mood-calm" data-filter="calm">Calm</span>
+        <span class="chip chip-mood-manic" data-filter="manic">Manic</span>
+        <span class="chip chip-mood-reflective" data-filter="reflective">Reflective</span>
+        <span class="chip chip-mood-defiant" data-filter="defiant">Defiant</span>
+    </div>
+    
+    <div class="post-grid">
+        {{#foreach posts}}
+            {{> "post-card"}}
+        {{/foreach}}
+    </div>
+    
+    {{pagination}}
+</div>
+

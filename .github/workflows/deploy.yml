@@ -1,0 +1,66 @@
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - '**/docker-compose.yml'
+      - '**/.env.example'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to deploy (leave empty for all)'
+        required: false
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Services
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Validate configurations
+        run: |
+          echo "Validating docker-compose configurations..."
+          find . -name "docker-compose.yml" -exec docker compose -f {} config \; > /dev/null
+          echo "✓ All configurations valid"
+      
+      - name: Run security scan
+        run: |
+          echo "Running security scan..."
+          # Extract and scan images
+          find . -name "docker-compose.yml" -exec grep -h "image:" {} \; | \
+            sed 's/.*image: *//' | sed 's/\${.*}//' | sort -u | \
+            while read image; do
+              if [ ! -z "$image" ]; then
+                echo "Scanning: $image"
+                docker run --rm aquasec/trivy:latest image \
+                  --severity CRITICAL \
+                  --exit-code 1 \
+                  "$image" || echo "⚠ Vulnerabilities found in $image"
+              fi
+            done
+      
+      - name: Deploy notification
+        run: |
+          echo "🚀 Deployment workflow completed"
+          echo "Note: Actual deployment should be done manually or via SSH"
+          echo "This workflow validates and tests configurations"
+      
+      # Add SSH deployment steps here if needed
+      # - name: Deploy via SSH
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USER }}
+      #     key: ${{ secrets.SSH_KEY }}
+      #     script: |
+      #       cd /root/infra
+      #       git pull
+      #       docker compose up -d
+

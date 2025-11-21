@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  fl-clone-db:
+    image: postgres:15
+    container_name: fl-clone-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-fl_clone_production}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - fl-clone-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fl-clone-redis:
+    image: redis:7-alpine
+    container_name: fl-clone-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - fl-clone-network
+    restart: unless-stopped
+
+  fl-clone-backend:
+    build: ./backend
+    container_name: fl-clone-backend
+    environment:
+      RAILS_ENV: ${RAILS_ENV:-production}
+      POSTGRES_HOST: fl-clone-db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-fl_clone_production}
+      REDIS_URL: redis://fl-clone-redis:6379/1
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+    volumes:
+      - ./backend:/app
+      - ./data/storage:/app/storage
+    networks:
+      - fl-clone-network
+      - traefik-network
+    depends_on:
+      fl-clone-db:
+        condition: service_healthy
+      fl-clone-redis:
+        condition: service_started
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fl-clone-api.rule=Host(`twist3dkinkst3r.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.fl-clone-api.entrypoints=websecure"
+      - "traefik.http.routers.fl-clone-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.fl-clone-api.loadbalancer.server.port=3000"
+
+  fl-clone-sidekiq:
+    build: ./backend
+    container_name: fl-clone-sidekiq
+    command: bundle exec sidekiq
+    environment:
+      RAILS_ENV: ${RAILS_ENV:-production}
+      POSTGRES_HOST: fl-clone-db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-fl_clone_production}
+      REDIS_URL: redis://fl-clone-redis:6379/1
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+    volumes:
+      - ./backend:/app
+      - ./data/storage:/app/storage
+    networks:
+      - fl-clone-network
+    depends_on:
+      - fl-clone-db
+      - fl-clone-redis
+    restart: unless-stopped
+
+  fl-clone-frontend:
+    build: ./frontend
+    container_name: fl-clone-frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - fl-clone-network
+      - traefik-network
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fl-clone.rule=Host(`twist3dkinkst3r.com`)"
+      - "traefik.http.routers.fl-clone.entrypoints=websecure"
+      - "traefik.http.routers.fl-clone.tls.certresolver=letsencrypt"
+      - "traefik.http.services.fl-clone.loadbalancer.server.port=5173"
+
+networks:
+  fl-clone-network:
+    driver: bridge
+  traefik-network:
+    external: true
+
+volumes:
+  postgres-data:
+  redis-data:
+  storage-data:
+

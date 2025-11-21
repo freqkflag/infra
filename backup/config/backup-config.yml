@@ -1,0 +1,68 @@
+# Backup configuration
+# Service-specific backup settings
+
+services:
+  # Database backups (daily)
+  databases:
+    - name: wikijs
+      type: postgres
+      container: wikijs-db
+      database: wiki
+      user: wikijs
+      password_env: POSTGRES_PASSWORD
+    
+    - name: n8n
+      type: postgres
+      container: n8n-db
+      database: n8n
+      user: n8n
+      password_env: POSTGRES_PASSWORD
+    
+    - name: mastodon
+      type: postgres
+      container: mastodon-db
+      database: mastodon
+      user: mastodon
+      password_env: POSTGRES_PASSWORD
+    
+    - name: supabase
+      type: postgres
+      container: supabase-db
+      database: postgres
+      user: supabase_admin
+      password_env: POSTGRES_PASSWORD
+    
+    - name: wordpress
+      type: mysql
+      container: wordpress-db
+      database: wordpress
+      user: wordpress
+      password_env: MYSQL_PASSWORD
+    
+    - name: linkstack
+      type: mysql
+      container: linkstack-db
+      database: linkstack
+      user: linkstack
+      password_env: MYSQL_PASSWORD
+
+  # Volume backups (weekly)
+  volumes:
+    - name: vault
+      path: vault/data
+      critical: true
+    
+    - name: wikijs
+      path: wikijs/data
+      critical: true
+    
+    - name: wordpress
+      path: wordpress/data
+      critical: true
+
+# Retention policies
+retention:
+  daily: 30  # days
+  weekly: 12  # weeks
+  monthly: 12  # months (if implemented)
+

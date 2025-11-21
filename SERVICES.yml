@@ -1,0 +1,276 @@
+# Infrastructure Services Registry
+# Machine-readable source of truth for all services
+# Last Updated: 2025-11-20
+
+services:
+  # Infrastructure Services
+  - id: traefik
+    name: Traefik
+    dir: /root/infra/traefik
+    url: null
+    type: infra
+    status: running
+    depends_on: []
+    description: Reverse proxy, SSL termination, service discovery
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    domain: traefik.localhost
+
+  - id: infisical
+    name: Infisical
+    dir: /root/infra/infisical
+    url: https://infisical.freqkflag.co
+    type: infra
+    status: configured
+    depends_on: [traefik, postgres]
+    description: Modern secrets management and secure credential storage
+    domain: infisical.freqkflag.co
+    database:
+      type: postgres
+      version: "15"
+      container: infisical-db
+
+  - id: vault
+    name: Vault
+    dir: /root/infra/vault
+    url: https://vault.freqkflag.co
+    type: infra
+    status: deprecated
+    depends_on: [traefik]
+    description: Secrets management (deprecated - being replaced by Infisical)
+    mode: production
+    domain: vault.freqkflag.co
+    note: "Deprecated due to Docker restart issues. Migration to Infisical in progress."
+
+  - id: monitoring
+    name: Monitoring Stack
+    dir: /root/infra/monitoring
+    url: https://grafana.freqkflag.co
+    type: infra
+    status: configured
+    depends_on: [traefik]
+    description: Prometheus + Grafana monitoring
+    domains:
+      - grafana.freqkflag.co
+      - prometheus.freqkflag.co
+
+  - id: logging
+    name: Logging Stack
+    dir: /root/infra/logging
+    url: https://loki.freqkflag.co
+    type: infra
+    status: configured
+    depends_on: [traefik, monitoring]
+    description: Loki + Promtail centralized logging
+    domain: loki.freqkflag.co
+
+  - id: backup
+    name: Backup System
+    dir: /root/infra/backup
+    url: null
+    type: infra
+    status: configured
+    depends_on: []
+    description: Automated backup system for databases and volumes
+
+  # Application Services - Infrastructure Domain
+  - id: wikijs
+    name: WikiJS
+    dir: /root/infra/wikijs
+    url: https://wiki.freqkflag.co
+    type: app
+    status: running
+    depends_on: [traefik, postgres]
+    description: Documentation and knowledge base
+    domain: wiki.freqkflag.co
+    database:
+      type: postgres
+      version: "15"
+      container: wikijs-db
+
+  - id: n8n
+    name: n8n
+    dir: /root/infra/n8n
+    url: https://n8n.freqkflag.co
+    type: app
+    status: configured
+    depends_on: [traefik, postgres]
+    description: Workflow automation and integration platform
+    domain: n8n.freqkflag.co
+    database:
+      type: postgres
+      version: "15"
+      container: n8n-db
+
+  - id: nodered
+    name: Node-RED
+    dir: /root/infra/nodered
+    url: https://nodered.freqkflag.co
+    type: app
+    status: configured
+    depends_on: [traefik]
+    description: Flow-based development tool for visual programming
+    domain: nodered.freqkflag.co
+
+  - id: mailu
+    name: Mailu
+    dir: /root/infra/mailu
+    url: https://mail.freqkflag.co
+    type: app
+    status: configured
+    depends_on: [traefik]
+    description: IMAP/SMTP mail server
+    domains:
+      - mail.freqkflag.co
+      - webmail.freqkflag.co
+    ports:
+      - "25:25"
+      - "587:587"
+      - "465:465"
+      - "143:143"
+      - "993:993"
+
+  - id: supabase
+    name: Supabase
+    dir: /root/infra/supabase
+    url: https://supabase.freqkflag.co
+    type: app
+    status: configured
+    depends_on: [traefik, postgres]
+    description: Backend-as-a-Service platform
+    domains:
+      - supabase.freqkflag.co
+      - api.supabase.freqkflag.co
+    database:
+      type: postgres
+      version: "15"
+      container: supabase-db
+
+  - id: adminer
+    name: Adminer
+    dir: /root/infra/adminer
+    url: https://adminer.freqkflag.co
+    type: infra
+    status: configured
+    depends_on: [traefik]
+    description: Web-based database management tool
+    domain: adminer.freqkflag.co
+
+  # Application Services - Personal Brand Domain
+  - id: wordpress
+    name: WordPress
+    dir: /root/infra/wordpress
+    url: https://cultofjoey.com
+    type: app
+    status: running
+    depends_on: [traefik, mysql]
+    description: Main website for personal brand
+    domain: cultofjoey.com
+    database:
+      type: mysql
+      version: "8.0"
+      container: wordpress-db
+
+  - id: linkstack
+    name: LinkStack
+    dir: /root/infra/linkstack
+    url: https://link.cultofjoey.com
+    type: app
+    status: running
+    depends_on: [traefik, mysql]
+    description: Link-in-bio page
+    domain: link.cultofjoey.com
+    database:
+      type: mysql
+      version: "8.0"
+      container: linkstack-db
+
+  # Application Services - Community Domain
+  - id: mastadon
+    name: Mastodon
+    dir: /root/infra/mastadon
+    url: https://twist3dkinkst3r.com
+    type: app
+    status: configured
+    depends_on: [traefik, postgres, redis]
+    description: Federated social network instance
+    domain: twist3dkinkst3r.com
+    database:
+      type: postgres
+      version: "14"
+      container: mastodon-db
+    components:
+      - mastodon-web
+      - mastodon-sidekiq
+      - mastodon-redis
+      - mastodon-db
+
+  # Database Services (embedded in app services)
+  - id: postgres
+    name: PostgreSQL
+    dir: null
+    url: null
+    type: db
+    status: running
+    depends_on: []
+    description: PostgreSQL database (embedded in services)
+    instances:
+      - service: wikijs
+        container: wikijs-db
+        version: "15"
+      - service: n8n
+        container: n8n-db
+        version: "15"
+      - service: mastodon
+        container: mastodon-db
+        version: "14"
+      - service: supabase
+        container: supabase-db
+        version: "15"
+
+  - id: mysql
+    name: MySQL
+    dir: null
+    url: null
+    type: db
+    status: running
+    depends_on: []
+    description: MySQL database (embedded in services)
+    instances:
+      - service: wordpress
+        container: wordpress-db
+        version: "8.0"
+      - service: linkstack
+        container: linkstack-db
+        version: "8.0"
+
+  - id: redis
+    name: Redis
+    dir: null
+    url: null
+    type: db
+    status: configured
+    depends_on: []
+    description: Redis cache (embedded in services)
+    instances:
+      - service: mastodon
+        container: mastodon-redis
+        version: "7"
+      - service: mailu
+        container: mailu-redis
+        version: "7"
+
+# Service Metadata
+metadata:
+  last_updated: "2025-11-20"
+  total_services: 15
+  running_services: 5
+  configured_services: 10
+  infrastructure_domain: freqkflag.co
+  public_domains:
+    - cultofjoey.com
+    - twist3dkink.com
+    - twist3dkinkst3r.com
+

@@ -1,0 +1,45 @@
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <h3 class="glitch-hover">CULT OF JOEY</h3>
+                <p>Broadcasting from the intersection of mental health recovery, queer identity, and high-voltage electronics.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-heading">Navigation</h4>
+                <nav class="footer-links">
+                    {{navigation}}
+                </nav>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-heading">Connect</h4>
+                <nav class="footer-links">
+                    {{#if @site.facebook}}
+                    <a href="{{facebook_url @site.facebook}}" target="_blank" rel="noopener">Facebook</a>
+                    {{/if}}
+                    {{#if @site.twitter}}
+                    <a href="{{twitter_url @site.twitter}}" target="_blank" rel="noopener">Twitter</a>
+                    {{/if}}
+                    <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://mastodon.social" target="_blank" rel="noopener">Mastodon</a>
+                </nav>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="footer-copyright">
+                © {{date format="YYYY"}} {{@site.title}}. Built with silicon and anxiety.
+            </p>
+            
+            <div class="footer-notice">
+                <div class="footer-notice-dot"></div>
+                <p class="footer-notice-text">
+                    Need immediate help? <a href="#" target="_blank" rel="noopener">Peer Support Resources</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+

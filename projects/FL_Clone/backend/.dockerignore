@@ -1,0 +1,9 @@
+.git
+.gitignore
+.bundle
+log/*
+tmp/*
+node_modules
+storage/*
+!.keep
+

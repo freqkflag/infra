@@ -1,0 +1,53 @@
+name: Update Docker Images
+
+on:
+  schedule:
+    # Weekly on Monday at 3 AM UTC
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    name: Check for Image Updates
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for outdated images
+        run: |
+          echo "Checking for outdated Docker images..."
+          find . -name "docker-compose.yml" -exec grep -h "image:" {} \; | \
+            sed 's/.*image: *//' | sed 's/\${.*}//' | sort -u | \
+            while read image; do
+              if [ ! -z "$image" ]; then
+                echo "Checking: $image"
+                # Extract image name and tag
+                if echo "$image" | grep -q ":"; then
+                  IMG_NAME=$(echo "$image" | cut -d: -f1)
+                  IMG_TAG=$(echo "$image" | cut -d: -f2)
+                else
+                  IMG_NAME="$image"
+                  IMG_TAG="latest"
+                fi
+                
+                # Check if newer version available (simplified)
+                echo "  Image: $IMG_NAME"
+                echo "  Current tag: $IMG_TAG"
+                echo "  ⚠ Manual check recommended for updates"
+              fi
+            done
+      
+      - name: Create issue for updates
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Docker Image Updates Available',
+              body: 'Weekly image update check completed. Review and update images as needed.'
+            })
+

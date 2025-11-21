@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="{{@site.locale}}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{meta_title}}</title>
+    
+    {{! Fonts }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    {{! Styles }}
+    <link rel="stylesheet" href="{{asset "css/main.css"}}">
+    <link rel="stylesheet" href="{{asset "css/custom.css"}}">
+    
+    {{! Ghost Head }}
+    {{ghost_head}}
+</head>
+<body class="{{body_class}}">
+    {{> header}}
+    
+    <main class="site-main">
+        {{{body}}}
+    </main>
+    
+    {{> footer}}
+    
+    {{! Lightbox }}
+    <div id="lightbox" class="lightbox">
+        <button id="lightbox-close" class="lightbox-close" aria-label="Close lightbox">&times;</button>
+        <div class="lightbox-content">
+            <img id="lightbox-image" class="lightbox-image" src="" alt="">
+            <div class="lightbox-caption">
+                <h2 id="lightbox-title"></h2>
+                <span id="lightbox-category"></span>
+            </div>
+        </div>
+    </div>
+    
+    {{! Scripts }}
+    <script src="{{asset "js/main.js"}}"></script>
+    {{ghost_foot}}
+</body>
+</html>
+
