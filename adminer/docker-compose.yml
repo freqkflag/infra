@@ -1,6 +1,6 @@
 services:
   adminer:
-    image: adminer:latest
+    image: adminer:4.8.1
     container_name: adminer
     restart: unless-stopped
     deploy:

@@ -1,6 +1,6 @@
 services:
   nodered:
-    image: nodered/node-red:latest
+    image: nodered/node-red:3.1.4
     container_name: nodered
     restart: unless-stopped
     user: "1000:1000"

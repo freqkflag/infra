@@ -1,6 +1,6 @@
 services:
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:2.45.0
     container_name: prometheus
     restart: unless-stopped
     user: "nobody"
@@ -47,7 +47,7 @@ services:
       - "prometheus.io/port=9090"
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:10.2.0
     container_name: grafana
     restart: unless-stopped
     user: "472"
@@ -97,7 +97,7 @@ services:
       - "prometheus.io/port=3000"
 
   alertmanager:
-    image: prom/alertmanager:latest
+    image: prom/alertmanager:0.26.0
     container_name: alertmanager
     restart: unless-stopped
     user: "65534"
@@ -145,7 +145,7 @@ services:
       - "prometheus.io/port=9093"
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:1.7.0
     container_name: node-exporter
     restart: unless-stopped
     command:
