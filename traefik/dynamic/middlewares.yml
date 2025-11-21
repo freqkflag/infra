@@ -16,6 +16,25 @@ http:
         stsPreload: true
         stsSeconds: 31536000
         customFrameOptionsValue: "SAMEORIGIN"
+        referrerPolicy: "strict-origin-when-cross-origin"
+        permissionsPolicy: "geolocation=(), microphone=(), camera=()"
         customRequestHeaders:
           X-Forwarded-Proto: "https"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "SAMEORIGIN"
+          X-XSS-Protection: "1; mode=block"
+    
+    # Rate limiting
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1m
+    
+    # Stricter rate limiting for auth endpoints
+    rate-limit-strict:
+      rateLimit:
+        average: 10
+        burst: 5
+        period: 1m
 
