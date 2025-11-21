@@ -13,7 +13,7 @@ services:
       OPS_OAUTH_CLIENT_ID: ${OPS_OAUTH_CLIENT_ID:-Ov23limlVzKVg7zjVrek}
       OPS_OAUTH_CLIENT_SECRET: ${OPS_OAUTH_CLIENT_SECRET:-440c697fde6d0a2632831c4863fb6932934f53dc}
       OPS_OAUTH_CALLBACK_URL: ${OPS_OAUTH_CALLBACK_URL:-https://ops.freqkflag.co/auth/callback}
-      OPS_SESSION_SECRET: ${OPS_SESSION_SECRET:-c7d53fae681e91b1a66bfd83a7441a60b09c8d04b02f29f0e856365ff06b327a}
+      OPS_SESSION_SECRET: ${OPS_SESSION_SECRET:-b817a2dfc0621fd07f544f7625277998c51289930888732b2600832e036152ac}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /root/infra:/root/infra:ro

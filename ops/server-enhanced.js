@@ -63,18 +63,6 @@ if (!fs.existsSync(ORCHESTRATION_DIR)) {
   fs.mkdirSync(ORCHESTRATION_DIR, { recursive: true });
 }
 
-// Session middleware (if OAuth enabled)
-if (OAUTH_ENABLED && session) {
-  app.use(session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: true, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
-  }));
-  app.use(passport.initialize());
-  app.use(passport.session());
-}
-
 // Authentication middleware - supports both Basic Auth and OAuth
 function authenticate(req, res, next) {
   // Skip auth for health endpoint and SSE
@@ -84,7 +72,7 @@ function authenticate(req, res, next) {
   
   // OAuth routes (if enabled)
   if (OAUTH_ENABLED && passport) {
-    if (req.path === '/auth/github' || req.path === '/auth/callback') {
+    if (req.path === '/auth/github' || req.path === '/auth/callback' || req.path === '/auth/logout') {
       return next();
     }
     // Check if user is authenticated via OAuth
@@ -117,9 +105,21 @@ function authenticate(req, res, next) {
   res.status(401).send('Authentication failed');
 }
 
-// Middleware (must be before authentication)
+// Middleware (must be before authentication and OAuth routes)
 app.use(express.json());
 app.use(express.static('public'));
+
+// Session middleware (if OAuth enabled) - must be before passport
+if (OAUTH_ENABLED && session) {
+  app.use(session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: true, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+  }));
+  app.use(passport.initialize());
+  app.use(passport.session());
+}
 
 // OAuth routes (if enabled) - must be before authenticate middleware
 if (OAUTH_ENABLED && passport) {
@@ -128,13 +128,20 @@ if (OAUTH_ENABLED && passport) {
     res.redirect('/');
   });
   app.get('/auth/logout', (req, res) => {
-    req.logout(() => {
+    if (req.logout) {
+      req.logout((err) => {
+        if (err) {
+          console.error('Logout error:', err);
+        }
+        res.redirect('/');
+      });
+    } else {
       res.redirect('/');
-    });
+    }
   });
 }
 
-// Apply authentication middleware (after OAuth routes)
+// Apply authentication middleware (after OAuth routes and session setup)
 app.use(authenticate);
 
 // CORS for SSE

@@ -102,3 +102,27 @@ coverage/
 *.old
 *~
 
+# Database data directories (runtime data - should not be tracked)
+**/data/postgres/
+**/data/grafana/
+**/data/prometheus/
+**/data/loki/
+**/data/*/postgres/
+**/data/*/grafana/
+**/data/*/prometheus/
+**/data/*/loki/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+pg_wal/
+pg_xact/
+pg_internal.init
+pg_control
+
+# Monitoring/Logging runtime data
+**/wal/
+**/chunks/
+**/tsdb-shipper-active/
+

@@ -33,6 +33,29 @@
             border-radius: 12px;
             border: 2px solid #2a2a3e;
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.1);
+            position: relative;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #2a2a3e;
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: #ff00ff;
+            color: #1a1a2e;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.6);
         }
         
         h1 {
@@ -414,6 +437,7 @@
 <body>
     <div class="container">
         <header>
+            <a href="/auth/logout" class="logout-btn">🚪 Logout</a>
             <h1>🚀 Infrastructure Control Plane - Enhanced</h1>
             <p class="subtitle">Agent Communication | Task Management | Command Execution | Full Infra Control</p>
         </header>
