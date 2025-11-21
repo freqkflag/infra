@@ -262,6 +262,17 @@ services:
         container: mailu-redis
         version: "7"
 
+  # Control Plane
+  - id: ops
+    name: Ops Control Plane
+    dir: /root/infra/ops
+    url: https://ops.freqkflag.co
+    type: infra
+    status: configured
+    depends_on: [traefik]
+    description: Single web UI to see, operate, and jump into any infrastructure service
+    domain: ops.freqkflag.co
+
 # Service Metadata
 metadata:
   last_updated: "2025-11-20"

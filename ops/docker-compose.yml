@@ -1,0 +1,40 @@
+services:
+  ops:
+    build: .
+    container_name: ops-control-plane
+    environment:
+      TZ: ${TZ:-America/New_York}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /root/infra:/root/infra:ro
+    networks:
+      - traefik-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ops.rule=Host(`ops.freqkflag.co`)"
+      - "traefik.http.routers.ops.entrypoints=websecure"
+      - "traefik.http.routers.ops.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ops.middlewares=security-headers@file"
+      - "traefik.http.services.ops.loadbalancer.server.port=3000"
+
+networks:
+  traefik-network:
+    external: true
+    name: traefik-network
+

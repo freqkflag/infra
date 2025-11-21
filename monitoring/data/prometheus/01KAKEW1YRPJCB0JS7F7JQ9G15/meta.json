@@ -1,0 +1,18 @@
+{
+	"ulid": "01KAKEW1YRPJCB0JS7F7JQ9G15",
+	"minTime": 1763726407730,
+	"maxTime": 1763733600000,
+	"stats": {
+		"numSamples": 2530472,
+		"numFloatSamples": 2530472,
+		"numSeries": 18060,
+		"numChunks": 33604
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01KAKEW1YRPJCB0JS7F7JQ9G15"
+		]
+	},
+	"version": 1
+}
