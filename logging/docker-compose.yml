@@ -61,7 +61,7 @@ services:
     security_opt:
       - no-new-privileges:true
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'exit 0' || exit 1"]
+      test: ["CMD-SHELL", "sh -c 'kill -0 1 2>/dev/null && cat /proc/1/cmdline | tr \"\\0\" \" \" | grep -q promtail && exit 0 || exit 1'"]
       interval: 30s
       timeout: 10s
       retries: 3

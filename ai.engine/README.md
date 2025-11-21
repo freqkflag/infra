@@ -20,11 +20,28 @@ ai.engine/
 │   ├── tests-agent.md
 │   ├── refactor-agent.md
 │   ├── release-agent.md
+│   ├── development-agent.md
+│   ├── ops-agent.md
 │   ├── orchestrator-agent.md
 │   └── README.md
-└── scripts/             # Helper scripts
-    ├── invoke-agent.sh
-    └── list-agents.sh
+├── scripts/             # Helper scripts
+│   ├── invoke-agent.sh
+│   ├── list-agents.sh
+│   ├── status.sh
+│   ├── bug-hunter.sh
+│   ├── performance.sh
+│   ├── security.sh
+│   ├── architecture.sh
+│   ├── docs.sh
+│   ├── tests.sh
+│   ├── refactor.sh
+│   ├── release.sh
+│   ├── development.sh
+│   ├── ops.sh
+│   └── orchestrator.sh
+├── PROMPT_CATALOG.md    # Reusable prompt catalog
+├── README.md
+└── AGENTS_SUMMARY.md
 ```
 
 ## Quick Start
@@ -38,6 +55,7 @@ cd /root/infra/ai.engine/scripts
 
 ### Invoke an Agent
 
+**Using the generic invoker:**
 ```bash
 # Invoke bug-hunter agent
 ./invoke-agent.sh bug-hunter
@@ -45,6 +63,20 @@ cd /root/infra/ai.engine/scripts
 # Invoke orchestrator (full analysis)
 ./invoke-agent.sh orchestrator /root/infra/orchestration-report.json
 ```
+
+**Using individual helper scripts:**
+```bash
+# Quick status check
+./status.sh
+
+# Security audit
+./security.sh /tmp/security-report.json
+
+# Full orchestration
+./orchestrator.sh /root/infra/orchestration-report.json
+```
+
+**See [PROMPT_CATALOG.md](./PROMPT_CATALOG.md) for all available prompts and helper scripts.**
 
 ### Use Agents in Cursor
 
@@ -131,7 +163,21 @@ Release readiness evaluator and release note drafter.
 
 **Use when:** Evaluating release readiness or drafting release notes.
 
-### 10. **orchestrator** (`orchestrator-agent.md`)
+### 10. **development** (`development-agent.md`)
+Full technical sweep and development analysis.
+
+**Output:** Comprehensive development analysis with project summary, technical status, todos, and execution plan.
+
+**Use when:** Complete development analysis or technical debt assessment.
+
+### 11. **ops** (`ops-agent.md`)
+Infrastructure operations and command control.
+
+**Output:** Operational insights, service health, current tasks, and actionable commands.
+
+**Use when:** Infrastructure operations management or service monitoring.
+
+### 12. **orchestrator** (`orchestrator-agent.md`)
 Multi-agent orchestrator that coordinates all agents.
 
 **Output:** Complete JSON report with all agent findings aggregated.
@@ -253,8 +299,39 @@ ls -la /root/infra/ai.engine/agents/
 - Consider running individual agents instead of orchestrator
 - Check system resources (CPU, memory)
 
+## Prompt Catalog
+
+**See [PROMPT_CATALOG.md](./PROMPT_CATALOG.md) for:**
+- Ready-to-use prompts for all agents
+- Quick reference table
+- Full prompt templates
+- Usage examples
+- Customization guidelines
+
+## Helper Scripts
+
+Individual helper scripts are available for each agent:
+
+```bash
+cd /root/infra/ai.engine/scripts
+
+# Quick agent invocations
+./status.sh [output_file]
+./bug-hunter.sh [output_file]
+./security.sh [output_file]
+./orchestrator.sh [output_file]
+# ... and more
+```
+
+Each script provides:
+- Agent-specific prompt
+- Agent file reference
+- Usage instructions
+- Output file handling
+
 ## Related Documentation
 
+- [Prompt Catalog](./PROMPT_CATALOG.md) - Reusable prompts for all agents
 - [Agents README](./agents/README.md) - Detailed agent documentation
 - [Infrastructure Runbook](../runbooks/infra-runbook.md) - Orchestrator usage
 - [Infrastructure Cookbook](../INFRASTRUCTURE_COOKBOOK.md) - Infrastructure reference

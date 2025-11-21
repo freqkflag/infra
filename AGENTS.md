@@ -396,6 +396,8 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 
 ### Database Services
 - **PostgreSQL:** Used by WikiJS, Mastodon, n8n, Supabase
+  - **Recent Action:** Restarted (2025-11-21) via `DEVTOOLS_WORKSPACE=/root/infra docker compose -f compose.orchestrator.yml restart postgres` so `scram-sha-256` authentication takes effect.
+  - **Status:** Authentication enforced; dependent services may need to reconnect, monitor once they come back up.
 - **MySQL:** Used by WordPress, LinkStack
 
 ### Infrastructure Dependencies

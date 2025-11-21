@@ -1,7 +1,7 @@
 # Phase 1: Critical Security Remediation - Summary
 
 **Date:** 2025-11-21  
-**Status:** ✅ COMPLETED  
+**Status:** IN PROGRESS  
 **Phase:** 1 of 6
 
 ## Phase 1.1: Remove Plaintext Passwords ✅ COMPLETED
@@ -79,33 +79,27 @@
 
 ---
 
-## Phase 1.3: Secrets Audit and Rotation ✅ COMPLETED
+## Phase 1.3: Secrets Audit and Rotation 🔄 IN PROGRESS
 
 **Actions Taken:**
 - ✅ Identified all .env files in repository
 - ✅ Scanned for password/secret/token patterns
-- ✅ Audited git history for exposed secrets
-- ✅ Replaced weak default passwords in templates with placeholders
-- ✅ Committed changes (commit: aa6b031)
+- 🔄 Auditing git history for exposed secrets
 
 **Files Identified:**
 - `.env` files: wikijs, wordpress, n8n, linkstack, monitoring, mastadon
-- Template files: base.env.example, vps.env.example, mac.env.example, linux.env.example                                                                         
+- Template files: base.env.example, vps.env.example, mac.env.example, linux.env.example
 - Backup files: backup/.env
 
 **Weak Default Passwords Found in Templates:**
-- ✅ `postgrespassword` → `CHANGE_ME_STRONG_PASSWORD_FROM_INFISICAL`
-- ✅ `infra_password` → `CHANGE_ME_STRONG_PASSWORD_FROM_INFISICAL`
-- ✅ `redispassword` → `CHANGE_ME_STRONG_PASSWORD_FROM_INFISICAL`
-
-**Verification:**
-- ✅ Template passwords replaced with placeholders
-- ✅ Comments added about using Infisical for production
-- ✅ Changes committed to repository
+- `postgrespassword` (POSTGRES_PASSWORD in base.env.example)
+- `infra_password` (MARIADB_PASSWORD in base.env.example)
+- `redispassword` (REDIS_PASSWORD in base.env.example)
 
 **Action Required:**
-1. ⏳ Ensure production uses strong passwords from Infisical (ongoing)
-2. ⏳ Implement secrets scanning in CI/CD (Phase 6.1)
+1. Replace default passwords in templates with placeholders
+2. Ensure production uses strong passwords from Infisical
+3. Implement secrets scanning in CI/CD (Phase 6)
 
 ---
 
@@ -119,9 +113,9 @@
    - Verify all passwords configured in Infisical first
    - Monitor service reconnections
 
-3. ✅ **COMPLETED:** Replace weak default passwords in templates
-   - Updated env/templates/base.env.example
-   - Added placeholders with Infisical guidance
+3. **URGENT:** Replace weak default passwords in templates
+   - Update env/templates/base.env.example
+   - Document password requirements
 
 4. **HIGH:** Implement secrets scanning (Phase 6.1)
    - Configure gitleaks or similar
@@ -134,9 +128,8 @@
 
 1. **12b7f17** - `security: remove plaintext passwords from SSH config`
 2. **05a0970** - `security: enable PostgreSQL scram-sha-256 authentication`
-3. **aa6b031** - `security: replace weak default passwords with placeholders in templates`
 
 ---
 
-**Phase 1 Progress:** ✅ 3/3 tasks completed  
-**Status:** ✅ PHASE 1 COMPLETE - Ready for PostgreSQL restart (Phase 1.2) and Phase 2 execution
+**Phase 1 Progress:** 2/3 tasks completed  
+**Status:** Ready for PostgreSQL restart (Phase 1.2) and secrets template updates (Phase 1.3)

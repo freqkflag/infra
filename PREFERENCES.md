@@ -1,6 +1,6 @@
 # AI Interaction Preferences
 
-**Last Updated:** 2025-11-20  
+**Last Updated:** 2025-11-21  
 **Reference:** Use alongside [AGENTS.md](./AGENTS.md) for complete infrastructure context
 
 This document defines how AI assistants should interact with the infrastructure maintainer and approach technical tasks.
@@ -46,6 +46,13 @@ This document defines how AI assistants should interact with the infrastructure 
    - Ensure both files reflect the current state of the infrastructure
    - Maintain consistency across all documentation
    - These files are the source of truth for infrastructure operations
+
+4. **Provide Next Steps as AI Agent Prompt Instructions**
+   - **MANDATORY:** All next steps must be formatted as clear, actionable AI Agent prompt instructions
+   - Next steps should be copy-paste ready prompts that another AI agent can execute
+   - Include all necessary context, file paths, and specific actions required
+   - Format: Clear, direct instructions that can be given to an AI agent to continue the work
+   - Example: "Act as [agent role]. [Specific action]. [Context]. [Expected outcome]."
 
 **These files must be maintained and followed for every request - no exceptions.**
 
@@ -103,6 +110,7 @@ This document defines how AI assistants should interact with the infrastructure 
 - **Simplicity first** - simplest solution that works
 - **Docker Compose** for all services
 - **Traefik** for reverse proxy and SSL
+- When invoking `docker compose` against the full orchestrator bundle, explicitly set `DEVTOOLS_WORKSPACE` (for example `/root/infra`) so the dev-tools bind mount does not resolve to an empty volume spec.
 - **Local data directories** (`./data/`) instead of named volumes when possible
 - **Environment variables** in `.env` files
 - **Standardized structure** for all services
@@ -239,6 +247,21 @@ This document defines how AI assistants should interact with the infrastructure 
 - **Show changes** - demonstrate what was modified
 - **Explain reasoning** - when making non-obvious choices
 
+### Next Steps Format
+
+**MANDATORY:** All next steps must be formatted as AI Agent prompt instructions.
+
+- **Format:** Clear, actionable prompts that can be copy-pasted to another AI agent
+- **Include:** All necessary context, file paths, specific actions, and expected outcomes
+- **Structure:** "Act as [agent role]. [Specific action]. [Context]. [Expected outcome]."
+- **Purpose:** Enable seamless handoff between AI agents without requiring human interpretation
+- **Example:**
+  ```
+  Act as Deployment Runner. Start the newly configured n8n service at /root/infra/n8n/ 
+  using docker compose up -d. Verify it's running and accessible at n8n.freqkflag.co. 
+  Update AGENTS.md with running status. Expected: n8n service operational and documented.
+  ```
+
 ---
 
 ## Infrastructure-Specific Guidelines
@@ -322,6 +345,7 @@ When working with this infrastructure, always reference:
 - ✅ Be direct and terse
 - ✅ Maintain consistency
 - ✅ Update documentation
+- ✅ Format next steps as AI Agent prompt instructions
 
 ### Never Do
 - ❌ Provide high-level guidance without implementation
@@ -330,8 +354,8 @@ When working with this infrastructure, always reference:
 - ❌ Break existing patterns
 - ❌ Leave documentation outdated
 - ❌ Assume basic knowledge needed
+- ❌ Provide next steps as vague suggestions (must be AI Agent prompt instructions)
 
 ---
 
 **Remember:** K.I.S.S. - Keep It Simple, Stupid. Complexity is the enemy.
-
