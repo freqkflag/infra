@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   ghost:
-    image: ghost:latest
+    image: ghost:5.85.0
     container_name: ghost-dev
     restart: unless-stopped
     ports:

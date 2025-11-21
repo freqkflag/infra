@@ -49,7 +49,7 @@ services:
       retries: 5
 
   mastodon-web:
-    image: lscr.io/linuxserver/mastodon:latest
+    image: lscr.io/linuxserver/mastodon:4.2.0
     container_name: mastodon-web
     deploy:
       resources:
@@ -123,7 +123,7 @@ services:
       - "traefik.http.services.mastodon.loadbalancer.server.port=3000"
 
   mastodon-sidekiq:
-    image: lscr.io/linuxserver/mastodon:latest
+    image: lscr.io/linuxserver/mastodon:4.2.0
     container_name: mastodon-sidekiq
     deploy:
       resources:

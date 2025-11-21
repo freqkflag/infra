@@ -1,6 +1,6 @@
 services:
   backup:
-    image: alpine:latest
+    image: alpine:3.19
     container_name: backup
     restart: "no"  # Manual or cron-triggered
     volumes:

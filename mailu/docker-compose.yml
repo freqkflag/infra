@@ -22,7 +22,7 @@ services:
       retries: 5
 
   admin:
-    image: mailu/admin:latest
+    image: mailu/admin:1.10
     container_name: mailu-admin
     restart: unless-stopped
     volumes:
@@ -62,7 +62,7 @@ services:
       - "traefik.http.services.mailu-admin.loadbalancer.server.port=80"
 
   imap:
-    image: mailu/dovecot:latest
+    image: mailu/dovecot:1.10
     container_name: mailu-imap
     restart: unless-stopped
     volumes:
@@ -81,7 +81,7 @@ services:
       - "993:993"   # IMAPS
 
   smtp:
-    image: mailu/postfix:latest
+    image: mailu/postfix:1.10
     container_name: mailu-smtp
     restart: unless-stopped
     volumes:
@@ -101,7 +101,7 @@ services:
       - "587:587"   # Submission
 
   webmail:
-    image: mailu/roundcube:latest
+    image: mailu/roundcube:1.10
     container_name: mailu-webmail
     restart: unless-stopped
     volumes:
@@ -139,7 +139,7 @@ services:
       - "traefik.http.services.mailu-webmail.loadbalancer.server.port=80"
 
   front:
-    image: mailu/nginx:latest
+    image: mailu/nginx:1.10
     container_name: mailu-front
     restart: unless-stopped
     volumes:
