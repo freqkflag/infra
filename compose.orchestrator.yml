@@ -20,7 +20,7 @@ services:
       file: ./services/postgres/compose.yml
       service: postgres
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     profiles: ["vps"]
 
   mariadb:
