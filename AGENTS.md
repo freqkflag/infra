@@ -127,6 +127,16 @@ This document provides a standardized overview of all services and agents in the
   - Direct database access
   - SQL query interface
 
+### Help Service
+- **Domain:** `null` (no domain configured)
+- **Location:** `/root/infra/--help/`
+- **Status:** ⚙️ Configured (not running)
+- **Purpose:** Help and documentation service
+- **Features:**
+  - Nginx-based static content serving
+  - Data volume for content storage
+  - Health check monitoring
+
 ---
 
 ## Personal Brand Services (cultofjoey.com)
