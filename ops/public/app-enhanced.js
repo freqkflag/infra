@@ -81,6 +81,11 @@ async function apiCall(endpoint, options = {}) {
     
     try {
         const response = await fetch(endpoint, mergedOptions);
+        
+        // Check content type before parsing
+        const contentType = response.headers.get('content-type') || '';
+        const isJson = contentType.includes('application/json');
+        
         if (!response.ok) {
             if (response.status === 401) {
                 // Prompt for Basic Auth credentials
@@ -93,12 +98,56 @@ async function apiCall(endpoint, options = {}) {
                         mergedOptions.headers['Authorization'] = `Basic ${btoa(`${username}:${password}`)}`;
                         const retryResponse = await fetch(endpoint, mergedOptions);
                         if (retryResponse.ok) {
-                            return await retryResponse.json();
+                            const retryContentType = retryResponse.headers.get('content-type') || '';
+                            if (retryContentType.includes('application/json')) {
+                                try {
+                                    return await retryResponse.json();
+                                } catch (e) {
+                                    const text = await retryResponse.text();
+                                    console.error('Failed to parse retry response as JSON:', text);
+                                    showMessage('Server returned invalid JSON response', 'error');
+                                    return null;
+                                }
+                            } else {
+                                const text = await retryResponse.text();
+                                console.error('Non-JSON response:', text);
+                                showMessage('Server returned non-JSON response', 'error');
+                                return null;
+                            }
+                        } else {
+                            // Retry failed - check if it's still an auth error
+                            if (retryResponse.status === 401) {
+                                // Still unauthorized - credentials were wrong or OAuth required
+                                // If OAuth is enabled, try redirecting to login
+                                if (window.location.pathname !== '/auth/github') {
+                                    window.location.href = '/auth/github';
+                                } else {
+                                    showMessage('Authentication failed. Please check your credentials.', 'error');
+                                }
+                                return null;
+                            } else {
+                                // Different error (403, 500, etc.) - handle as regular error
+                                const retryContentType = retryResponse.headers.get('content-type') || '';
+                                let errorMessage = `HTTP ${retryResponse.status}: ${retryResponse.statusText}`;
+                                try {
+                                    if (retryContentType.includes('application/json')) {
+                                        const errorData = await retryResponse.json();
+                                        errorMessage = errorData.error || errorData.message || errorMessage;
+                                    } else {
+                                        const text = await retryResponse.text();
+                                        console.error('Retry error response:', text.substring(0, 200));
+                                    }
+                                } catch (e) {
+                                    console.error('Error reading retry response:', e);
+                                }
+                                showMessage(`Error: ${errorMessage}`, 'error');
+                                return null;
+                            }
                         }
                     }
                 }
                 
-                // If OAuth is enabled, try redirecting to login
+                // No credentials provided - try OAuth redirect
                 if (window.location.pathname !== '/auth/github') {
                     window.location.href = '/auth/github';
                 } else {
@@ -106,12 +155,58 @@ async function apiCall(endpoint, options = {}) {
                 }
                 return null;
             }
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            
+            // For non-401 errors, safely read response body
+            let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            try {
+                // Clone response to read body without consuming it
+                const responseClone = response.clone();
+                if (isJson) {
+                    try {
+                        const errorData = await responseClone.json();
+                        errorMessage = errorData.error || errorData.message || errorMessage;
+                    } catch (e) {
+                        // If JSON parsing fails, try reading as text
+                        const text = await response.text();
+                        console.error('Failed to parse error response as JSON:', text.substring(0, 200));
+                    }
+                } else {
+                    const text = await response.text();
+                    console.error('Non-JSON error response:', text.substring(0, 200));
+                }
+            } catch (e) {
+                // If reading response fails, use default message
+                console.error('Error reading response body:', e);
+            }
+            throw new Error(errorMessage);
         }
-        return await response.json();
+        
+        // Only parse as JSON if content type indicates JSON
+        if (isJson) {
+            try {
+                return await response.json();
+            } catch (e) {
+                // If JSON parsing fails despite content-type, read as text
+                const text = await response.text();
+                console.error('Failed to parse response as JSON despite content-type:', text.substring(0, 200));
+                showMessage('Server returned invalid JSON response', 'error');
+                return null;
+            }
+        } else {
+            // Return text response for non-JSON
+            const text = await response.text();
+            console.warn('Non-JSON response received:', text.substring(0, 200));
+            return { error: 'Non-JSON response', text };
+        }
     } catch (error) {
-        console.error('API call error:', error);
-        showMessage(`Error: ${error.message}`, 'error');
+        // Handle JSON parse errors specifically
+        if (error instanceof SyntaxError && error.message.includes('JSON')) {
+            console.error('JSON parse error:', error);
+            showMessage('Error: Server returned invalid JSON response', 'error');
+        } else {
+            console.error('API call error:', error);
+            showMessage(`Error: ${error.message}`, 'error');
+        }
         return null;
     }
 }
