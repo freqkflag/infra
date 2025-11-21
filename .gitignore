@@ -173,3 +173,4 @@ docker-compose.override.yaml
 harvest/
 harvest_*/
 harvest_*
+.ssh
