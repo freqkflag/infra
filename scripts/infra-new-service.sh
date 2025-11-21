@@ -170,7 +170,9 @@ EOF
 echo "✓ Created README.md"
 
 # Add entry to SERVICES.yml
-SERVICE_ENTRY=$(cat <<EOF
+# Create temporary file with service entry
+TEMP_FILE=$(mktemp)
+cat > "$TEMP_FILE" <<EOF
   - id: ${SERVICE_ID}
     name: ${SERVICE_NAME}
     dir: /root/infra/${SERVICE_ID}
@@ -179,33 +181,37 @@ SERVICE_ENTRY=$(cat <<EOF
     status: configured
     depends_on: [traefik]
     description: ${SERVICE_NAME} service
-    $([ "$SERVICE_DOMAIN" != "null" ] && echo "domain: ${SERVICE_DOMAIN}" || echo "")
+$([ "$SERVICE_DOMAIN" != "null" ] && echo "    domain: ${SERVICE_DOMAIN}" || echo "")
 
 EOF
-)
 
 # Find insertion point (before metadata section)
 if grep -q "^# Service Metadata" "$SERVICES_FILE"; then
-    # Insert before metadata section
-    sed -i "/^# Service Metadata/i\\$SERVICE_ENTRY" "$SERVICES_FILE"
+    # Insert before metadata section using awk
+    awk -v insert="$(cat "$TEMP_FILE")" '/^# Service Metadata/ {print insert} 1' "$SERVICES_FILE" > "${SERVICES_FILE}.tmp" && mv "${SERVICES_FILE}.tmp" "$SERVICES_FILE"
 else
     # Append to end
     echo "" >> "$SERVICES_FILE"
-    echo "$SERVICE_ENTRY" >> "$SERVICES_FILE"
+    cat "$TEMP_FILE" >> "$SERVICES_FILE"
 fi
+
+rm -f "$TEMP_FILE"
 
 echo "✓ Added entry to SERVICES.yml"
 
 # Create runbook from template
 if [[ -f "$TEMPLATE_RUNBOOK" ]]; then
     RUNBOOK_FILE="$RUNBOOKS_DIR/${SERVICE_ID}-runbook.md"
-    sed -e "s/\[Service Name\]/${SERVICE_NAME}/g" \
-        -e "s/\[service-id\]/${SERVICE_ID}/g" \
-        -e "s/\[service-dir\]/${SERVICE_ID}/g" \
-        -e "s/\[service-name\]/${SERVICE_ID}/g" \
-        -e "s/\[primary-domain\]/${SERVICE_DOMAIN}/g" \
-        -e "s/\[service-urls\]/$([ "$SERVICE_DOMAIN" != "null" ] && echo "https://${SERVICE_DOMAIN}" || echo "N/A")/g" \
-        -e "s/\[date\]/$(date +%Y-%m-%d)/g" \
+    SERVICE_URL="$([ "$SERVICE_DOMAIN" != "null" ] && echo "https://${SERVICE_DOMAIN}" || echo "N/A")"
+    CURRENT_DATE=$(date +%Y-%m-%d)
+    
+    sed -e "s|\[Service Name\]|${SERVICE_NAME}|g" \
+        -e "s|\[service-id\]|${SERVICE_ID}|g" \
+        -e "s|\[service-dir\]|${SERVICE_ID}|g" \
+        -e "s|\[service-name\]|${SERVICE_ID}|g" \
+        -e "s|\[primary-domain\]|${SERVICE_DOMAIN}|g" \
+        -e "s|\[service-urls\]|${SERVICE_URL}|g" \
+        -e "s|\[date\]|${CURRENT_DATE}|g" \
         "$TEMPLATE_RUNBOOK" > "$RUNBOOK_FILE"
     echo "✓ Created runbook: ${RUNBOOK_FILE}"
 else

@@ -5,7 +5,6 @@ const yaml = require('js-yaml');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const Docker = require('dockerode');
-const basicAuth = require('express-basic-auth');
 
 const execAsync = promisify(exec);
 const app = express();
@@ -22,16 +21,29 @@ const AUTH_USER = process.env.OPS_AUTH_USER || 'admin';
 const AUTH_PASS = process.env.OPS_AUTH_PASS || 'changeme';
 
 // Basic Auth middleware (skip for health endpoint)
-app.use((req, res, next) => {
+function basicAuth(req, res, next) {
   if (req.path === '/health') {
     return next();
   }
-  basicAuth({
-    users: { [AUTH_USER]: AUTH_PASS },
-    challenge: true,
-    realm: 'Infrastructure Control Plane'
-  })(req, res, next);
-});
+  
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Infrastructure Control Plane"');
+    return res.status(401).send('Authentication required');
+  }
+  
+  const credentials = Buffer.from(auth.substring(6), 'base64').toString('utf8');
+  const [username, password] = credentials.split(':');
+  
+  if (username === AUTH_USER && password === AUTH_PASS) {
+    return next();
+  }
+  
+  res.setHeader('WWW-Authenticate', 'Basic realm="Infrastructure Control Plane"');
+  res.status(401).send('Authentication failed');
+}
+
+app.use(basicAuth);
 
 // Middleware
 app.use(express.json());

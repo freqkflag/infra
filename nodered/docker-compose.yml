@@ -3,6 +3,7 @@ services:
     image: nodered/node-red:latest
     container_name: nodered
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       - TZ=${TZ:-America/New_York}
       - NODE_OPTIONS=--max_old_space_size=512

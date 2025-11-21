@@ -9,7 +9,8 @@ global:
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: []
+        - targets:
+            - 'alertmanager:9093'
 
 # Load rules once and periodically evaluate them
 rule_files:

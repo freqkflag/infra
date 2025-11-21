@@ -4,6 +4,8 @@ services:
     container_name: ops-control-plane
     environment:
       TZ: ${TZ:-America/New_York}
+      OPS_AUTH_USER: ${OPS_AUTH_USER:-admin}
+      OPS_AUTH_PASS: ${OPS_AUTH_PASS:-changeme}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /root/infra:/root/infra:ro

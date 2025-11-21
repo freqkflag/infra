@@ -96,6 +96,54 @@ services:
       - "prometheus.io/scrape=true"
       - "prometheus.io/port=3000"
 
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: unless-stopped
+    user: "65534"
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=https://alertmanager.freqkflag.co'
+    environment:
+      - SMTP_HOST=${SMTP_HOST:-localhost:587}
+      - SMTP_FROM=${SMTP_FROM:-alertmanager@freqkflag.co}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - ALERT_EMAIL=${ALERT_EMAIL:-admin@freqkflag.co}
+    volumes:
+      - ./config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./data/alertmanager:/alertmanager
+    networks:
+      - monitoring-network
+      - traefik-network
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.freqkflag.co`)"
+      - "traefik.http.routers.alertmanager.entrypoints=websecure"
+      - "traefik.http.routers.alertmanager.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alertmanager.middlewares=security-headers@file"
+      - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=9093"
+
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter

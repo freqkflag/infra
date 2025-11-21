@@ -1,0 +1,117 @@
+global:
+  # Default notification settings
+  resolve_timeout: 5m
+  # SMTP configuration - set via environment variables or update directly
+  # Defaults can be overridden by setting env vars: SMTP_HOST, SMTP_FROM, etc.
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alertmanager@freqkflag.co'
+  smtp_require_tls: true
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree for alert routing
+route:
+  receiver: 'default'
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  routes:
+    # Critical alerts go to all channels
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      continue: true
+    
+    # Warning alerts go to email
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+    
+    # Default route
+    - match_re:
+        severity: .*
+      receiver: 'default'
+
+# Inhibition rules (suppress lower priority alerts when higher priority ones fire)
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+
+# Receivers
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: 'admin@freqkflag.co'
+        headers:
+          Subject: '{{ .GroupLabels.alertname }} - {{ .GroupLabels.severity }}'
+        html: |
+          <h2>Alert: {{ .GroupLabels.alertname }}</h2>
+          <p><strong>Severity:</strong> {{ .GroupLabels.severity }}</p>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+          <hr>
+          <h3>Alerts:</h3>
+          {{ range .Alerts }}
+          <div style="border-left: 3px solid {{ if eq .Labels.severity "critical" }}red{{ else }}orange{{ end }}; padding-left: 10px; margin: 10px 0;">
+            <p><strong>{{ .Labels.alertname }}</strong></p>
+            <p>{{ .Annotations.description }}</p>
+            <p><small>Started: {{ .StartsAt.Format "2006-01-02 15:04:05" }}</small></p>
+          </div>
+          {{ end }}
+
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'admin@freqkflag.co'
+        headers:
+          Subject: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        html: |
+          <h2 style="color: red;">🚨 CRITICAL ALERT</h2>
+          <h3>{{ .GroupLabels.alertname }}</h3>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+          <hr>
+          <h3>Affected Services:</h3>
+          {{ range .Alerts }}
+          <div style="border-left: 3px solid red; padding-left: 10px; margin: 10px 0;">
+            <p><strong>{{ .Labels.alertname }}</strong> on {{ .Labels.instance }}</p>
+            <p>{{ .Annotations.description }}</p>
+            <p><small>Started: {{ .StartsAt.Format "2006-01-02 15:04:05" }}</small></p>
+          </div>
+          {{ end }}
+    
+    # Discord webhook (uncomment and configure if needed)
+    # webhook_configs:
+    #   - url: 'https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN'
+    #     http_config:
+    #       bearer_token: 'your_discord_token'
+    
+    # Matrix webhook (uncomment and configure if needed)
+    # webhook_configs:
+    #   - url: 'https://matrix.example.com/_matrix/client/r0/rooms/!ROOM_ID/send/m.room.message'
+    #     http_config:
+    #       bearer_token: 'your_matrix_token'
+
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'admin@freqkflag.co'
+        headers:
+          Subject: '⚠️ Warning: {{ .GroupLabels.alertname }}'
+        html: |
+          <h2 style="color: orange;">⚠️ Warning Alert</h2>
+          <h3>{{ .GroupLabels.alertname }}</h3>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+          <hr>
+          {{ range .Alerts }}
+          <div style="border-left: 3px solid orange; padding-left: 10px; margin: 10px 0;">
+            <p><strong>{{ .Labels.alertname }}</strong> on {{ .Labels.instance }}</p>
+            <p>{{ .Annotations.description }}</p>
+          </div>
+          {{ end }}
+

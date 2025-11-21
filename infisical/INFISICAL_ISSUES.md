@@ -13,12 +13,21 @@
 ### 2. Encryption Key Length ⚠️ IN PROGRESS
 - **Issue:** "Invalid key length" error during migration
 - **Error:** `RangeError: Invalid key length` in KMS encryption
-- **Current:** Keys are 32 bytes (44 base64 chars) but still failing
+- **Attempted Fixes:**
+  - ✅ Tried base64 format (44 chars = 32 bytes) - Still fails
+  - ✅ Tried hex format (64 chars = 32 bytes) - Still fails
+  - ✅ Verified key generation produces correct lengths
+- **Current Status:** Issue persists with both formats
 - **Possible Causes:**
-  - Wrong key format (might need hex instead of base64)
-  - Wrong environment variable names
+  - Infisical version bug (using `latest` tag)
+  - Wrong environment variable names or format expectations
   - Missing required environment variables
-  - Infisical version compatibility issue
+  - Infisical expecting keys in a different encoding
+- **Next Steps:**
+  - Check Infisical GitHub repository for known issues
+  - Try specific version tag instead of `latest`
+  - Review official Infisical docker-compose.yml for correct format
+  - Consider using Infisical's official setup as base
 
 ### 3. Service Not Starting
 - **Issue:** Container starts but fails during migration
@@ -53,7 +62,8 @@ For now, Infisical is configured but not running due to encryption key issues.
 
 - ✅ `docker-compose.yml` - Service definition
 - ✅ `.env` - Environment variables (needs key format fix)
-- ✅ `generate-secrets.sh` - Secret generation
+- ✅ `generate-secrets.sh` - Secret generation (updated to use hex format)
+- ✅ `fix-encryption-keys.sh` - Script to regenerate keys in correct format
 - ✅ `migrate-from-vault.sh` - Migration script
 - ✅ `README.md` - Documentation
 

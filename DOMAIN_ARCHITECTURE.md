@@ -51,8 +51,6 @@ This document defines the domain structure and purpose for all infrastructure se
 **Examples:**
 - `cultofjoey.com` - Main site (WordPress)
 - `link.cultofjoey.com` - LinkStack (link-in-bio)
-- `blog.cultofjoey.com` - Blog (if separate)
-- `portfolio.cultofjoey.com` - Portfolio (if separate)
 
 **Characteristics:**
 - Public-facing
