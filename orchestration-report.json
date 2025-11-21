@@ -1,0 +1,1097 @@
+{
+  "status_agent": {
+    "summary": "Docker Compose-based microservices infrastructure for freqkflag.co domain ecosystem. 22 containers running across 18+ services. Infrastructure is operational but requires security hardening and operational improvements.",
+    "architecture": "Traefik reverse proxy → 15+ application services (WikiJS, WordPress, LinkStack, Mastodon, n8n, Node-RED, Mailu, Supabase, Adminer, Infisical) with centralized monitoring (Prometheus/Grafana/Alertmanager), logging (Loki/Promtail), and backup automation. All services on traefik-network for external access with service-specific internal networks.",
+    "current_phase": "Phase 6 Complete - Production operational. Security hardening in progress. 6 unhealthy containers requiring healthcheck fixes. Infisical migration from Vault blocked by encryption key issues.",
+    "overall_health": "Good (78%) - 17 healthy, 6 unhealthy, 2 starting. Critical security fixes applied (.env permissions, rate limiting, dashboard auth). Backup automation enabled. Main blockers: Infisical encryption key issues, healthcheck failures, default credentials.",
+    "key_findings": [
+      "22 containers running: 17 healthy, 6 unhealthy (promtail, loki, nodered, wikijs, wordpress, adminer, traefik), 2 starting (n8n, infisical)",
+      "All .env files have correct 600 permissions (fixed)",
+      "Rate limiting middleware created and applied to services",
+      "Traefik dashboard secured with basic auth but using default password (CRITICAL)",
+      "Backup systemd timer enabled and active (daily 2:00 AM)",
+      "Infisical encryption key format issues blocking Vault migration (HIGH)",
+      "Image versions pinned for most services (verified no 'latest' tags in docker-compose.yml files)",
+      "Alertmanager notification channels not configured (MEDIUM)",
+      "6 unhealthy containers require healthcheck timeout/start_period adjustments",
+      "Services configured but not running: Mailu, Supabase, Mastodon - decision needed"
+    ]
+  },
+  "bug_hunter": {
+    "critical_bugs": [
+      {
+        "severity": "CRITICAL",
+        "location": "traefik/dynamic/middlewares.yml:42",
+        "issue": "Traefik dashboard using default password hash (admin/changeme) - MUST be changed immediately",
+        "impact": "Unauthorized access to infrastructure dashboard",
+        "fix": "Generate new password hash: docker run --rm httpd:2.4-alpine htpasswd -nbB admin NEW_PASSWORD | sed 's/\\$/$/g' and update traefik/dynamic/middlewares.yml traefik-dashboard-auth.users"
+      },
+      {
+        "severity": "HIGH",
+        "location": "infisical/docker-compose.yml:70-71",
+        "issue": "Infisical encryption key format error: RangeError: Invalid key length in KMS encryption - blocking service startup",
+        "impact": "Blocks Vault migration completion, secrets management unavailable",
+        "fix": "Verify encryption key format requirements for infisical/infisical:0.8.0, check official documentation for key generation method"
+      },
+      {
+        "severity": "HIGH",
+        "location": "ops/server.js",
+        "issue": "Default credentials hardcoded (admin:changeme) - mitigated by env vars but defaults still present",
+        "impact": "Potential unauthorized access if .env not configured",
+        "fix": "Remove default credentials, require environment variables"
+      }
+    ],
+    "warnings": [
+      {
+        "severity": "MEDIUM",
+        "location": "traefik/docker-compose.yml:36-41",
+        "issue": "Traefik healthcheck showing unhealthy despite service functioning - timeout 15s, start_period 20s may need further adjustment",
+        "impact": "False negative health status, monitoring confusion",
+        "fix": "Investigate healthcheck endpoint response time, increase timeout or start_period if needed"
+      },
+      {
+        "severity": "MEDIUM",
+        "location": "nodered/docker-compose.yml",
+        "issue": "Node-RED healthcheck failing - start_period 60s may not be sufficient",
+        "impact": "False negative health status",
+        "fix": "Verify healthcheck endpoint /health, adjust start_period or retries"
+      },
+      {
+        "severity": "MEDIUM",
+        "location": "promtail, loki containers",
+        "issue": "Promtail/Loki showing unhealthy during initialization - may be normal startup behavior",
+        "impact": "False negative health status during startup",
+        "fix": "Monitor for resolution after full startup, adjust healthcheck if persistent"
+      },
+      {
+        "severity": "MEDIUM",
+        "location": "wikijs, wordpress, adminer containers",
+        "issue": "WikiJS, WordPress, Adminer showing unhealthy - healthcheck configuration may need adjustment",
+        "impact": "False negative health status",
+        "fix": "Review healthcheck endpoints and timing for each service"
+      },
+      {
+        "severity": "LOW",
+        "location": "mastadon/docker-compose.yml.bak",
+        "issue": "Backup file present in repository - should be removed",
+        "impact": "Repository clutter",
+        "fix": "Remove backup file: rm -f mastadon/docker-compose.yml.bak"
+      }
+    ],
+    "code_smells": [
+      {
+        "type": "Hardcoded Credentials",
+        "location": "ops/server.js",
+        "issue": "Default credentials in code even though env vars are used",
+        "recommendation": "Remove defaults, fail fast if env vars missing"
+      },
+      {
+        "type": "Database Duplication",
+        "location": "Multiple services",
+        "issue": "PostgreSQL 15 setup duplicated across WikiJS, n8n, Supabase, Infisical; MySQL 8.0 duplicated in WordPress/LinkStack",
+        "recommendation": "Consider centralized database instances or compose file templates"
+      },
+      {
+        "type": "Inconsistent Healthchecks",
+        "location": "Various docker-compose.yml files",
+        "issue": "Healthcheck patterns vary across services - some detailed, others minimal",
+        "recommendation": "Standardize healthcheck patterns with templates"
+      },
+      {
+        "type": "Resource Limits Inconsistency",
+        "location": "Various docker-compose.yml files",
+        "issue": "Traefik has resource limits, some services don't - inconsistent resource management",
+        "recommendation": "Apply resource limits consistently to all services"
+      },
+      {
+        "type": "Security Opts Inconsistency",
+        "location": "Various docker-compose.yml files",
+        "issue": "Only Traefik and Infisical have no-new-privileges:true - should be applied to all services",
+        "recommendation": "Add security opts to all services for defense in depth"
+      }
+    ],
+    "recommended_fixes": [
+      {
+        "priority": "CRITICAL",
+        "fix": "Change Traefik dashboard password immediately",
+        "commands": ["docker run --rm httpd:2.4-alpine htpasswd -nbB admin NEW_SECURE_PASSWORD", "Update traefik/dynamic/middlewares.yml with new hash", "docker exec traefik kill -SIGHUP 1"]
+      },
+      {
+        "priority": "HIGH",
+        "fix": "Resolve Infisical encryption key format issues",
+        "commands": ["cd /root/infra/infisical", "Review encryption key format requirements for version 0.8.0", "Regenerate keys using official method", "docker compose down && docker compose up -d"]
+      },
+      {
+        "priority": "HIGH",
+        "fix": "Remove default credentials from ops/server.js",
+        "commands": ["Remove default username/password from ops/server.js", "Ensure .env has required variables", "Fail fast if env vars missing"]
+      },
+      {
+        "priority": "MEDIUM",
+        "fix": "Fix healthcheck failures for 6 unhealthy containers",
+        "commands": ["Review healthcheck endpoints for traefik, promtail, loki, nodered, wikijs, wordpress, adminer", "Adjust timeout/start_period/retries as needed", "Verify services are actually functional despite healthcheck failures"]
+      },
+      {
+        "priority": "LOW",
+        "fix": "Clean up backup files and stale configurations",
+        "commands": ["rm -f mastadon/docker-compose.yml.bak", "rm -f /root/ghost-production-compose.yml", "rm -rf projects/cult-of-joey-ghost-theme/ if not needed"]
+      }
+    ]
+  },
+  "performance": {
+    "hotspots": [
+      {
+        "service": "infisical",
+        "issue": "High CPU usage (92.76% previously observed) - may be initialization or configuration issue",
+        "impact": "Resource contention",
+        "recommendation": "Monitor long-term usage, adjust CPU limits if needed, investigate initialization process"
+      },
+      {
+        "service": "Traefik",
+        "issue": "Single point of failure for all services - all routing goes through Traefik",
+        "impact": "Potential bottleneck under high load",
+        "recommendation": "Monitor Traefik metrics, consider horizontal scaling if needed"
+      },
+      {
+        "service": "Database instances",
+        "issue": "No connection pooling configuration visible",
+        "impact": "Potential database connection exhaustion",
+        "recommendation": "Configure connection pooling for PostgreSQL/MySQL instances"
+      }
+    ],
+    "build_and_ci_issues": [
+      {
+        "issue": "No CI/CD pipeline for infrastructure changes",
+        "impact": "Manual deployment process, no automated testing",
+        "recommendation": "Implement CI/CD pipeline with automated testing for docker-compose.yml changes"
+      },
+      {
+        "issue": "No automated security scanning integrated",
+        "impact": "Manual security audits required",
+        "recommendation": "Integrate Trivy or similar for automated container image scanning"
+      },
+      {
+        "issue": "No automated image update process",
+        "impact": "Manual updates required, risk of outdated images",
+        "recommendation": "Implement automated image update process with testing"
+      },
+      {
+        "issue": "No version control workflow for infrastructure changes",
+        "impact": "No formal change management process",
+        "recommendation": "Establish git workflow for infrastructure changes with review process"
+      },
+      {
+        "issue": "No rollback procedures documented or automated",
+        "impact": "Manual rollback process if issues occur",
+        "recommendation": "Document and automate rollback procedures"
+      }
+    ],
+    "dependency_costs": [
+      {
+        "dependency": "PostgreSQL instances",
+        "cost": "Multiple PostgreSQL 15 instances embedded in services (WikiJS, n8n, Supabase, Infisical) - memory overhead",
+        "recommendation": "Consider shared PostgreSQL instance with multiple databases"
+      },
+      {
+        "dependency": "MySQL instances",
+        "cost": "Multiple MySQL 8.0 instances (WordPress, LinkStack) - memory overhead",
+        "recommendation": "Consider shared MySQL instance with multiple databases"
+      },
+      {
+        "dependency": "Redis",
+        "cost": "Redis only used by Mastodon and Mailu (not running) - not shared caching layer",
+        "recommendation": "Consider shared Redis instance for caching across services"
+      },
+      {
+        "dependency": "Traefik",
+        "cost": "All services depend on Traefik for routing - single point of failure",
+        "recommendation": "Document dependency, implement health monitoring, consider redundancy"
+      }
+    ],
+    "optimization_suggestions": [
+      {
+        "area": "Caching",
+        "suggestion": "Implement shared Redis caching layer for application-level caching across services",
+        "impact": "High - Reduced database load, improved response times"
+      },
+      {
+        "area": "Static Assets",
+        "suggestion": "Consider CDN for static assets instead of serving through Traefik",
+        "impact": "Medium - Reduced server load, improved global performance"
+      },
+      {
+        "area": "Database",
+        "suggestion": "Configure connection pooling and query optimization for all databases",
+        "impact": "Medium - Better resource utilization, improved performance"
+      },
+      {
+        "area": "Resource Limits",
+        "suggestion": "Review and optimize CPU/memory limits based on actual usage patterns",
+        "impact": "Low - Better resource allocation"
+      },
+      {
+        "area": "Network",
+        "suggestion": "Review network topology for optimization opportunities",
+        "impact": "Low - Potential performance improvements"
+      }
+    ]
+  },
+  "security": {
+    "vulnerabilities": [
+      {
+        "severity": "CRITICAL",
+        "location": "traefik/dynamic/middlewares.yml:42",
+        "issue": "Traefik dashboard using default password (admin/changeme) - publicly accessible if port exposed",
+        "recommendation": "Generate secure password hash and update immediately"
+      },
+      {
+        "severity": "HIGH",
+        "location": "ops/server.js",
+        "issue": "Default credentials hardcoded in code - security risk if .env not configured",
+        "recommendation": "Remove default credentials, require environment variables"
+      },
+      {
+        "severity": "MEDIUM",
+        "location": "monitoring/.env",
+        "issue": "Grafana default admin password may still be in use",
+        "recommendation": "Verify Grafana admin password has been changed from default"
+      },
+      {
+        "severity": "MEDIUM",
+        "location": "infisical/.env",
+        "issue": "Infisical encryption keys - verify they are properly generated and not weak",
+        "recommendation": "Review encryption key generation method, ensure keys meet security requirements"
+      }
+    ],
+    "secret_leaks": [
+      {
+        "severity": "LOW",
+        "location": "All .env files",
+        "issue": "All .env files have correct 600 permissions (fixed) - verified secure",
+        "status": "RESOLVED"
+      },
+      {
+        "severity": "LOW",
+        "location": "Git repository",
+        "issue": "No secrets found in git repository - .env files properly gitignored",
+        "status": "GOOD"
+      },
+      {
+        "severity": "MEDIUM",
+        "location": "acme.json",
+        "issue": "ACME certificates stored in traefik/acme/acme.json - contains certificate data",
+        "recommendation": "Ensure acme.json has appropriate permissions (600), consider encryption at rest"
+      }
+    ],
+    "misconfigurations": [
+      {
+        "severity": "MEDIUM",
+        "location": "traefik/config/traefik.yml",
+        "issue": "Dashboard authentication implemented but using default password",
+        "recommendation": "Change default password immediately"
+      },
+      {
+        "severity": "LOW",
+        "location": "Various docker-compose.yml files",
+        "issue": "Security opts (no-new-privileges) only applied to Traefik and Infisical, not all services",
+        "recommendation": "Apply security opts to all services consistently"
+      },
+      {
+        "severity": "LOW",
+        "location": "monitoring/config/alertmanager/alertmanager.yml",
+        "issue": "Alertmanager notification channels not configured - alerts won't be delivered",
+        "recommendation": "Configure SMTP/webhook channels for alert delivery"
+      },
+      {
+        "severity": "LOW",
+        "location": "Backup system",
+        "issue": "Backup coverage incomplete - Infisical data, n8n workflows, Node-RED flows, Grafana dashboards not in backup config",
+        "recommendation": "Add missing services to backup configuration"
+      }
+    ],
+    "security_recommendations": [
+      {
+        "priority": "CRITICAL",
+        "recommendation": "Change Traefik dashboard password immediately - default credentials are insecure",
+        "action": "Generate secure password hash and update traefik/dynamic/middlewares.yml"
+      },
+      {
+        "priority": "HIGH",
+        "recommendation": "Remove default credentials from ops/server.js - fail fast if env vars missing",
+        "action": "Refactor code to require environment variables, no fallback defaults"
+      },
+      {
+        "priority": "HIGH",
+        "recommendation": "Configure Alertmanager notification channels for security alerts",
+        "action": "Set up SMTP/webhook in monitoring/.env and update alertmanager.yml"
+      },
+      {
+        "priority": "MEDIUM",
+        "recommendation": "Apply security opts (no-new-privileges) to all services consistently",
+        "action": "Add security_opt to all service definitions in docker-compose.yml files"
+      },
+      {
+        "priority": "MEDIUM",
+        "recommendation": "Verify all default passwords have been changed (Grafana, ops control plane)",
+        "action": "Audit all services for default credentials"
+      },
+      {
+        "priority": "MEDIUM",
+        "recommendation": "Ensure acme.json has appropriate file permissions (600)",
+        "action": "chmod 600 traefik/acme/acme.json"
+      },
+      {
+        "priority": "LOW",
+        "recommendation": "Implement automated security scanning (Trivy) in CI/CD pipeline",
+        "action": "Integrate Trivy scans into update process"
+      },
+      {
+        "priority": "LOW",
+        "recommendation": "Create security monitoring dashboard in Grafana",
+        "action": "Build dashboard based on existing alert rules"
+      }
+    ]
+  },
+  "architecture": {
+    "architecture_overview": "Well-structured Docker Compose microservices architecture with Traefik as reverse proxy. Services follow standardized directory structure with docker-compose.yml, .env, data/, and README.md. Network architecture uses traefik-network for external access and service-specific networks for internal communication. Centralized monitoring (Prometheus/Grafana/Alertmanager) and logging (Loki/Promtail) provide observability. Backup automation system handles scheduled backups. Secrets management transitioning from Vault to Infisical (incomplete).",
+    "boundary_violations": [
+      {
+        "violation": "Database instances embedded in services instead of centralized",
+        "impact": "Resource duplication, harder to manage",
+        "recommendation": "Consider centralized PostgreSQL/MySQL instances with multiple databases"
+      },
+      {
+        "violation": "Service dependencies not explicitly validated before startup",
+        "impact": "Potential startup failures if dependencies not ready",
+        "recommendation": "Implement service dependency orchestration or startup scripts"
+      }
+    ],
+    "cross_service_concerns": [
+      {
+        "concern": "All services depend on Traefik for routing - single point of failure",
+        "impact": "Traefik failure affects all services",
+        "recommendation": "Document dependency, implement health monitoring, consider redundancy"
+      },
+      {
+        "concern": "PostgreSQL setup duplicated across 4 services (WikiJS, n8n, Supabase, Infisical)",
+        "impact": "Code duplication, maintenance burden",
+        "recommendation": "Create shared PostgreSQL compose pattern or centralized instance"
+      },
+      {
+        "concern": "MySQL setup duplicated across 2 services (WordPress, LinkStack)",
+        "impact": "Code duplication",
+        "recommendation": "Create shared MySQL compose pattern or centralized instance"
+      },
+      {
+        "concern": "Traefik label patterns repeated across 15+ services",
+        "impact": "Code duplication, inconsistent configurations",
+        "recommendation": "Create template or helper script for Traefik labels"
+      },
+      {
+        "concern": "Healthcheck patterns similar but not standardized",
+        "impact": "Inconsistent healthcheck configurations",
+        "recommendation": "Create healthcheck templates for common service types"
+      },
+      {
+        "concern": "Backup scripts follow similar patterns but not abstracted",
+        "impact": "Code duplication, maintenance burden",
+        "recommendation": "Create reusable backup functions"
+      }
+    ],
+    "refactor_opportunities": [
+      {
+        "opportunity": "Centralize database setup",
+        "benefit": "Reduce duplication, easier management, shared connection pooling",
+        "effort": "HIGH",
+        "priority": "MEDIUM"
+      },
+      {
+        "opportunity": "Template Traefik labels",
+        "benefit": "Consistency, easier updates, reduced duplication",
+        "effort": "MEDIUM",
+        "priority": "LOW"
+      },
+      {
+        "opportunity": "Standardize healthcheck patterns",
+        "benefit": "Consistency, easier troubleshooting",
+        "effort": "LOW",
+        "priority": "LOW"
+      },
+      {
+        "opportunity": "Abstract backup scripts",
+        "benefit": "Code reuse, easier maintenance",
+        "effort": "MEDIUM",
+        "priority": "LOW"
+      },
+      {
+        "opportunity": "Complete Vault removal",
+        "benefit": "Reduce complexity, remove deprecated code",
+        "effort": "LOW",
+        "priority": "MEDIUM"
+      },
+      {
+        "opportunity": "Apply resource limits consistently",
+        "benefit": "Better resource management, predictable performance",
+        "effort": "LOW",
+        "priority": "MEDIUM"
+      },
+      {
+        "opportunity": "Apply security opts consistently",
+        "benefit": "Improved security posture",
+        "effort": "LOW",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  "docs": {
+    "missing_docs": [
+      {
+        "area": "Infisical Migration",
+        "issue": "Migration documentation incomplete - encryption key issues not fully documented",
+        "location": "infisical/README.md or separate migration doc",
+        "priority": "HIGH"
+      },
+      {
+        "area": "Service Dependencies",
+        "issue": "No explicit documentation of service startup order and dependencies",
+        "location": "README.md or separate dependencies doc",
+        "priority": "MEDIUM"
+      },
+      {
+        "area": "Change Management",
+        "issue": "No documented process for infrastructure changes",
+        "location": "OPERATIONAL_GUIDE.md or separate change-management doc",
+        "priority": "MEDIUM"
+      },
+      {
+        "area": "Emergency Procedures",
+        "issue": "Emergency procedures mentioned but not fully documented",
+        "location": "runbooks/emergency-procedures.md",
+        "priority": "MEDIUM"
+      },
+      {
+        "area": "Image Update Process",
+        "issue": "No documented procedure for updating pinned image versions",
+        "location": "OPERATIONAL_GUIDE.md",
+        "priority": "LOW"
+      }
+    ],
+    "files_to_document": [
+      {
+        "file": "infisical/INFISICAL_ISSUES.md",
+        "issue": "Needs update with latest encryption key troubleshooting",
+        "priority": "HIGH"
+      },
+      {
+        "file": "SERVICES.yml",
+        "issue": "Service status may not reflect actual running state",
+        "priority": "MEDIUM"
+      },
+      {
+        "file": "AGENTS.md",
+        "issue": "May need updates to reflect current service status",
+        "priority": "MEDIUM"
+      },
+      {
+        "file": "infisical/docker-compose.yml",
+        "issue": "Comments explaining encryption key format requirements",
+        "priority": "HIGH"
+      }
+    ],
+    "proposed_doc_structure": [
+      {
+        "doc": "infisical/MIGRATION.md",
+        "purpose": "Complete Vault to Infisical migration guide with troubleshooting",
+        "sections": ["Prerequisites", "Migration Steps", "Encryption Key Generation", "Troubleshooting", "Rollback Procedure"]
+      },
+      {
+        "doc": "DEPENDENCIES.md",
+        "purpose": "Service dependency graph and startup order",
+        "sections": ["Dependency Overview", "Startup Order", "Health Check Dependencies", "Network Dependencies"]
+      },
+      {
+        "doc": "CHANGE_MANAGEMENT.md",
+        "purpose": "Infrastructure change management process",
+        "sections": ["Change Process", "Testing Requirements", "Rollback Procedures", "Version Control"]
+      },
+      {
+        "doc": "runbooks/emergency-procedures.md",
+        "purpose": "Emergency response procedures",
+        "sections": ["Incident Response", "Service Recovery", "Data Recovery", "Escalation"]
+      }
+    ],
+    "doc_generation_plan": [
+      {
+        "step": 1,
+        "action": "Update infisical/MIGRATION.md with encryption key troubleshooting",
+        "priority": "HIGH"
+      },
+      {
+        "step": 2,
+        "action": "Create DEPENDENCIES.md with service dependency graph",
+        "priority": "MEDIUM"
+      },
+      {
+        "step": 3,
+        "action": "Create CHANGE_MANAGEMENT.md with change process",
+        "priority": "MEDIUM"
+      },
+      {
+        "step": 4,
+        "action": "Create runbooks/emergency-procedures.md",
+        "priority": "MEDIUM"
+      },
+      {
+        "step": 5,
+        "action": "Update SERVICES.yml to reflect actual service status",
+        "priority": "MEDIUM"
+      },
+      {
+        "step": 6,
+        "action": "Add comments to infisical/docker-compose.yml explaining key requirements",
+        "priority": "HIGH"
+      }
+    ]
+  },
+  "tests": {
+    "coverage_summary": "No test infrastructure exists. No unit tests, integration tests, or infrastructure-as-code validation tests found. Services are validated manually through healthchecks and operational verification.",
+    "missing_tests": [
+      {
+        "area": "Docker Compose Validation",
+        "test": "Validate all docker-compose.yml files for syntax and configuration correctness",
+        "priority": "HIGH"
+      },
+      {
+        "area": "Service Healthchecks",
+        "test": "Automated tests to verify healthcheck endpoints respond correctly",
+        "priority": "HIGH"
+      },
+      {
+        "area": "Traefik Configuration",
+        "test": "Validate Traefik labels and routing configuration",
+        "priority": "MEDIUM"
+      },
+      {
+        "area": "Backup/Restore",
+        "test": "Automated backup and restore verification tests",
+        "priority": "HIGH"
+      },
+      {
+        "area": "Service Dependencies",
+        "test": "Test service startup order and dependency validation",
+        "priority": "MEDIUM"
+      },
+      {
+        "area": "Security Configuration",
+        "test": "Validate .env file permissions, secret management, security opts",
+        "priority": "HIGH"
+      },
+      {
+        "area": "Network Configuration",
+        "test": "Verify network connectivity and service isolation",
+        "priority": "LOW"
+      }
+    ],
+    "flaky_tests": [
+      {
+        "issue": "No automated tests exist - cannot identify flaky tests",
+        "recommendation": "Implement test infrastructure first"
+      }
+    ],
+    "high_priority_test_targets": [
+      {
+        "target": "Docker Compose validation",
+        "reason": "Catch configuration errors before deployment",
+        "priority": "CRITICAL"
+      },
+      {
+        "target": "Backup/restore verification",
+        "reason": "Ensure backups are actually restorable",
+        "priority": "CRITICAL"
+      },
+      {
+        "target": "Healthcheck endpoints",
+        "reason": "Verify all healthchecks work correctly",
+        "priority": "HIGH"
+      },
+      {
+        "target": "Security configuration",
+        "reason": "Validate security hardening",
+        "priority": "HIGH"
+      },
+      {
+        "target": "Service startup dependencies",
+        "reason": "Ensure services start in correct order",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  "refactor": {
+    "refactor_targets": [
+      {
+        "target": "Database setup duplication",
+        "location": "wikijs, n8n, supabase, infisical (PostgreSQL); wordpress, linkstack (MySQL)",
+        "current": "PostgreSQL 15 and MySQL 8.0 setup duplicated across multiple services",
+        "proposed": "Create shared database compose patterns or centralized instances",
+        "benefit": "Reduced duplication, easier management, shared connection pooling",
+        "effort": "HIGH",
+        "priority": "MEDIUM"
+      },
+      {
+        "target": "Traefik label patterns",
+        "location": "All service docker-compose.yml files",
+        "current": "Traefik labels repeated with slight variations across 15+ services",
+        "proposed": "Create template or helper script for generating Traefik labels",
+        "benefit": "Consistency, easier updates, reduced duplication",
+        "effort": "MEDIUM",
+        "priority": "LOW"
+      },
+      {
+        "target": "Healthcheck patterns",
+        "location": "All service docker-compose.yml files",
+        "current": "Similar healthcheck patterns but not standardized",
+        "proposed": "Create healthcheck templates for common service types (web, db, cache)",
+        "benefit": "Consistency, easier troubleshooting",
+        "effort": "LOW",
+        "priority": "LOW"
+      },
+      {
+        "target": "Backup scripts",
+        "location": "backup/scripts/",
+        "current": "Backup scripts follow similar patterns but not abstracted",
+        "proposed": "Create reusable backup functions",
+        "benefit": "Code reuse, easier maintenance",
+        "effort": "MEDIUM",
+        "priority": "LOW"
+      },
+      {
+        "target": "Vault directory",
+        "location": "vault/",
+        "current": "Deprecated service still in codebase, migration to Infisical incomplete",
+        "proposed": "Complete migration and remove vault/ directory",
+        "benefit": "Reduce complexity, remove deprecated code",
+        "effort": "LOW",
+        "priority": "MEDIUM"
+      },
+      {
+        "target": "Resource limits",
+        "location": "Various docker-compose.yml files",
+        "current": "Inconsistent resource limits - Traefik has limits, some services don't",
+        "proposed": "Apply resource limits consistently to all services",
+        "benefit": "Better resource management, predictable performance",
+        "effort": "LOW",
+        "priority": "MEDIUM"
+      },
+      {
+        "target": "Security opts",
+        "location": "Various docker-compose.yml files",
+        "current": "Only Traefik and Infisical have no-new-privileges:true",
+        "proposed": "Apply security opts consistently to all services",
+        "benefit": "Improved security posture",
+        "effort": "LOW",
+        "priority": "MEDIUM"
+      },
+      {
+        "target": "Default credentials",
+        "location": "ops/server.js",
+        "current": "Default credentials hardcoded even though env vars used",
+        "proposed": "Remove defaults, fail fast if env vars missing",
+        "benefit": "Improved security",
+        "effort": "LOW",
+        "priority": "HIGH"
+      }
+    ],
+    "duplication_groups": [
+      {
+        "pattern": "PostgreSQL 15 setup",
+        "count": 4,
+        "locations": ["wikijs/docker-compose.yml", "n8n/docker-compose.yml", "supabase/docker-compose.yml", "infisical/docker-compose.yml"],
+        "recommendation": "Extract to shared compose pattern or use centralized instance"
+      },
+      {
+        "pattern": "MySQL 8.0 setup",
+        "count": 2,
+        "locations": ["wordpress/docker-compose.yml", "linkstack/docker-compose.yml"],
+        "recommendation": "Extract to shared compose pattern or use centralized instance"
+      },
+      {
+        "pattern": "Traefik label configuration",
+        "count": 15,
+        "locations": "All service docker-compose.yml files",
+        "recommendation": "Create template or helper script"
+      },
+      {
+        "pattern": "Healthcheck configuration",
+        "count": 20,
+        "locations": "All service docker-compose.yml files",
+        "recommendation": "Standardize with templates"
+      },
+      {
+        "pattern": "Backup configuration",
+        "count": 6,
+        "locations": "backup/config/backup-config.yml",
+        "recommendation": "Abstract common patterns"
+      }
+    ],
+    "legacy_patterns": [
+      {
+        "pattern": "Vault service (deprecated)",
+        "location": "vault/",
+        "issue": "Being replaced by Infisical but migration incomplete",
+        "recommendation": "Complete migration and remove"
+      },
+      {
+        "pattern": "Default credentials fallback",
+        "location": "ops/server.js",
+        "issue": "Security risk if env vars not configured",
+        "recommendation": "Remove defaults, require env vars"
+      },
+      {
+        "pattern": "Embedded database instances",
+        "location": "All services with databases",
+        "issue": "Duplication, harder to manage",
+        "recommendation": "Consider centralized instances"
+      }
+    ],
+    "simplifications": [
+      {
+        "area": "Service configuration",
+        "current": "Manual configuration of each service",
+        "proposed": "Template-based service generation with scripts/infra-new-service.sh (exists but could be enhanced)",
+        "benefit": "Faster service creation, consistency"
+      },
+      {
+        "area": "Healthcheck configuration",
+        "current": "Manual configuration per service",
+        "proposed": "Standardized healthcheck templates",
+        "benefit": "Consistency, easier maintenance"
+      },
+      {
+        "area": "Backup configuration",
+        "current": "Manual addition to backup-config.yml",
+        "proposed": "Automatic backup configuration based on service metadata",
+        "benefit": "Less manual work, fewer errors"
+      },
+      {
+        "area": "Traefik label management",
+        "current": "Manual label configuration",
+        "proposed": "Template or script-based label generation",
+        "benefit": "Consistency, easier updates"
+      }
+    ]
+  },
+  "release": {
+    "release_readiness": "Production-ready with critical security fixes needed. Infrastructure is operational (78% healthy containers) but requires immediate security hardening (Traefik dashboard password change, default credentials removal) and healthcheck fixes before production deployment. Backup automation enabled. Main blockers: Infisical encryption key issues (blocks Vault migration), 6 unhealthy containers, default credentials.",
+    "blockers": [
+      {
+        "severity": "CRITICAL",
+        "blocker": "Traefik dashboard using default password (admin/changeme)",
+        "impact": "Security vulnerability - unauthorized access possible",
+        "resolution": "Change password immediately",
+        "effort": "LOW"
+      },
+      {
+        "severity": "HIGH",
+        "blocker": "Infisical encryption key format issues preventing startup",
+        "impact": "Blocks Vault migration, secrets management unavailable",
+        "resolution": "Resolve encryption key format requirements",
+        "effort": "MEDIUM"
+      },
+      {
+        "severity": "HIGH",
+        "blocker": "Default credentials in ops/server.js",
+        "impact": "Security risk if .env not configured",
+        "resolution": "Remove defaults, require env vars",
+        "effort": "LOW"
+      },
+      {
+        "severity": "MEDIUM",
+        "blocker": "6 unhealthy containers (promtail, loki, nodered, wikijs, wordpress, adminer, traefik)",
+        "impact": "False negative health status, monitoring confusion",
+        "resolution": "Fix healthcheck configurations",
+        "effort": "LOW"
+      },
+      {
+        "severity": "MEDIUM",
+        "blocker": "Alertmanager notification channels not configured",
+        "impact": "Alerts won't be delivered",
+        "resolution": "Configure SMTP/webhook channels",
+        "effort": "LOW"
+      }
+    ],
+    "required_changes": [
+      {
+        "category": "Security",
+        "changes": [
+          "Change Traefik dashboard password from default",
+          "Remove default credentials from ops/server.js",
+          "Verify Grafana admin password changed",
+          "Ensure acme.json has 600 permissions",
+          "Configure Alertmanager notification channels"
+        ]
+      },
+      {
+        "category": "Reliability",
+        "changes": [
+          "Fix healthcheck failures for 6 unhealthy containers",
+          "Resolve Infisical encryption key issues",
+          "Verify backup restoration works"
+        ]
+      },
+      {
+        "category": "Documentation",
+        "changes": [
+          "Update Infisical migration documentation",
+          "Create service dependency documentation",
+          "Update SERVICES.yml status"
+        ]
+      },
+      {
+        "category": "Operations",
+        "changes": [
+          "Decide on unused services (Mailu, Supabase, Mastodon) - start or remove",
+          "Complete Vault removal after Infisical migration",
+          "Clean up stale files (docker-compose.yml.bak, ghost files)"
+        ]
+      }
+    ],
+    "draft_release_notes": [
+      "Security: All .env files have correct 600 permissions",
+      "Security: Rate limiting middleware applied to all services",
+      "Security: Traefik dashboard secured with basic auth (default password must be changed)",
+      "Operations: Backup automation enabled with systemd timer (daily 2:00 AM)",
+      "Operations: Image versions pinned for all services",
+      "Operations: Healthcheck configurations improved (some services still need adjustment)",
+      "Infrastructure: 22 containers running (17 healthy, 6 unhealthy, 2 starting)",
+      "Known Issues: Infisical encryption key format issues blocking Vault migration",
+      "Known Issues: 6 containers showing unhealthy status (healthcheck timing issues)",
+      "Known Issues: Alertmanager notification channels not configured",
+      "Breaking Changes: None",
+      "Migration Notes: Vault to Infisical migration in progress (blocked by encryption key issues)"
+    ]
+  },
+  "global_next_steps": {
+    "prioritized_actions": [
+      {
+        "priority": "CRITICAL",
+        "action": "Change Traefik dashboard password immediately",
+        "location": "traefik/dynamic/middlewares.yml",
+        "commands": [
+          "docker run --rm httpd:2.4-alpine htpasswd -nbB admin NEW_SECURE_PASSWORD",
+          "Update traefik/dynamic/middlewares.yml traefik-dashboard-auth.users with new hash",
+          "docker exec traefik kill -SIGHUP 1"
+        ],
+        "estimated_time": "5 minutes"
+      },
+      {
+        "priority": "CRITICAL",
+        "action": "Remove default credentials from ops/server.js",
+        "location": "ops/server.js",
+        "commands": [
+          "Remove default username/password constants",
+          "Ensure .env has OPS_USERNAME and OPS_PASSWORD",
+          "Fail fast if env vars missing at startup"
+        ],
+        "estimated_time": "10 minutes"
+      },
+      {
+        "priority": "HIGH",
+        "action": "Resolve Infisical encryption key format issues",
+        "location": "infisical/docker-compose.yml",
+        "commands": [
+          "cd /root/infra/infisical",
+          "Review official Infisical 0.8.0 documentation for encryption key requirements",
+          "Regenerate ENCRYPTION_KEY and ROOT_ENCRYPTION_KEY using correct format",
+          "docker compose down && docker compose up -d",
+          "docker logs infisical --tail 50"
+        ],
+        "estimated_time": "30 minutes"
+      },
+      {
+        "priority": "HIGH",
+        "action": "Fix healthcheck failures for unhealthy containers",
+        "location": "traefik, promtail, loki, nodered, wikijs, wordpress, adminer docker-compose.yml files",
+        "commands": [
+          "Review healthcheck endpoints for each service",
+          "Adjust timeout/start_period/retries as needed",
+          "Verify services are actually functional",
+          "docker compose restart <service>"
+        ],
+        "estimated_time": "1 hour"
+      },
+      {
+        "priority": "HIGH",
+        "action": "Configure Alertmanager notification channels",
+        "location": "monitoring/.env and monitoring/config/alertmanager/alertmanager.yml",
+        "commands": [
+          "Add SMTP credentials to monitoring/.env",
+          "Update monitoring/config/alertmanager/alertmanager.yml with SMTP/webhook config",
+          "docker compose -f monitoring/docker-compose.yml restart alertmanager",
+          "Test alert delivery"
+        ],
+        "estimated_time": "30 minutes"
+      },
+      {
+        "priority": "MEDIUM",
+        "action": "Decide on unused services (Mailu, Supabase, Mastodon)",
+        "location": "mailu/, supabase/, mastadon/",
+        "commands": [
+          "Decision: Start services or remove configurations",
+          "If starting: cd <service> && docker compose up -d",
+          "If removing: rm -rf <service>/"
+        ],
+        "estimated_time": "15 minutes"
+      },
+      {
+        "priority": "MEDIUM",
+        "action": "Update Infisical migration documentation",
+        "location": "infisical/MIGRATION.md or infisical/INFISICAL_ISSUES.md",
+        "commands": [
+          "Document encryption key format requirements",
+          "Document troubleshooting steps",
+          "Document rollback procedure"
+        ],
+        "estimated_time": "30 minutes"
+      },
+      {
+        "priority": "MEDIUM",
+        "action": "Clean up stale files",
+        "location": "mastadon/docker-compose.yml.bak, /root/ghost-production-compose.yml, projects/cult-of-joey-ghost-theme/",
+        "commands": [
+          "rm -f mastadon/docker-compose.yml.bak",
+          "rm -f /root/ghost-production-compose.yml",
+          "rm -rf projects/cult-of-joey-ghost-theme/ (if not needed)"
+        ],
+        "estimated_time": "5 minutes"
+      },
+      {
+        "priority": "LOW",
+        "action": "Apply security opts consistently to all services",
+        "location": "All docker-compose.yml files",
+        "commands": [
+          "Add security_opt: [\"no-new-privileges:true\"] to all service definitions",
+          "Verify no service breaks with this setting"
+        ],
+        "estimated_time": "1 hour"
+      },
+      {
+        "priority": "LOW",
+        "action": "Create service dependency documentation",
+        "location": "DEPENDENCIES.md",
+        "commands": [
+          "Document service dependency graph",
+          "Document startup order",
+          "Create dependency validation script"
+        ],
+        "estimated_time": "1 hour"
+      }
+    ],
+    "risks_and_blockers": [
+      {
+        "risk": "Infisical encryption key format issues blocking Vault migration",
+        "severity": "HIGH",
+        "impact": "Secrets management unavailable, migration incomplete",
+        "mitigation": "Research official documentation, try alternative key formats, consider contacting Infisical support"
+      },
+      {
+        "risk": "Default Traefik dashboard password exposed",
+        "severity": "CRITICAL",
+        "impact": "Unauthorized access to infrastructure dashboard",
+        "mitigation": "Change password immediately"
+      },
+      {
+        "risk": "Multiple services showing unhealthy status",
+        "severity": "MEDIUM",
+        "impact": "False negative health status, potential monitoring gaps",
+        "mitigation": "Investigate each service, verify functionality, adjust healthchecks"
+      },
+      {
+        "risk": "Alertmanager notifications not configured",
+        "severity": "MEDIUM",
+        "impact": "Alerts won't be delivered, issues may go unnoticed",
+        "mitigation": "Configure SMTP/webhook channels immediately"
+      },
+      {
+        "risk": "Service dependencies not validated",
+        "severity": "LOW",
+        "impact": "Potential startup failures if dependencies not ready",
+        "mitigation": "Document dependencies, create startup orchestration script"
+      },
+      {
+        "risk": "Backup coverage incomplete",
+        "severity": "MEDIUM",
+        "impact": "Some services/data not backed up",
+        "mitigation": "Add missing services to backup configuration"
+      }
+    ],
+    "strategic_recommendations": [
+      {
+        "recommendation": "Establish infrastructure change management process",
+        "rationale": "No formal process for infrastructure changes, testing, rollback",
+        "benefit": "Reduced risk, better change tracking, easier rollback"
+      },
+      {
+        "recommendation": "Implement automated security scanning",
+        "rationale": "Trivy mentioned but not integrated, manual security audits required",
+        "benefit": "Early detection of vulnerabilities, automated security checks"
+      },
+      {
+        "recommendation": "Create centralized database management",
+        "rationale": "Multiple PostgreSQL/MySQL instances embedded in services",
+        "benefit": "Reduced resource usage, easier management, shared connection pooling"
+      },
+      {
+        "recommendation": "Implement shared Redis caching layer",
+        "rationale": "Redis only used by Mastodon/Mailu (not running), no shared caching",
+        "benefit": "Improved performance, reduced database load"
+      },
+      {
+        "recommendation": "Add CI/CD pipeline for infrastructure",
+        "rationale": "No automated testing or deployment pipeline",
+        "benefit": "Automated testing, consistent deployments, faster iteration"
+      },
+      {
+        "recommendation": "Create service dependency orchestration",
+        "rationale": "Services depend on each other but no validation of startup order",
+        "benefit": "Reliable startup, dependency validation, easier troubleshooting"
+      },
+      {
+        "recommendation": "Implement comprehensive monitoring dashboard",
+        "rationale": "Security alerts defined but no security dashboard",
+        "benefit": "Better visibility, proactive issue detection"
+      },
+      {
+        "recommendation": "Establish disaster recovery testing schedule",
+        "rationale": "Backup system exists but no regular testing",
+        "benefit": "Confidence in recovery procedures, faster recovery times"
+      }
+    ]
+  },
+  "exec": {
+    "cursor_instructions": [
+      "Change Traefik dashboard password: Generate secure hash using htpasswd, update traefik/dynamic/middlewares.yml traefik-dashboard-auth.users section, reload Traefik config",
+      "Remove default credentials from ops/server.js: Delete default username/password constants, add validation to require OPS_USERNAME and OPS_PASSWORD env vars at startup, throw error if missing",
+      "Resolve Infisical encryption key issues: Review official Infisical 0.8.0 documentation, verify encryption key format requirements, update infisical/.env with correctly formatted keys, test startup",
+      "Fix healthcheck configurations: For each unhealthy container (traefik, promtail, loki, nodered, wikijs, wordpress, adminer), review healthcheck endpoint, adjust timeout/start_period/retries in docker-compose.yml, verify service functionality",
+      "Configure Alertmanager notifications: Add SMTP credentials to monitoring/.env, update monitoring/config/alertmanager/alertmanager.yml with receiver configuration, test alert delivery",
+      "Update Infisical migration documentation: Document encryption key format requirements, troubleshooting steps, and rollback procedure in infisical/MIGRATION.md or update INFISICAL_ISSUES.md",
+      "Apply security opts consistently: Add security_opt: [\"no-new-privileges:true\"] to all service definitions in docker-compose.yml files that don't have it",
+      "Clean up stale files: Remove mastadon/docker-compose.yml.bak, /root/ghost-production-compose.yml, and projects/cult-of-joey-ghost-theme/ if not needed",
+      "Create service dependency documentation: Document service dependency graph, startup order, and create dependency validation script in DEPENDENCIES.md",
+      "Update SERVICES.yml: Verify actual running state of services and update status in SERVICES.yml to match reality"
+    ],
+    "shell_commands": [
+      "docker run --rm httpd:2.4-alpine htpasswd -nbB admin NEW_SECURE_PASSWORD | sed 's/\\$/$/g'",
+      "cd /root/infra/traefik && docker exec traefik kill -SIGHUP 1",
+      "cd /root/infra/infisical && docker compose down && docker compose up -d && docker logs infisical --tail 50",
+      "docker ps --format 'table {{.Names}}\t{{.Status}}' | grep -E '(unhealthy|Exited|Restarting)'",
+      "docker inspect traefik promtail loki nodered wikijs wordpress adminer | grep -A 10 Health",
+      "cd /root/infra/monitoring && docker compose restart alertmanager",
+      "rm -f /root/infra/mastadon/docker-compose.yml.bak /root/ghost-production-compose.yml",
+      "rm -rf /root/infra/projects/cult-of-joey-ghost-theme/",
+      "find /root/infra -name 'docker-compose.yml' -exec grep -l 'security_opt' {} \\;",
+      "cd /root/infra && for dir in */; do [ -f \"$dir/docker-compose.yml\" ] && docker compose -f \"$dir/docker-compose.yml\" config >/dev/null 2>&1 && echo \"$dir: valid\" || echo \"$dir: invalid\"; done"
+    ]
+  }
+}
+

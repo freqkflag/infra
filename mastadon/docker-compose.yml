@@ -119,7 +119,7 @@ services:
       - "traefik.http.routers.mastodon.rule=Host(`twist3dkinkst3r.com`)"
       - "traefik.http.routers.mastodon.entrypoints=websecure"
       - "traefik.http.routers.mastodon.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.mastodon.middlewares=security-headers@file"
+      - "traefik.http.routers.mastodon.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.services.mastodon.loadbalancer.server.port=3000"
 
   mastodon-sidekiq:

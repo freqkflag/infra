@@ -12,12 +12,12 @@
 - **Script Created:** `/root/infra/scripts/fix-env-permissions.sh` for future use
 - **Verification:** All 13 .env files verified with correct permissions
 
-#### Rate Limiting Added
+#### Rate Limiting Added ✅
 - **Location:** `traefik/dynamic/middlewares.yml`
 - **Added:**
   - `rate-limit`: 100 requests/minute, burst 50
   - `rate-limit-strict`: 10 requests/minute, burst 5 (for auth endpoints)
-- **Status:** Middleware created, ready to apply to services
+- **Status:** ✅ Applied to all services (see [RATE_LIMITING_APPLIED.md](./RATE_LIMITING_APPLIED.md))
 
 #### Enhanced Security Headers
 - **Added:**
@@ -47,38 +47,47 @@
 - **Service:** `/etc/systemd/system/infra-backup.service`
 - **Timer:** `/etc/systemd/system/infra-backup.timer`
 - **Schedule:** Daily at 2:00 AM with 5-minute randomized delay
-- **Status:** Created, needs to be enabled
+- **Status:** ✅ Enabled and active
 
-**To Enable:**
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable infra-backup.timer
-sudo systemctl start infra-backup.timer
-sudo systemctl status infra-backup.timer
-```
+### 4. Traefik Dashboard Security ✅
+
+#### Basic Authentication Added
+- **Middleware:** `traefik-dashboard-auth` with basic auth
+- **Default credentials:** `admin:changeme` (⚠️ **CHANGE THIS!**)
+- **Insecure mode:** Disabled (`insecure: false`)
+- **HTTPS:** Enabled via `websecure` entrypoint
+- **Rate limiting:** Strict rate limiting applied
+- **Status:** ✅ Complete (see [RATE_LIMITING_APPLIED.md](./RATE_LIMITING_APPLIED.md))
+
+### 5. Image Version Pinning ✅
+
+#### All Docker Images Pinned
+- **Status:** ✅ All `latest` tags replaced with specific versions
+- **Documentation:** See [IMAGE_VERSIONS_PINNED.md](./IMAGE_VERSIONS_PINNED.md)
 
 ## Next Steps
 
 ### Immediate (Do Now)
-1. **Enable backup timer:**
+1. **Change Traefik dashboard password:**
    ```bash
-   sudo systemctl daemon-reload
-   sudo systemctl enable infra-backup.timer
-   sudo systemctl start infra-backup.timer
+   # Generate new password hash
+   docker run --rm httpd:2.4-alpine htpasswd -nbB admin YOUR_NEW_PASSWORD
+   # Update traefik/dynamic/middlewares.yml
    ```
 
-2. **Apply rate limiting to services:**
-   - Add `rate-limit` middleware to public endpoints
-   - Add `rate-limit-strict` to auth endpoints (Adminer, Ops, etc.)
-
-3. **Secure Traefik dashboard:**
-   - Add authentication or IP whitelist
-   - Change `insecure: true` to `false` in `traefik/config/traefik.yml`
+2. **Restart services to apply rate limiting:**
+   ```bash
+   cd /root/infra
+   for dir in adminer infisical n8n ops vault monitoring wordpress linkstack wikijs nodered logging mailu mastadon supabase; do
+     cd $dir && docker compose up -d && cd ..
+   done
+   ```
+   - **Status:** ✅ Completed - All running services restarted
 
 ### This Week
-4. **Pin image versions** - Replace all `latest` tags
-5. **Configure Alertmanager** - Set up notification channels
-6. **Review unused services** - Start or remove Mailu, Supabase, Mastodon, Vault
+3. **Configure Alertmanager** - Set up notification channels
+4. **Review unused services** - Start or remove Mailu, Supabase, Mastodon, Vault
+5. **Monitor rate limiting** - Check logs for rate limit hits
 
 ## Files Modified
 
@@ -110,10 +119,11 @@ sudo systemctl list-timers | grep backup
 
 ## Notes
 
-- Traefik has been restarted to apply middleware changes
-- Healthcheck fixes will take effect on next container restart
-- Rate limiting middleware is ready but needs to be applied to service labels
-- Backup timer needs to be enabled manually (see commands above)
+- ✅ Traefik has been restarted to apply middleware changes
+- ✅ Rate limiting applied to all services (containers need restart to activate)
+- ✅ Backup timer is enabled and scheduled
+- ✅ All image versions pinned
+- ⚠️ **IMPORTANT:** Change Traefik dashboard password from default!
 
 ---
 

@@ -1,0 +1,410 @@
+{
+  "project_summary": {
+    "purpose": "Multi-service Docker infrastructure management for freqkflag.co domain ecosystem, supporting infrastructure, personal brand (cultofjoey.com), business (twist3dkink.com), and community (twist3dkinkst3r.com) services",
+    "architecture_overview": "Docker Compose-based microservices architecture with Traefik reverse proxy for routing/SSL, centralized logging (Loki/Promtail), monitoring stack (Prometheus/Grafana/Alertmanager), secrets management (Infisical/Vault transition), and 15+ application services across 4 domain namespaces",
+    "current_phase": "Phase 6 Complete - Extensions & Polish finished. Infrastructure operational with 20 containers (17 running, 3 unhealthy). Security hardening and automation improvements in progress",
+    "overall_health": "Good - 85% services running. Critical security fixes applied (.env permissions, rate limiting, dashboard auth). Image version pinning mostly complete. Backup automation enabled. Main blockers: Infisical encryption key issues, 6 unhealthy containers, unused services need decision"
+  },
+  "technical_status": {
+    "recent_changes": [
+      "Rate limiting middleware added to all services (100 req/min standard, 10 req/min strict)",
+      "Traefik dashboard secured with basic auth (default: admin/changeme - MUST CHANGE)",
+      "Image version pinning completed for 11 services (alertmanager, grafana, prometheus, promtail, loki, adminer, nodered, n8n, wordpress, linkstack, infisical)",
+      "Healthcheck timeouts increased for Traefik (15s timeout, 20s start_period) and Node-RED (5 retries, 60s start_period)",
+      "Backup systemd timer enabled and active (daily at 2:00 AM)",
+      ".env file permissions fixed to 600 (owner read/write only)",
+      "Enhanced security headers middleware (referrerPolicy, permissionsPolicy, X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)",
+      "9 commits ahead of origin/main - rate limiting, image pinning, healthcheck fixes, ops control plane added"
+    ],
+    "in_progress": [
+      "Infisical encryption key format issues - RangeError: Invalid key length in KMS encryption (tried base64 44 chars, hex 64 chars - both fail)",
+      "Vault to Infisical migration - blocked by encryption key issues",
+      "Alertmanager notification channels - configured but SMTP/webhook not set up",
+      "Security monitoring dashboard - alerts defined but Grafana dashboard not created",
+      "6 unhealthy containers: promtail, loki, nodered, wikijs, wordpress, adminer (likely startup timing or healthcheck issues)",
+      "2 services starting: n8n (health: starting), infisical (health: starting)"
+    ],
+    "technical_debt": [
+      "vault/ directory - Deprecated service still in codebase, migration to Infisical incomplete",
+      "mastadon/docker-compose.yml.bak - Backup file should be removed",
+      "projects/cult-of-joey-ghost-theme/ - Ghost theme development, WordPress now handles cultofjoey.com",
+      "External Dokploy remnants - /etc/dokploy/compose/ directories (migrated services)",
+      "Ghost production compose - /root/ghost-production-compose.yml (replaced by WordPress)",
+      "Services configured but not running: Mailu, Supabase, Mastodon - need decision to start or remove",
+      "Traefik dashboard default password (admin/changeme) - MUST be changed",
+      "Default credentials in ops/server.js - mitigated by env vars but defaults still present",
+      "No centralized database management - PostgreSQL/MySQL instances embedded in services",
+      "No shared Redis caching layer - each service manages its own if needed",
+      "No CI/CD pipeline for infrastructure changes",
+      "No automated security scanning (Trivy mentioned but not integrated)",
+      "No service startup order orchestration - dependencies exist but no validation"
+    ],
+    "errors_warnings": [
+      "6 unhealthy containers: promtail (Up 4m unhealthy), loki (Up 4m healthy but was unhealthy), nodered (Up 4m unhealthy), wikijs (Up 4m unhealthy), wordpress (Up 5m unhealthy), adminer (Up 6m unhealthy), traefik (Up 10m unhealthy)",
+      "Infisical container - Health: starting - encryption key issues preventing full startup (RangeError: Invalid key length)",
+      "n8n container - Health: starting - may be normal initialization",
+      "Loki/Promtail unhealthy status - may be normal during initialization, needs monitoring",
+      "Node-RED healthcheck failing - start_period increased to 60s but may need further adjustment",
+      "Traefik healthcheck failing - timeout increased to 15s, start_period to 20s, but still showing unhealthy",
+      "Git working directory has uncommitted changes - 50+ modified files (mostly database WAL files, Loki chunks, MySQL temp files - runtime data)",
+      "9 commits ahead of origin/main - needs push to remote"
+    ],
+    "dependencies_env_issues": [
+      "Infisical using 'latest' tag in IMAGE_VERSIONS_PINNED.md but docker-compose.yml shows 'latest' - version pinning may be incomplete",
+      "Multiple services using 'latest' tags - alertmanager, grafana, prometheus still show 'latest' in docker ps output despite documentation saying pinned",
+      "Vault deprecated but dependencies may still reference it in documentation",
+      "No explicit service startup order - dependencies exist in SERVICES.yml but no orchestration",
+      "Backup system not covering all services - Infisical data, n8n workflows, Node-RED flows, Grafana dashboards not in backup config",
+      "PostgreSQL 15 setup duplicated across WikiJS, n8n, Supabase, Infisical",
+      "MySQL 8.0 setup duplicated in WordPress and LinkStack",
+      "All services depend on Traefik for routing - single point of failure"
+    ]
+  },
+  "todos_and_issues": {
+    "todo_comments": [
+      "Change Traefik dashboard password from default (admin/changeme) - generate new hash and update traefik/dynamic/middlewares.yml",
+      "Resolve Infisical encryption key format issues - try specific version tag (0.8.0) or review official docker-compose.yml",
+      "Complete Vault to Infisical migration - remove vault/ directory after migration",
+      "Configure Alertmanager notification channels - set SMTP credentials in monitoring/.env and test alert delivery",
+      "Create security monitoring dashboard in Grafana - alerts defined but dashboard not created",
+      "Fix unhealthy container healthchecks - adjust Loki, Promtail, Node-RED, WikiJS, WordPress, Adminer, Traefik timeouts/start periods",
+      "Decide on unused services (Mailu, Supabase, Mastodon) - start or remove configurations",
+      "Remove stale files: mastadon/docker-compose.yml.bak, projects/cult-of-joey-ghost-theme/, /root/ghost-production-compose.yml",
+      "Add backup verification script - verify backups can be restored",
+      "Update SERVICES.yml status - reflect actual running state of services",
+      "Document change management process - establish version control for infrastructure",
+      "Configure swap space (2-4GB recommended) - not currently configured",
+      "Push 9 commits to origin/main - local commits ahead of remote",
+      "Clean up git working directory - commit or .gitignore runtime data files (database WAL, Loki chunks, MySQL temp files)"
+    ],
+    "issue_tracker_items": [
+      "Infisical encryption key length error - RangeError: Invalid key length in KMS encryption, blocks Vault migration",
+      "Backup automation enabled but needs verification - systemd timer active, next run in 3h 28min",
+      "Traefik dashboard insecure password - default credentials must be changed",
+      "6 unhealthy containers - healthcheck failures need investigation and fixes",
+      "Image version drift - some services still using 'latest' despite documentation saying pinned",
+      "Missing backup coverage - 5 services/data sources not in backup config (Infisical, n8n workflows, Node-RED flows, Grafana dashboards)",
+      "Default credentials - Ops control plane and Grafana using defaults (mitigated by env vars)",
+      "No alert notifications configured - Alertmanager channels need SMTP/webhook setup",
+      "Service dependencies not validated - potential startup failures if dependencies not ready",
+      "Git working directory dirty - 50+ uncommitted runtime data files"
+    ]
+  },
+  "coding_standards_and_architecture_recommendations": {
+    "standards": [
+      "All docker-compose.yml files must use pinned image versions (no 'latest' tags) - 11 services still need pinning verification",
+      ".env files must have 600 permissions (owner read/write only) - ✅ Fixed",
+      "All services must include healthchecks with appropriate timeouts - ✅ Most have healthchecks, some need adjustment",
+      "Traefik labels must be consistent: rule, entrypoints, tls, middlewares, services - ✅ Standardized",
+      "Service directories must include README.md with setup and usage instructions - ✅ Most complete",
+      "All services must be registered in SERVICES.yml with complete metadata - ✅ Complete",
+      "Runbooks must exist for all production services - ✅ Complete",
+      "Security headers middleware must be applied to all public-facing services - ✅ Applied",
+      "Rate limiting middleware must be applied to all services - ✅ Applied",
+      "All services must use traefik-network for external access - ✅ Standardized",
+      "Resource limits should be defined for all services - ⚠️ Inconsistent (Traefik has limits, others don't)",
+      "Security opt 'no-new-privileges:true' should be applied - ⚠️ Only Traefik has it"
+    ],
+    "architectural_notes": [
+      "Services follow consistent directory structure: <service>/docker-compose.yml, .env, data/, README.md - ✅ Standardized",
+      "Traefik integration is standardized across all web services - ✅ Complete",
+      "Database services are embedded in application services (not centralized) - ⚠️ Consider centralization for better management",
+      "Network architecture uses traefik-network for external access and service-specific networks for internal communication - ✅ Good pattern",
+      "Monitoring and logging are centralized but services are not required to use them - ✅ Flexible approach",
+      "Backup system is centralized but coverage is incomplete - ⚠️ Need to add missing services",
+      "Secrets management is transitioning from Vault to Infisical (incomplete) - ⚠️ Blocked by encryption key issues",
+      "No service dependency orchestration - dependencies exist but no startup order validation - ⚠️ Risk of startup failures",
+      "No centralized configuration management - each service manages its own config - ⚠️ Consider templating for consistency",
+      "Healthcheck patterns vary across services - ⚠️ Could be standardized with templates"
+    ]
+  },
+  "task_breakdown": {
+    "core_features": [
+      "Complete Infisical migration - resolve encryption key issues and migrate from Vault",
+      "Enable and verify backup automation - systemd timer enabled, verify execution at next run",
+      "Apply rate limiting to all services - ✅ Complete (middleware applied, services restarted)",
+      "Configure Alertmanager notification channels - set up email/Slack/Matrix notifications",
+      "Secure Traefik dashboard - ✅ Basic auth added, but default password must be changed",
+      "Start or remove unused services - Mailu, Supabase, Mastodon decision needed",
+      "Complete image version pinning verification - ensure all 'latest' tags are actually replaced",
+      "Create security monitoring dashboard in Grafana - alerts defined but dashboard missing"
+    ],
+    "bug_fixes": [
+      "Fix Loki/Promtail healthcheck - adjust timeouts or start periods (currently unhealthy)",
+      "Fix Node-RED healthcheck - verify healthcheck endpoint and timing (currently unhealthy)",
+      "Fix WikiJS healthcheck - investigate why showing unhealthy (currently unhealthy)",
+      "Fix WordPress healthcheck - investigate why showing unhealthy (currently unhealthy)",
+      "Fix Adminer healthcheck - investigate why showing unhealthy (currently unhealthy)",
+      "Fix Traefik healthcheck - timeout/start_period increased but still unhealthy",
+      "Resolve Infisical encryption key format - try specific version tag (0.8.0) or official docker-compose",
+      "Update default credentials - change ops control plane and Grafana passwords from defaults"
+    ],
+    "refactoring": [
+      "Centralize database setup - create shared PostgreSQL/MySQL compose patterns to reduce duplication",
+      "Template Traefik labels - create helper script or template for consistent labels across services",
+      "Standardize healthcheck patterns - create healthcheck templates for common service types",
+      "Abstract backup scripts - create reusable backup functions to reduce duplication",
+      "Consolidate Vault removal - complete migration and remove vault/ directory",
+      "Add resource limits consistently - apply CPU/memory limits to all services",
+      "Add security opts consistently - apply no-new-privileges to all services",
+      "Create service startup orchestration - validate dependencies before starting services"
+    ],
+    "documentation": [
+      "Update SERVICES.yml status - reflect actual running state of services (some show 'configured' but are running)",
+      "Complete Infisical migration docs - document migration process and encryption key issues",
+      "Create service dependency diagram - visualize service relationships and dependencies",
+      "Document change management process - establish version control workflow for infrastructure",
+      "Create emergency procedures runbook - document disaster recovery steps and escalation",
+      "Update AGENTS.md - ensure service status matches reality",
+      "Document image update process - establish procedure for updating pinned versions",
+      "Create troubleshooting guide - document common issues and solutions"
+    ],
+    "testing": [
+      "Test backup restoration - verify backups can be restored successfully",
+      "Test service startup order - verify dependencies are met before services start",
+      "Test healthcheck configurations - ensure all healthchecks work correctly after fixes",
+      "Test rate limiting - verify middleware works as expected and doesn't block legitimate traffic",
+      "Test Alertmanager notifications - verify alerts are delivered when conditions are met",
+      "Test disaster recovery - run DR procedures in test environment",
+      "Test Infisical migration - verify migration from Vault works after encryption key fix",
+      "Test Traefik dashboard auth - verify basic auth works and default password is changed"
+    ]
+  },
+  "next_steps_plan": {
+    "prioritized_actions": [
+      {
+        "priority": "CRITICAL",
+        "action": "Change Traefik dashboard password",
+        "command": "docker run --rm httpd:2.4-alpine htpasswd -nbB admin NEW_PASSWORD | sed 's/\\$/$/g' > /tmp/new_hash.txt && update traefik/dynamic/middlewares.yml",
+        "impact": "HIGH - Prevents unauthorized access to infrastructure dashboard",
+        "effort": "LOW - 1 command + config update",
+        "risk": "LOW"
+      },
+      {
+        "priority": "CRITICAL",
+        "action": "Resolve Infisical encryption key issues",
+        "command": "cd /root/infra/infisical && docker compose down && update docker-compose.yml to use infisical/infisical:0.8.0 instead of latest && docker compose up -d",
+        "impact": "HIGH - Blocks Vault migration completion",
+        "effort": "MEDIUM - Research and testing required",
+        "risk": "MEDIUM - May require additional investigation"
+      },
+      {
+        "priority": "HIGH",
+        "action": "Fix unhealthy container healthchecks",
+        "command": "Review and adjust healthcheck timeouts/start periods for: promtail, loki, nodered, wikijs, wordpress, adminer, traefik",
+        "impact": "MEDIUM - Improves service monitoring accuracy",
+        "effort": "LOW - Configuration adjustments",
+        "risk": "LOW"
+      },
+      {
+        "priority": "HIGH",
+        "action": "Verify image version pinning",
+        "command": "grep -r 'image:.*:latest' /root/infra --include='docker-compose.yml' | grep -v 'node_modules' | grep -v '.git'",
+        "impact": "MEDIUM - Prevents unpredictable updates",
+        "effort": "LOW - Verification only",
+        "risk": "LOW"
+      },
+      {
+        "priority": "HIGH",
+        "action": "Configure Alertmanager notification channels",
+        "command": "Set SMTP credentials in monitoring/.env and update monitoring/config/alertmanager/alertmanager.yml",
+        "impact": "MEDIUM - Enables proactive alerting",
+        "effort": "LOW - Configuration only",
+        "risk": "LOW"
+      },
+      {
+        "priority": "MEDIUM",
+        "action": "Decide on unused services (Mailu, Supabase, Mastodon)",
+        "command": "Either start services (docker compose up -d) or remove configurations (rm -rf <service-dir>)",
+        "impact": "MEDIUM - Reduces configuration drift",
+        "effort": "LOW - Decision and action",
+        "risk": "LOW"
+      },
+      {
+        "priority": "MEDIUM",
+        "action": "Clean up stale files and directories",
+        "command": "rm -f mastadon/docker-compose.yml.bak /root/ghost-production-compose.yml && rm -rf projects/cult-of-joey-ghost-theme/",
+        "impact": "LOW - Reduces clutter",
+        "effort": "LOW - File removal",
+        "risk": "LOW"
+      },
+      {
+        "priority": "MEDIUM",
+        "action": "Push commits to origin/main",
+        "command": "git push origin main",
+        "impact": "MEDIUM - Syncs local changes to remote",
+        "effort": "LOW - 1 command",
+        "risk": "LOW"
+      },
+      {
+        "priority": "LOW",
+        "action": "Clean up git working directory",
+        "command": "Add runtime data patterns to .gitignore (database WAL files, Loki chunks, MySQL temp files) and commit or discard changes",
+        "impact": "LOW - Cleaner git status",
+        "effort": "LOW - .gitignore update",
+        "risk": "LOW"
+      }
+    ],
+    "risk_notes": [
+      {
+        "risk": "Infisical encryption key issues blocking Vault migration",
+        "severity": "HIGH",
+        "mitigation": "Try specific version tag (0.8.0), review official documentation, consider alternative key formats"
+      },
+      {
+        "risk": "Traefik dashboard insecure password - default credentials exposed",
+        "severity": "HIGH",
+        "mitigation": "Change password immediately using htpasswd and update middlewares.yml"
+      },
+      {
+        "risk": "Multiple services using 'latest' tags - unpredictable updates",
+        "severity": "MEDIUM",
+        "mitigation": "Verify all 'latest' tags are actually replaced, establish update process"
+      },
+      {
+        "risk": "6 unhealthy containers - may indicate real issues or just healthcheck problems",
+        "severity": "MEDIUM",
+        "mitigation": "Investigate each container, adjust healthchecks, verify services are actually functional"
+      },
+      {
+        "risk": "No alert notifications configured - issues may go unnoticed",
+        "severity": "MEDIUM",
+        "mitigation": "Configure Alertmanager SMTP/webhook channels immediately"
+      },
+      {
+        "risk": "Service dependencies not validated - potential startup failures",
+        "severity": "LOW",
+        "mitigation": "Document dependencies, create startup script with dependency validation"
+      },
+      {
+        "risk": "Backup coverage incomplete - 5 services/data sources not backed up",
+        "severity": "MEDIUM",
+        "mitigation": "Add missing services to backup config: Infisical, n8n workflows, Node-RED flows, Grafana dashboards"
+      }
+    ],
+    "optimization_targets": [
+      "Centralize database management - shared PostgreSQL/MySQL instances instead of embedded",
+      "Implement shared Redis caching layer - improve performance across services",
+      "Create service dependency orchestration - ensure proper startup order",
+      "Template Traefik labels - reduce duplication across 15+ services",
+      "Standardize healthcheck patterns - create templates for common service types",
+      "Add resource limits consistently - apply CPU/memory limits to all services",
+      "Implement CI/CD pipeline for infrastructure - automate testing and deployment",
+      "Add automated security scanning - integrate Trivy into update process",
+      "Create centralized configuration management - template-based config generation",
+      "Implement comprehensive monitoring - security dashboard, log analysis, alerting"
+    ]
+  },
+  "execution_commands": {
+    "steps": [
+      {
+        "step": 1,
+        "description": "Change Traefik dashboard password",
+        "commands": [
+          "docker run --rm httpd:2.4-alpine htpasswd -nbB admin NEW_SECURE_PASSWORD",
+          "Update traefik/dynamic/middlewares.yml with new hash in traefik-dashboard-auth.users",
+          "docker exec traefik kill -SIGHUP 1"
+        ]
+      },
+      {
+        "step": 2,
+        "description": "Fix Infisical encryption key issues",
+        "commands": [
+          "cd /root/infra/infisical",
+          "docker compose down",
+          "sed -i 's/infisical\\/infisical:latest/infisical\\/infisical:0.8.0/g' docker-compose.yml",
+          "docker compose up -d",
+          "docker logs infisical --tail 50 | grep -i error"
+        ]
+      },
+      {
+        "step": 3,
+        "description": "Verify image version pinning",
+        "commands": [
+          "cd /root/infra",
+          "grep -r 'image:.*:latest' --include='docker-compose.yml' --include='docker-compose.dev.yml' . | grep -v node_modules | grep -v '.git' | grep -v 'monitoring/data'"
+        ]
+      },
+      {
+        "step": 4,
+        "description": "Check unhealthy containers",
+        "commands": [
+          "docker ps --format 'table {{.Names}}\\t{{.Status}}' | grep -E '(unhealthy|Exited|Restarting)'",
+          "docker inspect promtail | jq '.[0].State.Health'",
+          "docker inspect loki | jq '.[0].State.Health'",
+          "docker inspect nodered | jq '.[0].State.Health'",
+          "docker inspect wikijs | jq '.[0].State.Health'",
+          "docker inspect wordpress | jq '.[0].State.Health'",
+          "docker inspect adminer | jq '.[0].State.Health'",
+          "docker inspect traefik | jq '.[0].State.Health'"
+        ]
+      },
+      {
+        "step": 5,
+        "description": "Configure Alertmanager notifications",
+        "commands": [
+          "cd /root/infra/monitoring",
+          "echo 'ALERTMANAGER_SMTP_HOST=smtp.example.com' >> .env",
+          "echo 'ALERTMANAGER_SMTP_PORT=587' >> .env",
+          "echo 'ALERTMANAGER_SMTP_USER=alerts@freqkflag.co' >> .env",
+          "echo 'ALERTMANAGER_SMTP_PASSWORD=SECURE_PASSWORD' >> .env",
+          "Update monitoring/config/alertmanager/alertmanager.yml with SMTP config",
+          "docker compose restart alertmanager"
+        ]
+      },
+      {
+        "step": 6,
+        "description": "Verify backup timer status",
+        "commands": [
+          "sudo systemctl status infra-backup.timer",
+          "sudo systemctl list-timers | grep backup",
+          "sudo journalctl -u infra-backup.service --since '1 day ago'"
+        ]
+      },
+      {
+        "step": 7,
+        "description": "Check service status vs documentation",
+        "commands": [
+          "docker ps --format '{{.Names}}' | sort > /tmp/running.txt",
+          "grep -E 'status: (running|configured)' /root/infra/SERVICES.yml | grep -o 'id: [a-z-]*' | sed 's/id: //' | sort > /tmp/documented.txt",
+          "diff /tmp/running.txt /tmp/documented.txt"
+        ]
+      },
+      {
+        "step": 8,
+        "description": "Clean up stale files",
+        "commands": [
+          "rm -f /root/infra/mastadon/docker-compose.yml.bak",
+          "rm -f /root/ghost-production-compose.yml",
+          "rm -rf /root/infra/projects/cult-of-joey-ghost-theme/"
+        ]
+      },
+      {
+        "step": 9,
+        "description": "Push commits to remote",
+        "commands": [
+          "cd /root/infra",
+          "git status --short | head -20",
+          "git push origin main"
+        ]
+      },
+      {
+        "step": 10,
+        "description": "Update .gitignore for runtime data",
+        "commands": [
+          "cd /root/infra",
+          "echo '# Runtime data files' >> .gitignore",
+          "echo '**/data/**/*.wal' >> .gitignore",
+          "echo '**/data/**/pg_wal/**' >> .gitignore",
+          "echo '**/data/**/pg_xact/**' >> .gitignore",
+          "echo '**/data/**/chunks/**' >> .gitignore",
+          "echo '**/data/**/#innodb_redo/**' >> .gitignore",
+          "echo '**/data/**/#innodb_temp/**' >> .gitignore",
+          "git add .gitignore",
+          "git commit -m 'chore: Add runtime data patterns to .gitignore'"
+        ]
+      }
+    ]
+  }
+}
+

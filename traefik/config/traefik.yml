@@ -4,7 +4,7 @@ global:
 
 api:
   dashboard: true
-  insecure: true  # Set to false and configure auth for production
+  insecure: false  # Secured with basic auth middleware
 
 entryPoints:
   web:

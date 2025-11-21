@@ -72,7 +72,7 @@ services:
       - "traefik.http.routers.supabase-studio.rule=Host(`supabase.freqkflag.co`)"
       - "traefik.http.routers.supabase-studio.entrypoints=websecure"
       - "traefik.http.routers.supabase-studio.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.supabase-studio.middlewares=security-headers@file"
+      - "traefik.http.routers.supabase-studio.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.services.supabase-studio.loadbalancer.server.port=3000"
 
   supabase-meta:
@@ -143,7 +143,7 @@ services:
       - "traefik.http.routers.supabase-api.rule=Host(`api.supabase.freqkflag.co`)"
       - "traefik.http.routers.supabase-api.entrypoints=websecure"
       - "traefik.http.routers.supabase-api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.supabase-api.middlewares=security-headers@file"
+      - "traefik.http.routers.supabase-api.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.services.supabase-api.loadbalancer.server.port=8000"
 
 networks:
