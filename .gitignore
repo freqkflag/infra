@@ -1,0 +1,104 @@
+# Logs
+*.log
+*.log.*
+*.log.gz
+*.log.bz2
+*.log.xz
+logs/
+log/
+**/logs/
+**/log/
+**/*.log
+
+# Application logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Rails logs
+backend/log/*
+backend/tmp/*
+backend/storage/*
+!backend/storage/.keep
+!backend/log/.keep
+!backend/tmp/.keep
+
+# Docker logs
+*.docker.log
+docker-compose.log
+
+# System logs
+syslog
+messages
+*.syslog
+
+# Service-specific logs
+traefik/logs/*
+wikijs/logs/*
+wordpress/logs/*
+mastadon/logs/*
+n8n/logs/*
+mailu/logs/*
+supabase/logs/*
+adminer/logs/*
+nodered/logs/*
+linkstack/logs/*
+
+# Data directories (may contain logs)
+data/*/logs/
+data/*/log/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build artifacts
+dist/
+build/
+*.o
+*.a
+*.so
+*.dylib
+
+# Dependencies
+node_modules/
+vendor/
+.bundle/
+
+# Coverage reports
+coverage/
+*.cover
+.nyc_output/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*~
+
