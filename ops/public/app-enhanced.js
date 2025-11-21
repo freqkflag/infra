@@ -5,6 +5,30 @@ let agents = [];
 let tasks = [];
 let reports = [];
 let selectedAgent = null;
+let basicAuthCredentials = null;
+
+// Get Basic Auth credentials (prompt if not stored)
+function getBasicAuthCredentials() {
+    if (basicAuthCredentials) {
+        return basicAuthCredentials;
+    }
+    
+    // Try to get from sessionStorage
+    const stored = sessionStorage.getItem('ops_basic_auth');
+    if (stored) {
+        basicAuthCredentials = stored;
+        return stored;
+    }
+    
+    return null;
+}
+
+// Set Basic Auth credentials
+function setBasicAuthCredentials(username, password) {
+    const encoded = btoa(`${username}:${password}`);
+    basicAuthCredentials = encoded;
+    sessionStorage.setItem('ops_basic_auth', encoded);
+}
 
 // Tab switching
 function switchTab(tabName) {
@@ -41,10 +65,17 @@ function showMessage(text, type = 'success') {
 // API helper with auth
 async function apiCall(endpoint, options = {}) {
     const defaultOptions = {
+        credentials: 'include', // Include cookies for OAuth sessions
         headers: {
             'Content-Type': 'application/json',
         }
     };
+    
+    // Add Basic Auth if credentials are available
+    const authCreds = getBasicAuthCredentials();
+    if (authCreds) {
+        defaultOptions.headers['Authorization'] = `Basic ${authCreds}`;
+    }
     
     const mergedOptions = { ...defaultOptions, ...options };
     
@@ -52,7 +83,27 @@ async function apiCall(endpoint, options = {}) {
         const response = await fetch(endpoint, mergedOptions);
         if (!response.ok) {
             if (response.status === 401) {
-                showMessage('Authentication required', 'error');
+                // Prompt for Basic Auth credentials
+                const username = prompt('Enter username:');
+                if (username) {
+                    const password = prompt('Enter password:');
+                    if (password) {
+                        setBasicAuthCredentials(username, password);
+                        // Retry the request with new credentials
+                        mergedOptions.headers['Authorization'] = `Basic ${btoa(`${username}:${password}`)}`;
+                        const retryResponse = await fetch(endpoint, mergedOptions);
+                        if (retryResponse.ok) {
+                            return await retryResponse.json();
+                        }
+                    }
+                }
+                
+                // If OAuth is enabled, try redirecting to login
+                if (window.location.pathname !== '/auth/github') {
+                    window.location.href = '/auth/github';
+                } else {
+                    showMessage('Authentication required. Please log in.', 'error');
+                }
                 return null;
             }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
