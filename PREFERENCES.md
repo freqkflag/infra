@@ -121,6 +121,7 @@ This document defines how AI assistants should interact with the infrastructure 
 - **Look for API tokens** and use them to complete tasks
 - **SSH tunneling** when appropriate
 - **Complete tasks directly** rather than providing instructions
+- **Visual verification** - Always verify visually using browser tools before confirming resolutions
 
 ---
 
@@ -228,6 +229,7 @@ This document defines how AI assistants should interact with the infrastructure 
 - **Fix errors immediately** if introduced
 - **Don't loop** - max 3 attempts to fix linter errors
 - **Verify changes** - test configurations before marking complete
+- **Visual verification required** - Always verify visually using browser tools before confirming resolutions
 - **Report issues** - if something can't be fixed, explain why
 
 ### Communication

@@ -31,6 +31,7 @@ MANDATORY WORKFLOW REQUIREMENTS:
 2. **ALWAYS read and reference [PREFERENCES.md](./PREFERENCES.md)** - Follow interaction guidelines, technical preferences, and workflow requirements
 3. **Follow all guidelines** specified in both documents
 4. **Ensure compliance** with agent responsibilities (starting features, testing operational functions, validation)
+5. **Visual verification** - Always verify visually using browser tools before confirming resolutions
 
 **AFTER COMPLETING ANY REQUEST:**
 1. **Update [AGENTS.md](./AGENTS.md)** - Add any new services, update service status, document new features or changes
@@ -45,6 +46,7 @@ ADDITIONAL GUIDELINES:
 
 - store and save all build plans in ~/dev/docs/build_plans/
 - If you need a secret, password, or other sensitive and security access information or are give the information, Politely add it the Centialized .env file located at ~/.env
+- **ALWAYS verify visually using browser tools before confirming resolutions** - Use browser navigation, snapshots, and inspection tools to verify fixes work correctly
 
 IF a task can be completed with an API call or tools look or request for a api token and then complete the task that way or use ssh tunneling.
 
