@@ -194,6 +194,61 @@ This document provides a standardized overview of all services and agents in the
 
 ---
 
+## Agents
+
+All agents in the infrastructure are responsible for:
+
+- **Starting newly created features** - Agents must automatically start and initialize any newly created features or services
+- **Testing operational functions** - Agents must verify that all operational functions are working correctly after deployment or changes
+- **Validation** - Agents should perform functional tests to ensure services are operational before marking tasks as complete
+- **Utilizing ai.engine** - Agents must always utilize the AI Engine (`/root/infra/ai.engine/`) for analysis, validation, and comprehensive infrastructure assessment
+
+### Agent Responsibilities
+
+When agents create or modify services:
+
+1. **Start the feature** - Ensure the newly created feature/service is started and running
+2. **Test functionality** - Verify all operational functions are working as expected
+3. **Validate dependencies** - Confirm all required dependencies are met and functioning
+4. **Report status** - Document the operational status of the feature
+5. **Use ai.engine** - Leverage appropriate AI Engine agents for analysis, bug detection, security checks, and validation
+
+### AI Engine Integration
+
+**Location:** `/root/infra/ai.engine/`  
+**Documentation:** See [ai.engine/README.md](./ai.engine/README.md)
+
+All agents must utilize the AI Engine system for:
+
+- **Status checks** - Use `status-agent` for infrastructure health and status
+- **Bug detection** - Use `bug-hunter` to identify errors, code smells, and issues
+- **Security validation** - Use `security-agent` to check for vulnerabilities and misconfigurations
+- **Performance analysis** - Use `performance-agent` for optimization opportunities
+- **Architecture review** - Use `architecture-agent` for design consistency and boundaries
+- **Documentation** - Use `docs-agent` to identify missing documentation
+- **Testing** - Use `tests-agent` for test coverage analysis
+- **Refactoring** - Use `refactor-agent` for code quality improvements
+- **Release readiness** - Use `release-agent` for deployment validation
+- **Comprehensive analysis** - Use `orchestrator-agent` for full infrastructure analysis
+
+**Quick Usage:**
+```bash
+# List available agents
+cd /root/infra/ai.engine/scripts && ./list-agents.sh
+
+# Invoke specific agent
+./invoke-agent.sh bug-hunter
+./invoke-agent.sh security
+./invoke-agent.sh orchestrator /root/infra/orchestration-report.json
+```
+
+**In Cursor AI:**
+- Read agent files: `cat /root/infra/ai.engine/agents/<agent-name>-agent.md`
+- Use agent prompts: "Act as bug_hunter. Scan /root/infra. Return crit bugs + fixes in strict JSON."
+- Use orchestrator: "Use the Multi-Agent Orchestrator preset. Focus on /root/infra..."
+
+---
+
 ## Service Status Legend
 
 - ✅ **Running** - Service is currently active and running
@@ -329,13 +384,42 @@ Each service has backup procedures documented in its README.md file.
 
 ## For AI Assistants
 
+**MANDATORY: Before completing ANY request, you MUST:**
+
+1. **Read [AGENTS.md](./AGENTS.md)** - Check all services, agent responsibilities, and infrastructure context
+2. **Read [PREFERENCES.md](./PREFERENCES.md)** - Follow interaction guidelines, technical preferences, and workflow requirements
+3. **Utilize [ai.engine](./ai.engine/)** - Always use appropriate AI Engine agents for analysis, validation, and assessment
+4. **Follow all guidelines** - Ensure compliance with agent responsibilities (starting features, testing operational functions, validation)
+
+**After completing ANY request, you MUST:**
+
+1. **Update [AGENTS.md](./AGENTS.md)** - Add new services, update status, document changes
+2. **Update [PREFERENCES.md](./PREFERENCES.md)** - Add new patterns, preferences, or guidelines discovered
+
 **When working with this infrastructure:**
 
-1. **Read [PREFERENCES.md](./PREFERENCES.md)** - Understand interaction style and preferences
-2. **Reference [AGENTS.md](./AGENTS.md)** - Know all available services
-3. **Follow K.I.S.S. principles** - Always choose simplicity
-4. **Provide actual code** - Not high-level guidance
-5. **Maintain consistency** - Follow existing patterns
+1. **Always use ai.engine** - Leverage AI Engine agents for:
+   - Status checks and health monitoring
+   - Bug detection and code quality
+   - Security validation and vulnerability scanning
+   - Performance analysis and optimization
+   - Architecture review and consistency
+   - Documentation gaps identification
+   - Test coverage analysis
+   - Refactoring opportunities
+   - Release readiness validation
+   - Comprehensive orchestration analysis
+
+2. **Follow K.I.S.S. principles** - Always choose simplicity
+3. **Provide actual code** - Not high-level guidance
+4. **Maintain consistency** - Follow existing patterns
+5. **Keep documentation current** - Both files must reflect current infrastructure state
+
+**AI Engine Reference:**
+- **Location:** `/root/infra/ai.engine/`
+- **Documentation:** [ai.engine/README.md](./ai.engine/README.md)
+- **Available Agents:** See [ai.engine/AGENTS_SUMMARY.md](./ai.engine/AGENTS_SUMMARY.md)
+- **Scripts:** `/root/infra/ai.engine/scripts/` (invoke-agent.sh, list-agents.sh)
 
 ---
 

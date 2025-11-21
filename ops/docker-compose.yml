@@ -2,10 +2,18 @@ services:
   ops:
     build: .
     container_name: ops-control-plane
+    command: node server-enhanced.js
     environment:
       TZ: ${TZ:-America/New_York}
       OPS_AUTH_USER: ${OPS_AUTH_USER:-admin}
       OPS_AUTH_PASS: ${OPS_AUTH_PASS:-changeme}
+      # OAuth Configuration (optional - enables OAuth if set)
+      # OPS_OAUTH_ENABLED: ${OPS_OAUTH_ENABLED:-false}
+      # OPS_OAUTH_PROVIDER: ${OPS_OAUTH_PROVIDER:-github}
+      # OPS_OAUTH_CLIENT_ID: ${OPS_OAUTH_CLIENT_ID:-}
+      # OPS_OAUTH_CLIENT_SECRET: ${OPS_OAUTH_CLIENT_SECRET:-}
+      # OPS_OAUTH_CALLBACK_URL: ${OPS_OAUTH_CALLBACK_URL:-https://ops.freqkflag.co/auth/callback}
+      # OPS_SESSION_SECRET: ${OPS_SESSION_SECRET:-change-this-secret-in-production}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /root/infra:/root/infra:ro

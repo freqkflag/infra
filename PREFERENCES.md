@@ -7,6 +7,50 @@ This document defines how AI assistants should interact with the infrastructure 
 
 ---
 
+## Mandatory Workflow Requirements
+
+**CRITICAL: These requirements must be followed for EVERY request.**
+
+### Before Completing Any Request
+
+1. **ALWAYS read and reference [AGENTS.md](./AGENTS.md)**
+   - Check all available services and their status
+   - Review agent responsibilities (starting features, testing operational functions, validation)
+   - Understand infrastructure context and dependencies
+   - Verify service locations and configurations
+
+2. **ALWAYS read and reference [PREFERENCES.md](./PREFERENCES.md)**
+   - Follow interaction guidelines and communication style
+   - Adhere to technical preferences and code quality standards
+   - Apply K.I.S.S. principles
+   - Use standardized service structures
+
+3. **Ensure compliance** with all guidelines specified in both documents
+
+### After Completing Any Request
+
+1. **Update [AGENTS.md](./AGENTS.md)**
+   - Add any new services or features created
+   - Update service status (Running/Configured)
+   - Document new capabilities or changes
+   - Update domain assignments if applicable
+   - Add to service catalog and quick reference sections
+
+2. **Update [PREFERENCES.md](./PREFERENCES.md)**
+   - Add any new patterns or preferences discovered
+   - Document new guidelines or best practices
+   - Update technical preferences if patterns emerge
+   - Keep interaction guidelines current
+
+3. **Keep documentation synchronized**
+   - Ensure both files reflect the current state of the infrastructure
+   - Maintain consistency across all documentation
+   - These files are the source of truth for infrastructure operations
+
+**These files must be maintained and followed for every request - no exceptions.**
+
+---
+
 ## Core Principles
 
 ### K.I.S.S. (Keep It Simple, Stupid)
