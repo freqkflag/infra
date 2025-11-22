@@ -14,6 +14,7 @@ services:
       - ./acme:/acme
     networks:
       - traefik-network
+      - edge
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
@@ -44,4 +45,7 @@ networks:
   traefik-network:
     driver: bridge
     name: traefik-network
+  edge:
+    external: true
+    name: edge
 

@@ -13,7 +13,7 @@ services:
       POSTGRES_HOST: backstage-db
       POSTGRES_PORT: 5432
       POSTGRES_USER: ${BACKSTAGE_DB_USER:-backstage}
-      POSTGRES_PASSWORD: ${BACKSTAGE_DB_PASSWORD}
+      POSTGRES_PASSWORD: ${BACKSTAGE_DB_PASSWORD:-backstage_249e1856dfb0bfe038154fa6}
       APP_BASE_URL: https://${BACKSTAGE_DOMAIN:-backstage.freqkflag.co}
       BACKEND_BASE_URL: https://${BACKSTAGE_DOMAIN:-backstage.freqkflag.co}
       INFISICAL_PUBLIC_URL: ${INFISICAL_PUBLIC_URL:-https://infisical.freqkflag.co}
@@ -66,6 +66,9 @@ services:
 networks:
   edge:
     external: true
+  traefik-network:
+    external: true
+    name: traefik-network
 
 volumes:
   backstage_db_data:
