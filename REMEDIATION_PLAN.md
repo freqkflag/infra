@@ -151,8 +151,8 @@ git commit -S -m 'security: enable PostgreSQL scram-sha-256 authentication'
 
 ### 1.3 Secrets Audit and Rotation
 
-**Issue:** Weak default passwords in templates, potential secret leaks  
-**Impact:** HIGH - Security risk if templates used in production
+**Issue:** Weak default passwords in templates, potential secret leaks, `__UNSET__` placeholders in Infisical  
+**Impact:** HIGH - Security risk if templates used in production, services blocked by missing secrets
 
 **Actions:**
 ```bash
@@ -193,7 +193,7 @@ git log --all --full-history --source --pretty=format: --name-only | \
   - **⚠️ ACTION REQUIRED:** Templates still contain weak passwords and need to be fully replaced with placeholders
 - [ ] Secrets scanning configured - **DEFERRED TO PHASE 6**
 
-**Status:** 🔄 IN PROGRESS (2025-11-21)  
+**Status:** 🔄 IN PROGRESS (2025-11-22)  
 **Findings:**
 - Weak passwords still present in `env/templates/base.env.example`:
   - POSTGRES_PASSWORD=postgrespassword
@@ -201,18 +201,104 @@ git log --all --full-history --source --pretty=format: --name-only | \
   - REDIS_PASSWORD=redispassword
 - Weak passwords still present in `env/templates/vps.env.example`:
   - Multiple service-specific passwords (ghost_password, wordpress_password, wikijs_password, discourse_password, linkstack_password, gitea_password, etc.)
+- **NEW (2025-11-22):** `__UNSET__` placeholders identified in Infisical `/prod` environment:
+  - **Critical Blockers:** `BACKSTAGE_DB_PASSWORD`, `INFISICAL_CLIENT_ID`, `INFISICAL_CLIENT_SECRET` (Backstage cannot start)
+  - **High Priority:** `GHOST_DB_PASSWORD`, `CF_TUNNEL_TOKEN_*`, `CF_DNS_API_TOKEN`, `KONG_ADMIN_KEY`
+  - **Medium Priority:** `INFISICAL_WEBHOOK_URL`, `ALERTMANAGER_WEBHOOK_URL`, `N8N_WEBHOOK_URL`
+  - **Full Audit:** See `docs/INFISICAL_SECRETS_AUDIT.md` for complete list and remediation plan
 
 **Next Steps:**
 1. **URGENT:** Complete replacement of weak passwords with placeholders (e.g., `POSTGRES_PASSWORD=CHANGE_ME_STRONG_PASSWORD`, `MARIADB_PASSWORD=CHANGE_ME_STRONG_PASSWORD`)
-2. Document password requirements and complexity rules
-3. Ensure production uses Infisical exclusively (verify no services use template passwords)
-4. Implement secrets scanning in CI/CD (Phase 6.1)
+2. **URGENT:** Replace `__UNSET__` placeholders with real values (see `docs/INFISICAL_SECRETS_AUDIT.md` for prioritized list)
+3. Document password requirements and complexity rules
+4. Ensure production uses Infisical exclusively (verify no services use template passwords)
+5. Implement secrets scanning in CI/CD (Phase 6.1)
 
 **Owner:** Security Team  
 **Dependencies:** CI/CD pipeline access
 
 **Phase 1 Agent Prompt:**  
 `Act as ai.engine security-agent. Validate Phase 1 credentials/Infisical coverage and secrets audit gaps, then update REMEDIATION_PLAN.md with findings. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh security`
+
+**Phase 1.4: Infisical __UNSET__ Placeholders Remediation** (NEW - 2025-11-22)
+
+**Issue:** `__UNSET__` placeholders in Infisical `/prod` blocking service startup and functionality  
+**Impact:** CRITICAL - Backstage cannot start, Ghost may fail, webhooks disabled, tunnels may fail
+
+**Actions:**
+```bash
+# Step 1: Review audit findings
+cat /root/infra/docs/INFISICAL_SECRETS_AUDIT.md
+
+# Step 2: Generate and store critical secrets (Backstage)
+# Generate password
+BACKSTAGE_DB_PASSWORD=$(openssl rand -base64 32)
+infisical secrets set --env prod --path /prod BACKSTAGE_DB_PASSWORD="$BACKSTAGE_DB_PASSWORD"
+
+# Create Infisical machine identity for Backstage (via UI)
+# Store INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET
+infisical secrets set --env prod --path /prod INFISICAL_CLIENT_ID="<from_infisical_ui>"
+infisical secrets set --env prod --path /prod INFISICAL_CLIENT_SECRET="<from_infisical_ui>"
+
+# Step 3: Generate and store Cloudflare tokens (via Cloudflare UI)
+# Generate tunnel tokens for each node
+infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_VPS="<from_cloudflare_ui>"
+infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_MAC="<from_cloudflare_ui>"
+infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_LINUX="<from_cloudflare_ui>"
+
+# Generate DNS API token
+infisical secrets set --env prod --path /prod CF_DNS_API_TOKEN="<from_cloudflare_ui>"
+
+# Step 4: Verify secrets are injected
+infisical export --env prod --path /prod --format env | grep -E "(BACKSTAGE|INFISICAL_CLIENT|CF_TUNNEL|CF_DNS)"
+
+# Step 5: Restart services after secret injection
+docker compose -f services/backstage/compose.yml restart backstage backstage-db
+```
+
+**Verification:**
+- [ ] All critical secrets stored in Infisical `/prod`
+- [x] Secrets appear in `.workspace/.env` (via Infisical Agent)
+- [x] Backstage containers restart successfully (2025-11-22)
+- [ ] Backstage health check passes (main app running, but health check status still "starting")
+- [ ] Cloudflare tunnels establish correctly
+- [ ] SSL certificates generate successfully
+
+**Status:** 🔄 IN PROGRESS (2025-11-22)  
+**Restart Status (2025-11-22):**
+- ✅ **Backstage containers restarted** - Both `backstage` and `backstage-db` containers restarted successfully
+- ✅ **Database healthy** - `backstage-db` container reports healthy status, PostgreSQL 16 ready to accept connections
+- ⚠️ **Main application running** - `backstage` container is running and listening on port 7007, but health check status remains "starting"
+- ❌ **Infisical plugin failed** - Plugin initialization failed due to empty `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` values; error: `TypeError: Invalid type in config for key 'infisical.authentication.universalAuth.clientId' in 'app-config.production.yaml', got empty-string, wanted string`
+- ⚠️ **Health check issue** - Health check may be failing because the container doesn't have `ps` command available (health check uses `ps aux | grep`)
+
+**Build Logs (2025-11-22 restart):**
+```
+backstage-db: PostgreSQL 16.11 started, database system ready to accept connections
+backstage: Loading config from MergedConfigSource...
+backstage: Listening on :7007
+backstage: Plugin initialization started (app, proxy, scaffolder, techdocs, auth, catalog, permission, search, kubernetes, notifications, signals, infisical-backend)
+backstage: Plugin initialization: proxy, techdocs initialized successfully
+backstage: Database migration completed, catalog plugin initialized
+backstage: Auth provider (guest) configured
+backstage: ERROR: Failed to initialize Infisical API client: TypeError: Invalid type in config for key 'infisical.authentication.universalAuth.clientId'...
+backstage: ERROR: Plugin 'infisical-backend' threw an error during startup
+backstage: Plugin initialization: app, scaffolder, auth, catalog, search, notifications initialized (infisical-backend failed)
+```
+
+**Next Actions:**
+1. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` environment
+2. Regenerate `.workspace/.env` via Infisical Agent
+3. Restart Backstage container to load new secrets
+4. Verify Infisical plugin initializes successfully
+5. Consider updating health check method if `ps` command unavailable
+
+**Documentation:** See `docs/INFISICAL_SECRETS_AUDIT.md` for complete audit, prioritized list, and remediation procedures  
+**Owner:** Infrastructure Lead  
+**Deadline:** 2025-11-29 (7 days from audit)
+
+**Phase 1.4 Agent Prompt:**  
+`Act as ai.engine docs-agent. Audit the Infisical /prod secret set for remaining __UNSET__ placeholders (GHOST, webhook, etc.), collect the required real values from owners, and document the expectations plus replacement plan in REMEDIATION_PLAN.md and supporting runbooks.`
 
 ---
 
@@ -372,6 +458,7 @@ docker inspect traefik --format='{{.State.Health.Status}}'
 **Current Progress:**  
 - [x] Backstage service skeleton deployed under `/root/infra/services/backstage/` with Traefik, PostgreSQL, and Infisical integration (per `server-changelog.md` entry); Docker build currently running but requires path adjustments before artifact creation.  
 - [x] Entire `.env` catalog injected into Infisical `prod` at path `/prod` (2025-11-22); `.workspace/.env` refreshed via `infisical export --env prod --path /prod`. Blank values were stored as the placeholder `__UNSET__` and need real credentials later.  
+- [x] **Infisical Secrets Audit Completed** (2025-11-22) - Comprehensive audit of `__UNSET__` placeholders documented in `docs/INFISICAL_SECRETS_AUDIT.md`
 - [ ] Backstage database container still needs to be restarted now that `BACKSTAGE_DB_PASSWORD`, `INFISICAL_CLIENT_ID`, and `INFISICAL_CLIENT_SECRET` are present in `.workspace/.env`; health verification pending.  
 - [ ] Service location audit and consolidation plan not started yet; existing root-level services still in place.  
 - [ ] Traefik configuration deduplication and health-check standardization work queued.

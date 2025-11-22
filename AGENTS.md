@@ -14,22 +14,24 @@ This document provides a standardized overview of all services and agents in the
 ### Critical Issues
 - ✅ **Traefik running** - Reverse proxy container healthy; dashboard reachable on `:8080`
 - ✅ **Health checks stabilized** - WikiJS, WordPress, Node-RED, Adminer, Infisical, n8n report healthy via process-oriented probes
-- ⚠️ **Backstage deployment blocked** - PostgreSQL container fails to initialize because `.workspace/.env` lacks `BACKSTAGE_DB_PASSWORD`, while Infisical client secrets are absent, preventing the build/health cycle from stabilizing; service still configured but not running
+- ⚠️ **Backstage partially running** - Both containers restarted (2025-11-22); database healthy, main application running on port 7007; Infisical plugin failed due to empty `INFISICAL_CLIENT_ID`/`INFISICAL_CLIENT_SECRET`; health check status "starting" (process check may be failing due to missing `ps` in container)
 
 ### Service Health Summary
-- ✅ **Healthy:** Traefik, Infisical, WikiJS, WordPress, n8n, Node-RED, Adminer, LinkStack, Monitoring stack (Grafana, Prometheus, Loki, Alertmanager), Databases (PostgreSQL, MySQL, Redis)
-- ⚙️ **Configured but not running/starting:** Mailu, Supabase, Mastodon, Help Service, Backstage (blocked by missing secrets for PostgreSQL/Infisical wiring)
+- ✅ **Healthy:** Traefik, Infisical, WikiJS, WordPress, n8n, Node-RED, Adminer, LinkStack, Monitoring stack (Grafana, Prometheus, Loki, Alertmanager), Databases (PostgreSQL, MySQL, Redis), Backstage DB
+- ⚠️ **Running with issues:** Backstage (main app running, Infisical plugin failed, health check pending)
+- ⚙️ **Configured but not running/starting:** Mailu, Supabase, Mastodon, Help Service
 
 ### Network Status
 - ✅ **edge network:** Created and available
 - ✅ **traefik-network:** Exists
 
 ### Next Steps
-1. Confirm Backstage Docker build completes and publish service status
+1. ✅ **Backstage containers restarted** (2025-11-22) - Both containers restarted successfully; database healthy; main app running; Infisical plugin requires secrets
 2. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
 3. Capture Infisical secret coverage for newly added services (Backstage + companions)
 4. Run deliberate preflight script to ensure dependencies sequence is honored
-5. Restart the Backstage compose stack now that secrets are in Infisical `/prod`, verify the DB initializes with the refreshed `.workspace/.env`, and document health status
+5. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
+6. Update Backstage health check method if `ps` command unavailable in container
 
 ---
 
@@ -139,7 +141,7 @@ This document provides a standardized overview of all services and agents in the
 ### Backstage
 - **Domain:** `backstage.freqkflag.co`
 - **Location:** `/root/infra/services/backstage/`
-- **Status:** ⚙️ Configured (Docker build in progress)
+- **Status:** ⚠️ Running (partial - Infisical plugin failed)
 - **Purpose:** Internal developer portal (Backstage)
 - **Database:** PostgreSQL 16 (auto-initialized on first start)
 - **Features:**
@@ -147,8 +149,22 @@ This document provides a standardized overview of all services and agents in the
   - Infisical plugin integration (`@infisical/backstage-plugin-infisical@^0.1.1`, backend & frontend wiring)
   - Configured via `services/backstage/backstage/app-config.production.yaml`
   - Documentation in `services/backstage/README.md` with usage steps and `entities-with-infisical.yaml` examples
-- **Notes:** Backend build currently requires source path adjustments; monitoring/health checks still pending.
-  - Infisical `/prod` now contains the `.env` catalog (2025-11-22) and `.workspace/.env` was regenerated; blank keys were stored as `__UNSET__` placeholders that should be replaced with proper values. Backstage containers still need a restart to consume the refreshed secrets and stabilize.
+- **Health Status (2025-11-22):**
+  - ✅ **backstage-db:** Healthy (PostgreSQL 16 ready to accept connections)
+  - ⚠️ **backstage:** Running but health check status "starting" - Main application listening on port 7007; Infisical backend plugin failed due to empty `INFISICAL_CLIENT_ID`/`INFISICAL_CLIENT_SECRET`; health check may be failing due to missing `ps` command in container
+- **Build Logs Summary (2025-11-22 restart):**
+  - Database initialized successfully, ready for connections
+  - Backstage application started, listening on :7007
+  - Plugin initialization: App, catalog, auth, scaffolder, search initialized successfully
+  - **Error:** Infisical plugin failed with `TypeError: Invalid type in config for key 'infisical.authentication.universalAuth.clientId' in 'app-config.production.yaml', got empty-string, wanted string`
+  - Main application continues running despite plugin failure
+- **Next Steps:**
+  - Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in `.workspace/.env` (from Infisical machine identity)
+  - Restart Backstage container after secrets are set
+  - Consider updating health check to use alternative method (e.g., HTTP endpoint) if `ps` is unavailable
+- **Previous Notes:**
+  - Infisical `/prod` now contains the `.env` catalog (2025-11-22) and `.workspace/.env` was regenerated; blank keys were stored as `__UNSET__` placeholders that should be replaced with proper values.
+  - **Secrets Audit Completed (2025-11-22):** Comprehensive audit of `__UNSET__` placeholders documented in `docs/INFISICAL_SECRETS_AUDIT.md`. Critical blockers identified: Backstage secrets (DB password, Infisical client credentials), Cloudflare tunnel tokens, Ghost database password. See `REMEDIATION_PLAN.md` Phase 1.4 for remediation plan and `docs/runbooks/SECRET_REPLACEMENT_RUNBOOK.md` for step-by-step procedures.
 
 ### Mailu
 - **Domain:** `mail.freqkflag.co` (admin), `webmail.freqkflag.co` (webmail)
@@ -176,6 +192,28 @@ This document provides a standardized overview of all services and agents in the
   - Auto-generated REST API
   - Web-based Studio interface
   - Schema management
+
+### GitLab
+- **Domain:** `gitlab.freqkflag.co`
+- **Location:** `/root/infra/gitlab/`
+- **Status:** 🔄 Starting (deployment in progress)
+- **Purpose:** Git repository hosting and DevOps platform (Community Edition)
+- **Database:** PostgreSQL (shared postgres service)
+- **Cache/Queue:** Redis (shared redis service)
+- **Features:**
+  - Git repository hosting
+  - CI/CD pipelines
+  - Issue tracking
+  - Code review
+  - Wiki and documentation
+  - Container registry
+- **Secrets Management:** Infisical integration via `.workspace/.env`
+- **Deployment:** Use `./deploy.sh` script or `docker compose up -d`
+- **Initial Setup:**
+  - Set secrets in Infisical `/prod` environment (see `gitlab/README.md`)
+  - Create database: `CREATE USER gitlab WITH PASSWORD '<password>'; CREATE DATABASE gitlab OWNER gitlab;`
+  - Access at `https://gitlab.freqkflag.co` with root user and password from `GITLAB_ROOT_PASSWORD`
+- **Note:** First boot takes 5-10 minutes for initialization
 
 ### Adminer
 - **Domain:** `adminer.freqkflag.co`
@@ -535,6 +573,7 @@ Each service follows a standardized structure:
 | `adminer.freqkflag.co` | Adminer | ✅ Running | DB management |
 | `nodered.freqkflag.co` | Node-RED | ✅ Running | Flow-based automation |
 | `backstage.freqkflag.co` | Backstage | ⚙️ Configured | Developer portal |
+| `gitlab.freqkflag.co` | GitLab CE | 🔄 Starting | Git repository hosting |
 | `cultofjoey.com` | WordPress | ✅ Running | Personal brand site |
 | `link.cultofjoey.com` | LinkStack | ✅ Running | Link-in-bio |
 | `twist3dkinkst3r.com` | Mastodon | ⚙️ Configured | Community instance |

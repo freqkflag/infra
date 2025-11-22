@@ -1,0 +1,90 @@
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    env_file:
+      - ../.workspace/.env
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://${GITLAB_DOMAIN}'
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT:-2224}
+        
+        # PostgreSQL configuration
+        postgresql['enable'] = false
+        gitlab_rails['db_adapter'] = 'postgresql'
+        gitlab_rails['db_encoding'] = 'unicode'
+        gitlab_rails['db_host'] = 'postgres'
+        gitlab_rails['db_port'] = 5432
+        gitlab_rails['db_username'] = '${GITLAB_DB_USER}'
+        gitlab_rails['db_password'] = '${GITLAB_DB_PASSWORD}'
+        gitlab_rails['db_database'] = '${GITLAB_DB_NAME}'
+        
+        # Redis configuration
+        redis['enable'] = false
+        gitlab_rails['redis_host'] = 'redis'
+        gitlab_rails['redis_port'] = 6379
+        gitlab_rails['redis_password'] = ''
+        
+        # Email configuration (optional, can be configured later)
+        gitlab_rails['smtp_enable'] = false
+        
+        # Security settings
+        gitlab_rails['initial_root_password'] = '${GITLAB_ROOT_PASSWORD}'
+        
+        # Performance tuning
+        puma['worker_processes'] = 2
+        sidekiq['max_concurrency'] = 10
+        
+        # Logging
+        logging['svlog'] = {
+          size: '200M',
+          rotate: 30,
+          compress: 'gzip'
+        }
+    volumes:
+      - ./data/config:/etc/gitlab
+      - ./data/logs:/var/log/gitlab
+      - ./data/data:/var/opt/gitlab
+    networks:
+      - gitlab-network
+      - traefik-network
+      - edge
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "gitlab-ctl status | grep -q 'run: gitlab-workhorse:.*ok' && exit 0 || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 600s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitlab.rule=Host(`${GITLAB_DOMAIN}`)"
+      - "traefik.http.routers.gitlab.entrypoints=websecure"
+      - "traefik.http.routers.gitlab.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.gitlab.middlewares=security-headers@file,rate-limit@file"
+      - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+      # SSH port forwarding (optional, for git clone via SSH)
+      - "traefik.tcp.routers.gitlab-ssh.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.gitlab-ssh.entrypoints=ssh"
+      - "traefik.tcp.routers.gitlab-ssh.service=gitlab-ssh"
+      - "traefik.tcp.services.gitlab-ssh.loadbalancer.server.port=${GITLAB_SSH_PORT:-2224}"
+
+networks:
+  gitlab-network:
+    driver: bridge
+  traefik-network:
+    external: true
+    name: traefik-network
+  edge:
+    external: true
+    name: edge
