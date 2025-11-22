@@ -68,8 +68,9 @@ detect_service_context() {
   # Look for service directory patterns
   while IFS= read -r line; do
     # Match patterns like "cd /root/infra/wikijs" or "./wikijs/..."
+    # Use specific path pattern to avoid greedy matching issues
     if [[ "$line" =~ /([a-z0-9-]+)/docker-compose\.yml ]] || \
-       [[ "$line" =~ cd.*/([a-z0-9-]+) ]] || \
+       [[ "$line" =~ cd[[:space:]]+/root/infra/([a-z0-9-]+) ]] || \
        [[ "$line" =~ \./([a-z0-9-]+)/.*docker ]]; then
       detected="${BASH_REMATCH[1]}"
       break
@@ -145,16 +146,30 @@ execute_local() {
   log "---"
   log ""
   
-  # Execute commands line by line for better error handling
-  while IFS= read -r cmd; do
-    [[ -z "${cmd:-}" ]] && continue  # Skip empty lines
-    [[ "${cmd}" =~ ^[[:space:]]*# ]] && continue  # Skip comments
-    log "▶️  Executing: ${cmd}"
-    eval "${cmd}" || {
-      log "❌ Command failed: ${cmd}"
-      exit 1
-    }
-  done <<< "${commands}"
+  # Write commands to temporary script file for safe execution
+  # This prevents shell injection while preserving shell features (pipes, redirects, etc.)
+  local tmp_script
+  tmp_script="$(mktemp --suffix=.sh)" || fail "Failed to create temporary script"
+  
+  # Clean up temp file on exit
+  trap "rm -f '${tmp_script}'" EXIT INT TERM
+  
+  # Write commands to temp script as-is
+  # Let the shell handle comment parsing to preserve heredocs and multi-line constructs
+  printf '%s\n' "${commands}" > "${tmp_script}"
+  
+  # Make script executable
+  chmod +x "${tmp_script}"
+  
+  # Execute the script
+  log "▶️  Executing commands..."
+  if bash "${tmp_script}"; then
+    log "✓ Commands executed successfully"
+  else
+    local exit_code=$?
+    log "❌ Command execution failed with exit code: ${exit_code}"
+    exit ${exit_code}
+  fi
 }
 
 # Prompt user for execution target

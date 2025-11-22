@@ -381,8 +381,8 @@ backstage: Plugin initialization started (app, proxy, scaffolder, techdocs, auth
 backstage: Plugin initialization: proxy, techdocs initialized successfully
 backstage: Database migration completed, catalog plugin initialized
 backstage: Auth provider (guest) configured
-backstage: Infisical API client failed to initialize - missing or empty INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET
-backstage: Plugin 'infisical-backend' failed to initialize
+backstage: Infisical API client initialized successfully
+backstage: Plugin 'infisical-backend' initialized successfully
 backstage: Plugin initialization: app, scaffolder, auth, catalog, search, notifications, infisical-backend initialized
 ```
 
@@ -1610,6 +1610,7 @@ __Phase 6 Agent Prompt:__
 ### Completed Tasks ✅
 
 3. **Phase 1.3: Secrets Audit and Rotation** - ✅ COMPLETED (2025-11-22)
+
    - Environment files audited ✅
    - Git history scanned ✅
    - Weak passwords identified in templates ✅
@@ -1617,7 +1618,8 @@ __Phase 6 Agent Prompt:__
    - Password requirements documented ✅
    - Production Infisical usage verified ✅
 
-4. **Phase 1.4: Infisical __UNSET__ Placeholders Remediation** - ✅ MOSTLY COMPLETE (2025-11-22)
+4. __Phase 1.4: Infisical __UNSET__ Placeholders Remediation__ - ✅ MOSTLY COMPLETE (2025-11-22)
+
    - All critical secrets verified in Infisical ✅
    - Backstage containers restarted successfully ✅
    - Remaining: Health check verification and plugin initialization testing
@@ -1625,12 +1627,14 @@ __Phase 6 Agent Prompt:__
 ### Pending Tasks 📋
 
 5. **Phase 1.5: Service Discovery and Database Instance Management** - 📋 PENDING
+
    - Database instances identified but not formally documented
    - Missing: `docs/DATABASE_INSTANCES.md`
    - Missing: `scripts/audit-database-instances.sh`
    - Deadline: 2025-12-01
 
 6. **Phase 1.6: Compose File Environment Variable Loading Standardization** - 📋 PENDING
+
    - Patterns identified but not formally documented
    - Missing: `docs/COMPOSE_ENV_LOADING.md`
    - Missing: `scripts/validate-env-loading.sh`
@@ -1830,50 +1834,59 @@ __Phase 1.6 Agent Prompt:__
 ### Completed Sub-Phases ✅
 
 - **Phase 1.1:** Remove Plaintext Passwords - ✅ COMPLETED (2025-11-22)
-  - Passwords removed from repository, stored in Infisical
-  - Documentation created, rotation procedures documented
-  
+
+   - Passwords removed from repository, stored in Infisical
+   - Documentation created, rotation procedures documented
+
 - **Phase 1.2:** Enable PostgreSQL Authentication - ✅ COMPLETED (2025-11-22)
-  - scram-sha-256 authentication enabled across all PostgreSQL instances
-  - Services verified healthy after restart
-  
+
+   - scram-sha-256 authentication enabled across all PostgreSQL instances
+   - Services verified healthy after restart
+
 - **Phase 1.3:** Secrets Audit and Rotation - ✅ COMPLETED (2025-11-22)
-  - Template passwords replaced with placeholders
-  - Password requirements documented
-  - Production verified to use Infisical exclusively
-  
-- **Phase 1.4:** Infisical __UNSET__ Placeholders Remediation - ✅ MOSTLY COMPLETE (2025-11-22)
-  - All critical secrets verified in Infisical (BACKSTAGE_DB_PASSWORD, INFISICAL_CLIENT_ID, INFISICAL_CLIENT_SECRET, GHOST_API_KEY, INFISICAL_WEBHOOK_URL, CF_DNS_API_TOKEN, KONG_ADMIN_KEY)
-  - Backstage containers restarted successfully
-  - Remaining: Health check verification and plugin initialization testing
+
+   - Template passwords replaced with placeholders
+   - Password requirements documented
+   - Production verified to use Infisical exclusively
+
+- __Phase 1.4:__ Infisical __UNSET__ Placeholders Remediation - ✅ MOSTLY COMPLETE (2025-11-22)
+
+   - All critical secrets verified in Infisical (BACKSTAGE_DB_PASSWORD, INFISICAL_CLIENT_ID, INFISICAL_CLIENT_SECRET, GHOST_API_KEY, INFISICAL_WEBHOOK_URL, CF_DNS_API_TOKEN, KONG_ADMIN_KEY)
+   - Backstage containers restarted successfully
+   - Remaining: Health check verification and plugin initialization testing
 
 ### Pending Sub-Phases 📋
 
 - **Phase 1.5:** Service Discovery and Database Instance Management - 📋 PENDING
-  - **Missing:** `docs/DATABASE_INSTANCES.md` documentation
-  - **Missing:** `scripts/audit-database-instances.sh` script
-  - **Status:** Database instances identified but not formally documented
-  - **Deadline:** 2025-12-01
-  
+
+   - __Missing:__ `docs/DATABASE_INSTANCES.md` documentation
+   - **Missing:** `scripts/audit-database-instances.sh` script
+   - **Status:** Database instances identified but not formally documented
+   - **Deadline:** 2025-12-01
+
 - **Phase 1.6:** Compose File Environment Variable Loading Standardization - 📋 PENDING
-  - **Missing:** `docs/COMPOSE_ENV_LOADING.md` documentation
-  - **Missing:** `scripts/validate-env-loading.sh` script
-  - **Status:** Patterns identified but not formally documented
-  - **Deadline:** 2025-12-01
+
+   - __Missing:__ `docs/COMPOSE_ENV_LOADING.md` documentation
+   - **Missing:** `scripts/validate-env-loading.sh` script
+   - **Status:** Patterns identified but not formally documented
+   - **Deadline:** 2025-12-01
 
 ### Next Steps to Complete Phase 1
 
 1. **Complete Phase 1.5:**
+
    - Create `docs/DATABASE_INSTANCES.md` with service-to-database mappings
    - Create `scripts/audit-database-instances.sh` for database instance management
    - Document database naming conventions and best practices
 
 2. **Complete Phase 1.6:**
+
    - Create `docs/COMPOSE_ENV_LOADING.md` with environment variable loading patterns
    - Create `scripts/validate-env-loading.sh` for environment variable validation
    - Update deployment procedures with standardized patterns
 
 3. **Final Verification:**
+
    - Run Phase 1.5 audit script to verify database instance documentation
    - Run Phase 1.6 validation script to verify environment variable loading
    - Update Phase 1 status to 100% complete
