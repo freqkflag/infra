@@ -5,10 +5,11 @@
 ## ✅ Completed Steps
 
 1. **Secrets stored in Infisical:**
-   - `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID` = `f2504243-280a-4456-b5a1-a58619d71f67`
-   - `INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET` = `c4c8d6968ee80934db83fd70d032c725335318fc0b59aa59c4c5d31bb00050f7`
+   - `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID` = `<stored in Infisical>`
+   - `INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET` = `<stored in Infisical>`
    - Location: `/prod` path in `prod` environment
    - Project ID: `8c430744-1a5b-4426-af87-e96d6b9c91e3`
+   - **⚠️ SECURITY NOTE:** If you previously saw hardcoded credentials in this file, they have been removed. Please rotate those credentials immediately in Infisical.
 
 2. **Setup verification:** ✅ All checks passed
 
@@ -43,15 +44,15 @@ Create or edit `~/.config/cursor/mcp.json` (Linux) or `~/Library/Application Sup
       "args": ["-y", "@infisical/mcp"],
       "env": {
         "INFISICAL_HOST_URL": "https://infisical.freqkflag.co",
-        "INFISICAL_UNIVERSAL_AUTH_CLIENT_ID": "f2504243-280a-4456-b5a1-a58619d71f67",
-        "INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET": "c4c8d6968ee80934db83fd70d032c725335318fc0b59aa59c4c5d31bb00050f7"
+        "INFISICAL_UNIVERSAL_AUTH_CLIENT_ID": "${INFISICAL_UNIVERSAL_AUTH_CLIENT_ID}",
+        "INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET": "${INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET}"
       }
     }
   }
 }
 ```
 
-**Note:** Using direct values for now. Once environment variables are synced, you can use `${VAR}` syntax.
+**Note:** Cursor IDE will read these values from your environment. Ensure `.workspace/.env` is loaded or set these variables manually before starting Cursor IDE.
 
 ### 3. Restart Cursor IDE
 
@@ -65,8 +66,11 @@ Create or edit `~/.config/cursor/mcp.json` (Linux) or `~/Library/Application Sup
 
 ```bash
 cd /root/infra/infisical-mcp
-export INFISICAL_UNIVERSAL_AUTH_CLIENT_ID=f2504243-280a-4456-b5a1-a58619d71f67
-export INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET=c4c8d6968ee80934db83fd70d032c725335318fc0b59aa59c4c5d31bb00050f7
+# Load credentials from .workspace/.env (auto-synced by Infisical Agent)
+source ../.workspace/.env
+# Or set manually:
+# export INFISICAL_UNIVERSAL_AUTH_CLIENT_ID=<your-client-id>
+# export INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET=<your-client-secret>
 export INFISICAL_HOST_URL=https://infisical.freqkflag.co
 npx @modelcontextprotocol/inspector npx -y @infisical/mcp
 ```
@@ -77,9 +81,10 @@ This launches a web UI where you can test all MCP tools.
 
 ```bash
 cd /root/infra/infisical-mcp
-export INFISICAL_UNIVERSAL_AUTH_CLIENT_ID=f2504243-280a-4456-b5a1-a58619d71f67
-export INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET=c4c8d6968ee80934db83fd70d032c725335318fc0b59aa59c4c5d31bb00050f7
-export INFISICAL_HOST_URL=https://infisical.freqkflag.co
+# The test script will automatically load from .workspace/.env
+# Or set manually before running:
+# export INFISICAL_UNIVERSAL_AUTH_CLIENT_ID=<your-client-id>
+# export INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET=<your-client-secret>
 ./test.sh
 ```
 

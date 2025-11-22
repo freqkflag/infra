@@ -109,6 +109,7 @@ This document provides a standardized overview of all services and agents in the
   - Runs via `npx -y @infisical/mcp`
 - **Documentation:** See `infisical-mcp/README.md` and `infisical-mcp/CURSOR_CONFIG.md`
 - **Setup:** Run `./setup.sh` to verify configuration and get setup instructions
+- **Security Note (2025-11-22):** Fixed critical security issue where Machine Identity credentials were hardcoded in `QUICK_START.md`. All hardcoded credentials have been removed and replaced with environment variable references. If credentials were previously exposed, they must be rotated immediately in Infisical.
 - **Next Steps:**
   - Create Machine Identity in Infisical with Universal Auth
   - Set credentials in Infisical `/prod` path

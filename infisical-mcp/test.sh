@@ -7,6 +7,16 @@ set -e
 echo "=== Infisical MCP Server Test ==="
 echo ""
 
+# Load from .workspace/.env if available (BEFORE validation checks)
+if [ -f "../.workspace/.env" ]; then
+    echo "Loading environment variables from .workspace/.env..."
+    set -a
+    source ../.workspace/.env
+    set +a
+    echo "✅ Environment variables loaded"
+    echo ""
+fi
+
 # Check if required environment variables are set
 if [ -z "$INFISICAL_UNIVERSAL_AUTH_CLIENT_ID" ]; then
     echo "❌ INFISICAL_UNIVERSAL_AUTH_CLIENT_ID not set"
@@ -20,17 +30,10 @@ fi
 
 if [ -z "$INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET" ]; then
     echo "❌ INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET not set"
-    exit 1
-fi
-
-# Load from .workspace/.env if available
-if [ -f "../.workspace/.env" ]; then
-    echo "Loading environment variables from .workspace/.env..."
-    set -a
-    source ../.workspace/.env
-    set +a
-    echo "✅ Environment variables loaded"
+    echo "   Source from .workspace/.env or set manually"
     echo ""
+    echo "   export INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET=<client-secret>"
+    exit 1
 fi
 
 # Set default INFISICAL_HOST_URL if not set
