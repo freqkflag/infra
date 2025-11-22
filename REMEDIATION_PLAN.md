@@ -373,7 +373,7 @@ docker compose -f services/backstage/compose.yml restart backstage backstage-db
 
 **Build Logs (2025-11-22 restart):**
 
-```yaml
+```text
 backstage-db: PostgreSQL 16.11 started, database system ready to accept connections
 backstage: Loading config from MergedConfigSource...
 backstage: Listening on :7007

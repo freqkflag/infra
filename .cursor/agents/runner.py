@@ -237,7 +237,8 @@ def execute_script(
         return 0
     except SystemExit as e:
         # Allow scripts to exit with a code
-        return e.code if isinstance(e.code, int) else 0
+        # Non-integer exit codes (e.g., strings) indicate failure -> return 1
+        return e.code if isinstance(e.code, int) else 1
     except Exception as e:
         print(f"Error executing script {script_path}: {e}", file=sys.stderr)
         import traceback

@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: backstage
     env_file:
-      - /root/infra/.workspace/.env
+      - ../../.workspace/.env
     environment:
       NODE_ENV: production
       POSTGRES_HOST: backstage-db
