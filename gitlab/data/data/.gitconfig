@@ -4,7 +4,7 @@
 
 [user]
         name = GitLab
-        email = gitlab@gitlab.freqkflag.co
+        email = gitlab@
 [core]
         autocrlf = input
 [gc]

@@ -17,9 +17,13 @@
 8. **refactor** (`refactor-agent.md`) - Refactor & cleanup strategy
 9. **release** (`release-agent.md`) - Release readiness, blockers, release notes
 
+### Integration Agent
+
+10. **mcp_agent** (`mcp-agent.md`) - MCP server integration and tool usage guidance
+
 ### Orchestration Agent
 
-10. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
+11. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
 
 ## Helper Scripts
 
@@ -62,7 +66,24 @@ Act as bug_hunter. Scan /root/infra. Return crit bugs + fixes in strict JSON.
 ```
 Use the Multi-Agent Orchestrator preset. Focus on /root/infra first, then repo-wide context. 
 Return a single strict JSON object with aggregated output from:
-status_agent, bug_hunter, performance, security, architecture, docs, tests, refactor, release.
+status_agent, bug_hunter, performance, security, architecture, docs, tests, refactor, release, mcp_agent.
+```
+
+### MCP Integration
+
+All agents can use MCP (Model Context Protocol) servers for infrastructure operations:
+
+- **Infisical MCP** - Secrets management (`mcp_infisical_*` tools)
+- **Cloudflare MCP** - DNS management (`mcp_cloudflare_*` tools)
+- **WikiJS MCP** - Documentation management (`mcp_wikijs_*` tools)
+- **Browser MCP** - Browser automation (`mcp_cursor-ide-browser_*` tools)
+
+**See [MCP_INTEGRATION.md](../MCP_INTEGRATION.md) for complete MCP integration documentation.**
+
+**Example with MCP:**
+```
+Act as security agent. Use Infisical MCP to audit secrets, then evaluate /root/infra. 
+Return vulnerabilities + fixes in strict JSON.
 ```
 
 ## Agent Characteristics
@@ -87,6 +108,7 @@ All agents output strict JSON with structured fields:
 - **tests**: `{ coverage_summary, missing_tests, flaky_tests, high_priority_test_targets }`
 - **refactor**: `{ refactor_targets, duplication_groups, legacy_patterns, simplifications }`
 - **release**: `{ release_readiness, blockers, required_changes, draft_release_notes }`
+- **mcp_agent**: `{ mcp_servers_available, mcp_opportunities, mcp_integration_recommendations, mcp_usage_patterns, missing_mcp_integrations, mcp_best_practices }`
 - **orchestrator**: Aggregates all agent outputs + `{ global_next_steps, exec }`
 
 ## Files Created
@@ -103,11 +125,16 @@ All agents output strict JSON with structured fields:
 │   ├── tests-agent.md           ✅
 │   ├── refactor-agent.md        ✅
 │   ├── release-agent.md         ✅
+│   ├── development-agent.md     ✅
+│   ├── ops-agent.md             ✅
+│   ├── mcp-agent.md             ✅
 │   ├── orchestrator-agent.md    ✅
 │   └── README.md                ✅
 ├── scripts/
 │   ├── invoke-agent.sh          ✅
 │   └── list-agents.sh           ✅
+├── PROMPT_CATALOG.md            ✅
+├── MCP_INTEGRATION.md           ✅
 ├── README.md                     ✅
 └── AGENTS_SUMMARY.md            ✅ (this file)
 ```
@@ -126,9 +153,25 @@ All agents output strict JSON with structured fields:
 - **Infrastructure Runbook** (`/root/infra/runbooks/infra-runbook.md`) - Orchestrator usage
 - **Orchestration Reports** (`/root/infra/orchestration/`) - Save orchestration JSONs
 - **CI/CD Pipeline** - Can invoke agents in automated workflows
+- **MCP Servers** - Direct infrastructure service access via MCP tools
+  - Infisical MCP (`@infisical/mcp`) - Secrets management
+  - Cloudflare MCP (custom) - DNS management
+  - WikiJS MCP (custom) - Documentation management
+  - Browser MCP (built-in) - Browser automation
+
+## MCP Integration
+
+**See [MCP_INTEGRATION.md](../MCP_INTEGRATION.md) for complete MCP integration documentation.**
+
+All agents can use MCP tools through function calling. MCP servers provide direct access to:
+- Secrets management (Infisical)
+- DNS configuration (Cloudflare)
+- Documentation (WikiJS)
+- Browser automation (Cursor IDE)
 
 ---
 
 **Status:** ✅ Complete  
-**Ready for use:** Yes
+**Ready for use:** Yes  
+**MCP Integration:** ✅ Available
 

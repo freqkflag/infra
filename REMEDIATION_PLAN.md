@@ -602,6 +602,279 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 
 ---
 
+### 3.4 Implement MCP Server Integration for Agent Automation
+
+**Issue:** Agents lack direct programmatic access to infrastructure services (Kong, Docker, Monitoring, GitLab)  
+**Impact:** MEDIUM - Manual intervention required for routing changes, container management, health validation, and GitLab workflows  
+**Root Cause:** MCP servers not yet implemented for infrastructure services (identified in AGENTS.md as expansion targets)
+
+**Actions:**
+
+#### 3.4.1 Kong Admin MCP Server (API Gatekeeper Agent)
+
+**Purpose:** Enable API Gatekeeper agent to manage Kong routes, services, plugins, and certificates via MCP
+
+**Actions:**
+```bash
+# Step 1: Create Kong MCP server
+# scripts/kong-mcp-server.js
+# - Authenticate with Kong Admin API (kong:8001)
+# - Implement tools:
+#   - list_services: GET /services
+#   - list_routes: GET /routes
+#   - apply_service_patch: PATCH /services/:id
+#   - sync_plugin: POST /plugins
+#   - reload: POST /config?check=false
+
+# Step 2: Register in Cursor MCP configuration
+# /root/.cursor/mcp.json
+# {
+#   "mcpServers": {
+#     "kong": {
+#       "command": "node",
+#       "args": ["/root/infra/scripts/kong-mcp-server.js"],
+#       "env": {
+#         "KONG_ADMIN_URL": "http://kong:8001",
+#         "KONG_ADMIN_KEY": "${KONG_ADMIN_KEY}"
+#       }
+#     }
+#   }
+# }
+
+# Step 3: Test MCP tools
+# - Verify list_services returns Kong services
+# - Test route creation via apply_service_patch
+# - Validate plugin synchronization
+
+# Step 4: Update API Gatekeeper agent documentation
+# - Document MCP tool usage
+# - Add examples to AGENTS.md
+```
+
+**Verification:**
+- [ ] Kong MCP server created and tested
+- [ ] MCP server registered in `/root/.cursor/mcp.json`
+- [ ] All tools (list_services, list_routes, apply_service_patch, sync_plugin, reload) functional
+- [ ] API Gatekeeper agent can manage Kong via MCP
+- [ ] Documentation updated in AGENTS.md
+
+**Status:** 📋 PENDING  
+**Owner:** API Gatekeeper Agent / DevOps Team  
+**Dependencies:** Kong Admin API access, MCP server framework  
+**Deadline:** 2025-12-15
+
+**Agent Prompt:**  
+`Act as API Gatekeeper. Build scripts/kong-mcp-server.js that wraps the Kong Admin API on kong:8001 with tools list_services/list_routes/apply_service_patch/sync_plugin/reload, then register it in /root/.cursor/mcp.json. Expected outcome: Kong routing changes can be performed entirely through MCP.`
+
+---
+
+#### 3.4.2 Docker/Compose MCP Server (Deployment Runner Agent)
+
+**Purpose:** Enable Deployment Runner and Ops agents to manage container lifecycle via MCP
+
+**Actions:**
+```bash
+# Step 1: Create Docker/Compose MCP server
+# scripts/docker-compose-mcp-server.js
+# - Shell out to docker commands
+# - Implement tools:
+#   - list_containers: docker ps --format json
+#   - compose_up: DEVTOOLS_WORKSPACE=/root/infra docker compose -f compose.orchestrator.yml up -d
+#   - compose_down: DEVTOOLS_WORKSPACE=/root/infra docker compose -f compose.orchestrator.yml down
+#   - compose_logs: DEVTOOLS_WORKSPACE=/root/infra docker compose -f compose.orchestrator.yml logs
+#   - health_report: Aggregate docker ps health status
+
+# Step 2: Register in Cursor MCP configuration
+# /root/.cursor/mcp.json
+# {
+#   "mcpServers": {
+#     "docker-compose": {
+#       "command": "node",
+#       "args": ["/root/infra/scripts/docker-compose-mcp-server.js"],
+#       "env": {
+#         "DEVTOOLS_WORKSPACE": "/root/infra"
+#       }
+#     }
+#   }
+# }
+
+# Step 3: Test MCP tools
+# - Verify list_containers returns container list
+# - Test compose_up/compose_down operations
+# - Validate health_report aggregation
+
+# Step 4: Update Deployment Runner agent documentation
+# - Document MCP tool usage
+# - Add examples to AGENTS.md
+```
+
+**Verification:**
+- [ ] Docker/Compose MCP server created and tested
+- [ ] MCP server registered in `/root/.cursor/mcp.json`
+- [ ] All tools (list_containers, compose_up, compose_down, compose_logs, health_report) functional
+- [ ] Deployment Runner agent can manage containers via MCP
+- [ ] Documentation updated in AGENTS.md
+
+**Status:** 📋 PENDING  
+**Owner:** Deployment Runner Agent / DevOps Team  
+**Dependencies:** Docker socket access, MCP server framework  
+**Deadline:** 2025-12-15
+
+**Agent Prompt:**  
+`Act as Deployment Runner. Implement a Docker/Compose MCP server that shells out to docker ps and DEVTOOLS_WORKSPACE=/root/infra docker compose -f compose.orchestrator.yml … with tools list_containers/compose_up/compose_down/compose_logs/health_report, plus config in mcp.json. Expected outcome: container lifecycle control is exposed to MCP agents.`
+
+---
+
+#### 3.4.3 Monitoring MCP Server (Status Agent)
+
+**Purpose:** Enable Status and Security agents to query Prometheus, Grafana, and Alertmanager via MCP
+
+**Actions:**
+```bash
+# Step 1: Create Monitoring MCP server
+# scripts/monitoring-mcp-server.js
+# - Authenticate with Prometheus (https://prometheus.freqkflag.co/api/v1/query)
+# - Authenticate with Grafana API
+# - Authenticate with Alertmanager API
+# - Implement tools:
+#   - prom_query: POST /api/v1/query with PromQL
+#   - grafana_dashboard: GET /api/dashboards/:uid
+#   - alertmanager_list: GET /api/v2/alerts
+#   - ack_alert: POST /api/v2/silences
+
+# Step 2: Register in Cursor MCP configuration
+# /root/.cursor/mcp.json
+# {
+#   "mcpServers": {
+#     "monitoring": {
+#       "command": "node",
+#       "args": ["/root/infra/scripts/monitoring-mcp-server.js"],
+#       "env": {
+#         "PROMETHEUS_URL": "https://prometheus.freqkflag.co",
+#         "GRAFANA_URL": "https://grafana.freqkflag.co",
+#         "ALERTMANAGER_URL": "https://alertmanager.freqkflag.co"
+#       }
+#     }
+#   }
+# }
+
+# Step 3: Test MCP tools
+# - Verify prom_query executes PromQL queries
+# - Test grafana_dashboard retrieval
+# - Validate alertmanager_list and ack_alert
+
+# Step 4: Document in MCP Integration guide
+# - Update ai.engine/MCP_INTEGRATION.md
+# - Add monitoring MCP server section
+# - Document tool usage and examples
+```
+
+**Verification:**
+- [ ] Monitoring MCP server created and tested
+- [ ] MCP server registered in `/root/.cursor/mcp.json`
+- [ ] All tools (prom_query, grafana_dashboard, alertmanager_list, ack_alert) functional
+- [ ] Status agent can query monitoring systems via MCP
+- [ ] Documentation updated in `ai.engine/MCP_INTEGRATION.md`
+
+**Status:** 📋 PENDING  
+**Owner:** Status Agent / DevOps Team  
+**Dependencies:** Prometheus, Grafana, Alertmanager API access, MCP server framework  
+**Deadline:** 2025-12-15
+
+**Agent Prompt:**  
+`Act as Status Agent. Create a Monitoring MCP server under scripts/monitoring-mcp-server.js that hits Prometheus (https://prometheus.freqkflag.co/api/v1/query), Grafana, and Alertmanager for prom_query/grafana_dashboard/alertmanager_list/ack_alert tools, then document it in ai.engine/MCP_INTEGRATION.md. Expected outcome: health/alert validation can be done via MCP.`
+
+---
+
+#### 3.4.4 GitLab MCP Server (Release Agent)
+
+**Purpose:** Enable Release and Development agents to manage GitLab projects, pipelines, issues, and variables via MCP
+
+**Actions:**
+```bash
+# Step 1: Create GitLab MCP server
+# scripts/gitlab-mcp-server.js
+# - Authenticate with GitLab API (https://gitlab.freqkflag.co/api/v4)
+# - Use Personal Access Token from Infisical
+# - Implement tools:
+#   - list_projects: GET /projects
+#   - get_pipeline_status: GET /projects/:id/pipelines/:pipeline_id
+#   - create_issue: POST /projects/:id/issues
+#   - update_variable: PUT /projects/:id/variables/:key
+
+# Step 2: Retrieve GitLab PAT from Infisical
+# - Add GITLAB_PAT to Infisical /prod environment
+# - Generate PAT with api, read_repository, write_repository scopes
+# - Store securely in Infisical
+
+# Step 3: Register in Cursor MCP configuration
+# /root/.cursor/mcp.json
+# {
+#   "mcpServers": {
+#     "gitlab": {
+#       "command": "node",
+#       "args": ["/root/infra/scripts/gitlab-mcp-server.js"],
+#       "env": {
+#         "GITLAB_URL": "https://gitlab.freqkflag.co",
+#         "GITLAB_PAT": "${GITLAB_PAT}"
+#       }
+#     }
+#   }
+# }
+
+# Step 4: Test MCP tools
+# - Verify list_projects returns GitLab projects
+# - Test get_pipeline_status for existing pipelines
+# - Validate create_issue and update_variable operations
+
+# Step 5: Update agent documentation
+# - Update AGENTS.md with GitLab MCP server
+# - Update PREFERENCES.md with GitLab workflow examples
+# - Document PAT requirements and scopes
+```
+
+**Verification:**
+- [ ] GitLab MCP server created and tested
+- [ ] GitLab PAT stored in Infisical `/prod` environment
+- [ ] MCP server registered in `/root/.cursor/mcp.json`
+- [ ] All tools (list_projects, get_pipeline_status, create_issue, update_variable) functional
+- [ ] Release agent can manage GitLab via MCP
+- [ ] Documentation updated in AGENTS.md and PREFERENCES.md
+
+**Status:** 📋 PENDING  
+**Owner:** Release Agent / DevOps Team  
+**Dependencies:** GitLab API access, Personal Access Token, MCP server framework  
+**Deadline:** 2025-12-15
+
+**Agent Prompt:**  
+`Act as Release Agent. Add a GitLab MCP server that authenticates with a PAT from Infisical and exposes list_projects/get_pipeline_status/create_issue/update_variable tools for https://gitlab.freqkflag.co/api/v4, updating AGENTS + PREFERENCES once registered. Expected outcome: GitLab workflows can be executed through MCP tooling.`
+
+---
+
+**Phase 3.4 Summary:**
+
+**Status:** 📋 PENDING  
+**Timeline:** Days 11-21 (Week 2-3)  
+**Priority:** 🟡 MEDIUM  
+**Risk:** LOW - Enhancement to existing agent capabilities
+
+**Dependencies:**
+- MCP server framework (Node.js)
+- Service API access (Kong, Prometheus, Grafana, Alertmanager, GitLab)
+- Infisical for secret storage (GitLab PAT)
+- Cursor IDE MCP configuration access
+
+**Success Criteria:**
+- All four MCP servers implemented and tested
+- MCP servers registered in `/root/.cursor/mcp.json`
+- Agents can perform operations via MCP tools
+- Documentation updated in AGENTS.md, PREFERENCES.md, and ai.engine/MCP_INTEGRATION.md
+
+**Phase 3.4 Agent Prompt:**  
+`Act as ai.engine mcp-agent. Review MCP expansion targets from AGENTS.md, implement the four MCP servers (Kong, Docker/Compose, Monitoring, GitLab), register them in Cursor MCP config, and update documentation. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh mcp`
+
+---
+
 ## Phase 4: Testing and Validation (Week 3-4)
 
 **Priority:** 🟡 MEDIUM  
@@ -1001,6 +1274,7 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 - ✅ Services consolidated to /services
 - ✅ Traefik configuration standardized
 - ✅ Health checks standardized
+- 📋 MCP server integration implemented (Kong, Docker/Compose, Monitoring, GitLab)
 
 **Phase 4 Complete:**
 - ✅ Compose validation automated
@@ -1064,7 +1338,23 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 
 ### Immediate Actions (Phase 1 - URGENT)
 
-1. **🟠 HIGH: Complete credential rotation** ⚠️ **IN PROGRESS**
+1. **🟠 HIGH: Audit and document database instances** 📋 **NEW** (2025-11-22)
+   - Document all PostgreSQL, MySQL/MariaDB, and Redis instances
+   - Create service-to-database mapping documentation
+   - Identify and remove orphaned instances
+   - Standardize database service naming conventions
+   - **Reference:** See Phase 1.5 for detailed procedure
+   - **Impact:** Prevents service connection confusion and version mismatches
+
+2. **🟠 HIGH: Standardize environment variable loading** 📋 **NEW** (2025-11-22)
+   - Document orchestrator vs service compose file patterns
+   - Create environment variable validation scripts
+   - Update deployment procedures with best practices
+   - Add preflight checks for environment variable availability
+   - **Reference:** See Phase 1.6 for detailed procedure
+   - **Impact:** Prevents service startup failures due to missing secrets
+
+3. **🟠 HIGH: Complete credential rotation** ⚠️ **IN PROGRESS**
    - ✅ New strong passwords generated (2025-11-21)
    - ✅ Scripts updated (reset-ghost-password.js)
    - ✅ Rotation documentation created (`docs/CREDENTIAL_ROTATION.md`)
@@ -1092,10 +1382,13 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 
 ### Ongoing Actions
 
-4. **Begin Phase 3** - Infrastructure standardization (services consolidation, Traefik config standardization)
-5. **Plan Phase 5** - Health check monitoring integration with Prometheus/Grafana
-6. **Review and approve plan** - Infrastructure Lead
-7. **Assign phase owners** - Team leads
+4. **Begin Phase 1.5** - Database instance audit and service discovery standardization
+5. **Begin Phase 1.6** - Compose file environment variable loading standardization
+6. **Begin Phase 3** - Infrastructure standardization (services consolidation, Traefik config standardization)
+   - **3.4: Implement MCP Server Integration** - Kong, Docker/Compose, Monitoring, GitLab MCP servers
+7. **Plan Phase 5** - Health check monitoring integration with Prometheus/Grafana
+8. **Review and approve plan** - Infrastructure Lead
+9. **Assign phase owners** - Team leads
 
 ---
 
@@ -1154,14 +1447,160 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 
 ---
 
-**Plan Version:** 1.2  
-**Last Updated:** 2025-11-21 (Phase 1 & 2 Status Update)  
-**Owner:** Infrastructure Team  
-**Status:** Active - Phase 1 in progress (2.5/3 tasks), Phase 2 completed (1/3 tasks)
+## Phase 1.5: Service Discovery and Database Instance Management (NEW - 2025-11-22)
 
-### Recent Updates (2025-11-21)
+**Issue:** Multiple database instances causing service connection confusion, environment variable loading inconsistencies  
+**Impact:** HIGH - Services connecting to wrong database versions, configuration drift, deployment failures  
+**Root Cause:** Discovered during GitLab deployment verification (2025-11-22)
+
+**Actions:**
+```bash
+# Step 1: Audit all database instances
+docker ps -a --filter "name=postgres" --format "{{.Names}}\t{{.Image}}\t{{.Status}}"
+docker ps -a --filter "name=mysql\|mariadb" --format "{{.Names}}\t{{.Image}}\t{{.Status}}"
+docker ps -a --filter "name=redis" --format "{{.Names}}\t{{.Image}}\t{{.Status}}"
+
+# Step 2: Document service-to-database mappings
+# Create docs/DATABASE_INSTANCES.md with:
+# - Container names and purposes
+# - Version information
+# - Network assignments
+# - Service dependencies
+
+# Step 3: Standardize database service names
+# - Use consistent naming: <service>-<dbtype>-<instance>
+# - Or use orchestrator service names: postgres, mariadb, redis
+# - Document which services should use which instances
+
+# Step 4: Update service configurations
+# - Ensure all services use correct database hostnames
+# - Verify network connectivity before deployment
+# - Test database connections during health checks
+
+# Step 5: Create database instance management script
+# scripts/audit-database-instances.sh
+# - List all database containers
+# - Show version information
+# - Display network assignments
+# - Identify orphaned instances
+```
+
+**Verification:**
+- [ ] All database instances documented
+- [ ] Service-to-database mappings created
+- [ ] Orphaned instances identified and removed
+- [ ] Service configurations updated with correct hostnames
+- [ ] Network connectivity verified for all services
+
+**Status:** 📋 PENDING  
+**Findings (2025-11-22):**
+- **Multiple PostgreSQL Instances:**
+  - `infra-postgres-1` (orchestrator) - PostgreSQL 16, restarting due to missing secrets
+  - `infisical-db` (infisical service) - PostgreSQL 15, healthy but wrong version
+  - `postgres-postgres-1` (service compose) - PostgreSQL 16, correct instance
+- **Environment Variable Loading:**
+  - Orchestrator compose (`compose.orchestrator.yml`) doesn't load `.workspace/.env` via `env_file`
+  - Service-level compose files (`services/*/compose.yml`) properly use `env_file: ../../.workspace/.env`
+  - **Recommendation:** Always use service-level compose files for services requiring secrets
+- **Service Discovery Issues:**
+  - GitLab initially connected to `infisical-db` (PostgreSQL 15) instead of `postgres-postgres-1` (PostgreSQL 16)
+  - Required explicit container name in configuration
+  - **Recommendation:** Use explicit container names or ensure consistent service naming
+
+**Best Practices Identified:**
+1. **Service Discovery:** Use explicit container names when multiple instances exist
+2. **Compose File Hierarchy:** Service-level compose files with `env_file` are more reliable than orchestrator-level
+3. **Configuration Persistence:** Some services (GitLab) cache configuration; full container restarts required for changes
+4. **Database Version Verification:** Always verify which instance a service is connecting to
+5. **Network Connectivity:** Verify DNS resolution before assuming connectivity
+
+**Owner:** Infrastructure Team / DevOps Team  
+**Dependencies:** None  
+**Deadline:** 2025-12-01 (9 days from identification)
+
+**Phase 1.5 Agent Prompt:**  
+`Act as ai.engine compose-engineer. Audit all database instances, document service-to-database mappings, identify orphaned instances, and create database instance management procedures. Update REMEDIATION_PLAN.md with findings. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh compose-engineer`
+
+---
+
+## Phase 1.6: Compose File Environment Variable Loading Standardization (NEW - 2025-11-22)
+
+**Issue:** Inconsistent environment variable loading between orchestrator and service compose files  
+**Impact:** HIGH - Services fail to start due to missing environment variables, secrets not injected  
+**Root Cause:** Discovered during PostgreSQL and GitLab deployment (2025-11-22)
+
+**Actions:**
+```bash
+# Step 1: Document environment variable loading patterns
+# docs/COMPOSE_ENV_LOADING.md
+# - Orchestrator compose: Requires shell environment or explicit --env-file
+# - Service compose: Uses env_file directive
+# - Best practices for each pattern
+
+# Step 2: Create environment variable validation script
+# scripts/validate-env-loading.sh
+# - Check if required variables are available
+# - Verify env_file paths are correct
+# - Test variable injection at runtime
+
+# Step 3: Standardize compose file patterns
+# - Service-level: Always use env_file: ../../.workspace/.env
+# - Orchestrator-level: Document requirement for shell environment
+# - Create helper script for orchestrator deployments
+
+# Step 4: Update deployment procedures
+# - Document when to use orchestrator vs service compose
+# - Add pre-deployment validation checks
+# - Create deployment helper scripts
+
+# Step 5: Add to preflight checks
+# scripts/preflight.sh
+# - Validate environment variables before deployment
+# - Check env_file paths exist
+# - Verify secrets are loaded
+```
+
+**Verification:**
+- [ ] Environment loading patterns documented
+- [ ] Validation script created and tested
+- [ ] Compose file patterns standardized
+- [ ] Deployment procedures updated
+- [ ] Preflight checks enhanced
+
+**Status:** 📋 PENDING  
+**Findings (2025-11-22):**
+- **Orchestrator Compose Issue:**
+  - `compose.orchestrator.yml` doesn't use `env_file` directive
+  - Requires environment variables in shell or explicit `--env-file` flag
+  - PostgreSQL service failed to start because `POSTGRES_PASSWORD` wasn't in shell environment
+- **Service Compose Success:**
+  - `services/postgres/compose.yml` uses `env_file: ../../.workspace/.env`
+  - Successfully loads secrets from `.workspace/.env`
+  - PostgreSQL started successfully when using service compose file
+- **Recommendation:**
+  - Use service-level compose files for services requiring secrets
+  - Or update orchestrator compose to use `env_file` where needed
+  - Document deployment patterns clearly
+
+**Owner:** DevOps Team / Infrastructure Lead  
+**Dependencies:** None  
+**Deadline:** 2025-12-01 (9 days from identification)
+
+**Phase 1.6 Agent Prompt:**  
+`Act as ai.engine compose-engineer. Document environment variable loading patterns, create validation scripts, standardize compose file usage, and update deployment procedures. Update REMEDIATION_PLAN.md with recommendations. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh compose-engineer`
+
+---
+
+**Plan Version:** 1.3  
+**Last Updated:** 2025-11-22 (Added Phase 1.5 and 1.6 based on GitLab deployment troubleshooting)  
+**Owner:** Infrastructure Team  
+**Status:** Active - Phase 1 in progress (2.5/6 tasks), Phase 2 completed (1/3 tasks), Phase 3 expanded (4 sub-phases including MCP integration)
+
+### Recent Updates (2025-11-22)
 - ✅ Phase 1.2 completed: PostgreSQL authentication enabled and restarted, all services verified healthy
 - ✅ Phase 2.1 completed: All service health checks verified and working correctly
 - 🔄 Phase 1.3 in progress: Template password replacement started but needs completion
 - 🔄 Phase 1.1 in progress: New passwords generated, documentation created, manual rotation required
 - ⚠️ CRITICAL: System password rotation pending (see `docs/CREDENTIAL_ROTATION.md`)
+- 📋 Phase 1.5 added: Service discovery and database instance management (based on GitLab deployment troubleshooting)
+- 📋 Phase 1.6 added: Compose file environment variable loading standardization (based on PostgreSQL startup issues)

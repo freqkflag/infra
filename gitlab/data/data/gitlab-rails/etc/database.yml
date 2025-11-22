@@ -7,10 +7,10 @@ production:
     adapter: postgresql
     encoding: unicode
     collation: 
-    database: gitlab
-    username: "gitlab"
-    password: "wJOBfNCBJHrYbOsXkK9OTuYS6"
-    host: "infisical-db"
+    database: 
+    username: ""
+    password: ""
+    host: "postgres-postgres-1"
     port: 5432
     socket: 
     sslmode: 
@@ -34,10 +34,10 @@ production:
     adapter: postgresql
     encoding: unicode
     collation: 
-    database: gitlab
-    username: "gitlab"
-    password: "wJOBfNCBJHrYbOsXkK9OTuYS6"
-    host: "infisical-db"
+    database: 
+    username: ""
+    password: ""
+    host: "postgres-postgres-1"
     port: 5432
     socket: 
     sslmode: 

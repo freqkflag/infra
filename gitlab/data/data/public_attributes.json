@@ -1,1 +1,1 @@
-{"postgresql":{"dir":"/var/opt/gitlab/postgresql","unix_socket_directory":"/var/opt/gitlab/postgresql","port":5432},"registry":{"dir":"/var/opt/gitlab/registry"},"gitlab":{"gitlab_rails":{"db_database":"gitlab","databases":{"main":"gitlab","ci":"gitlab"}}}}
+{"gitlab":{"gitlab_rails":{"db_database":"gitlab","databases":{"main":"gitlab","ci":"gitlab"}}},"postgresql":{"dir":"/var/opt/gitlab/postgresql","unix_socket_directory":"/var/opt/gitlab/postgresql","port":5432},"registry":{"dir":"/var/opt/gitlab/registry"}}

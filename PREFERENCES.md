@@ -323,6 +323,12 @@ Each service README should include:
 
 - **Capture automation outputs** (Infisical CLI runs, compose validations, etc.) with the exact command, target environment slug, and log artifact path (e.g., `/tmp/infisical-export.log`), especially when the output is empty (`{}`) so future agents know the operation succeeded but found no secrets.
 
+### MCP Server Strategy
+
+- **Expand MCP coverage first** whenever repetitive tasks surface (Kong routing, compose orchestration, monitoring queries, GitLab releases); only fall back to manual scripts if an MCP adapter is impossible.
+- **Document every new MCP server** in `AGENTS.md`, `PREFERENCES.md`, and `ai.engine/MCP_INTEGRATION.md` so agents know how to invoke the tools and which API tokens are required.
+- **Bundle agent prompts with MCP tooling** (e.g., “Act as API Gatekeeper. Use Kong MCP list_routes …”) to keep the AI Engine handoff copy/paste ready.
+
 ---
 
 ## Security Considerations

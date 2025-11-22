@@ -27,11 +27,12 @@ This document provides a standardized overview of all services and agents in the
 
 ### Next Steps
 1. ✅ **Backstage containers restarted** (2025-11-22) - Both containers restarted successfully; database healthy; main app running; Infisical plugin requires secrets
-2. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
-3. Capture Infisical secret coverage for newly added services (Backstage + companions)
-4. Run deliberate preflight script to ensure dependencies sequence is honored
-5. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
-6. Update Backstage health check method if `ps` command unavailable in container
+2. ✅ **Environment variable naming fixed** (2025-11-22) - Fixed invalid environment variable names in Infisical (hyphens replaced with underscores, colons replaced with equals signs); all Cloudflare and API keys now use proper naming conventions
+3. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
+4. Capture Infisical secret coverage for newly added services (Backstage + companions)
+5. Run deliberate preflight script to ensure dependencies sequence is honored
+6. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
+7. Update Backstage health check method if `ps` command unavailable in container
 
 ---
 
@@ -426,7 +427,8 @@ When agents create or modify services:
 ### AI Engine Integration
 
 **Location:** `/root/infra/ai.engine/`  
-**Documentation:** See [ai.engine/README.md](./ai.engine/README.md)
+**Documentation:** See [ai.engine/README.md](./ai.engine/README.md)  
+**MCP Integration:** See [ai.engine/MCP_INTEGRATION.md](./ai.engine/MCP_INTEGRATION.md)
 
 All agents must utilize the AI Engine system for:
 
@@ -439,7 +441,49 @@ All agents must utilize the AI Engine system for:
 - **Testing** - Use `tests-agent` for test coverage analysis
 - **Refactoring** - Use `refactor-agent` for code quality improvements
 - **Release readiness** - Use `release-agent` for deployment validation
+- **MCP integration** - Use `mcp-agent` for MCP server integration guidance
 - **Comprehensive analysis** - Use `orchestrator-agent` for full infrastructure analysis
+
+**MCP Server Integration:**
+
+The AI Engine integrates with MCP (Model Context Protocol) servers to provide direct access to infrastructure services:
+
+- **Infisical MCP** - Secrets management (`mcp_infisical_*` tools)
+  - Location: `/root/infra/infisical-mcp/`
+  - Official package: `@infisical/mcp`
+  - Tools: list-secrets, get-secret, create-secret, update-secret, delete-secret, list-projects, create-project, create-environment, create-folder, invite-members-to-project
+
+- **Cloudflare MCP** - DNS management (`mcp_cloudflare_*` tools)
+  - Location: `/root/infra/scripts/cloudflare-mcp-server.js`
+  - Custom implementation
+  - Tools: list_zones, get_dns_records, create_dns_record, update_dns_record, delete_dns_record
+
+- **WikiJS MCP** - Documentation management (`mcp_wikijs_*` tools)
+  - Location: `/root/infra/scripts/wikijs-mcp-server.js`
+  - Custom implementation
+  - Tools: list_pages, get_page, create_page, update_page, delete_page, search_pages
+
+- **Browser MCP** - Browser automation (`mcp_cursor-ide-browser_*` tools)
+  - Built-in Cursor IDE feature
+  - Tools: navigate, snapshot, click, type, hover, select_option, press_key, wait_for, navigate_back, resize, console_messages, network_requests, take_screenshot
+
+**MCP Expansion Targets (2025-11-22 review):**
+
+- **Kong Admin MCP** (`services/kong/`, Admin API on `kong:8001`)
+  - Purpose: Give the API Gatekeeper agent CRUD access to routes, services, plugins, ACLs, and certificates without editing `services/kong/kong.yml` manually.
+  - Suggested Tools: `list_services`, `list_routes`, `apply_service_patch`, `sync_plugin`, `reload`.
+
+- **Docker/Compose MCP** (`compose.orchestrator.yml`, `nodes/*/compose.yml`)
+  - Purpose: Allow Deployment Runner + Ops agents to run `docker ps`, `docker compose up/down`, health summaries, and log tailing on demand through the Docker socket.
+  - Suggested Tools: `list_containers`, `compose_up`, `compose_down`, `compose_logs`, `health_report` (set `DEVTOOLS_WORKSPACE=/root/infra`).
+
+- **Monitoring MCP** (`monitoring/`, `logging/`)
+  - Purpose: Let Status/Security agents query Prometheus (`/api/v1/query`), Grafana dashboards, and Alertmanager silences to validate health/alerts in one call.
+  - Suggested Tools: `prom_query`, `grafana_dashboard`, `alertmanager_list`, `ack_alert`.
+
+- **GitLab MCP** (`gitlab/`, API at `https://gitlab.freqkflag.co/api/v4`)
+  - Purpose: Help Release/Development agents open issues, inspect pipelines, manage runners, and set variables directly from GitLab’s REST API.
+  - Suggested Tools: `list_projects`, `get_pipeline_status`, `create_issue`, `update_variable`.
 
 **Quick Usage:**
 ```bash
@@ -449,12 +493,14 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 # Invoke specific agent
 ./invoke-agent.sh bug-hunter
 ./invoke-agent.sh security
+./invoke-agent.sh mcp
 ./invoke-agent.sh orchestrator /root/infra/orchestration-report.json
 ```
 
 **In Cursor AI:**
 - Read agent files: `cat /root/infra/ai.engine/agents/<agent-name>-agent.md`
 - Use agent prompts: "Act as bug_hunter. Scan /root/infra. Return crit bugs + fixes in strict JSON."
+- Use MCP with agents: "Act as security agent. Use Infisical MCP to audit secrets, then evaluate /root/infra. Return vulnerabilities + fixes in strict JSON."
 - Use orchestrator: "Use the Multi-Agent Orchestrator preset. Focus on /root/infra..."
 
 ### Runtime & Communication Rules
@@ -694,7 +740,15 @@ Each service has backup procedures documented in its README.md file.
    - Test coverage analysis
    - Refactoring opportunities
    - Release readiness validation
+   - MCP server integration guidance
    - Comprehensive orchestration analysis
+
+2. **Use MCP servers** - Leverage MCP tools for infrastructure operations:
+   - Use Infisical MCP for secrets management operations
+   - Use Cloudflare MCP for DNS management operations
+   - Use WikiJS MCP for documentation management operations
+   - Use Browser MCP for visual verification and automation
+   - See [ai.engine/MCP_INTEGRATION.md](./ai.engine/MCP_INTEGRATION.md) for complete MCP documentation
 
 2. **Follow K.I.S.S. principles** - Always choose simplicity
 3. **Provide actual code** - Not high-level guidance
@@ -705,7 +759,15 @@ Each service has backup procedures documented in its README.md file.
 - **Location:** `/root/infra/ai.engine/`
 - **Documentation:** [ai.engine/README.md](./ai.engine/README.md)
 - **Available Agents:** See [ai.engine/AGENTS_SUMMARY.md](./ai.engine/AGENTS_SUMMARY.md)
+- **MCP Integration:** See [ai.engine/MCP_INTEGRATION.md](./ai.engine/MCP_INTEGRATION.md)
 - **Scripts:** `/root/infra/ai.engine/scripts/` (invoke-agent.sh, list-agents.sh)
+
+**MCP Server Reference:**
+- **Infisical MCP:** `/root/infra/infisical-mcp/` - Official `@infisical/mcp` package
+- **Cloudflare MCP:** `/root/infra/scripts/cloudflare-mcp-server.js` - Custom implementation
+- **WikiJS MCP:** `/root/infra/scripts/wikijs-mcp-server.js` - Custom implementation
+- **Browser MCP:** Built-in Cursor IDE feature
+- **MCP Setup:** See `/root/infra/scripts/MCP_SETUP.md` for configuration
 
 ---
 

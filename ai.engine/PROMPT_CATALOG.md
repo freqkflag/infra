@@ -23,6 +23,7 @@ This catalog provides ready-to-use prompts for invoking each agent in the AI Eng
 | **release** | `Act as release agent. Evaluate /root/infra. Return readiness + blockers in strict JSON.` | Release readiness |
 | **development** | `Act as development agent. Analyze /root/infra. Return full technical sweep in strict JSON.` | Full development analysis |
 | **ops** | `Act as ops_agent. Analyze /root/infra. Return operational insights + commands in strict JSON.` | Operations management |
+| **mcp** | `Act as mcp_agent. Analyze /root/infra and identify MCP opportunities. Return MCP recommendations in strict JSON.` | MCP integration guidance |
 | **orchestrator** | `Use Multi-Agent Orchestrator. Analyze /root/infra. Return aggregated report in strict JSON.` | Comprehensive analysis |
 
 ---
@@ -378,7 +379,59 @@ cat /root/infra/ai.engine/agents/ops-agent.md
 
 ---
 
-### 12. Orchestrator Agent
+### 12. MCP Agent
+
+**Purpose:** MCP server integration and tool usage guidance
+
+**Quick Prompt:**
+```
+Act as mcp_agent. Analyze /root/infra and identify MCP opportunities. Return MCP recommendations in strict JSON.
+```
+
+**Full Prompt:**
+```
+You are the mcp_agent - a specialized agent that helps AI assistants effectively use MCP (Model Context Protocol) servers for infrastructure operations.
+
+Analyze /root/infra and identify MCP opportunities, verify MCP server availability, and provide MCP tool recommendations.
+
+Output strict JSON with:
+- mcp_servers_available: Object with status for each MCP server (infisical, cloudflare, wikijs, browser)
+- mcp_opportunities: Array of operations that could use MCP tools
+- mcp_integration_recommendations: Array of recommendations for agent-MCP integration
+- mcp_usage_patterns: Array of common MCP usage patterns
+- missing_mcp_integrations: Array of services that could benefit from MCP
+- mcp_best_practices: Array of best practices for MCP usage
+
+Be proactive in identifying MCP integration opportunities. Output only conclusions.
+```
+
+**File Reference:**
+```bash
+cat /root/infra/ai.engine/agents/mcp-agent.md
+```
+
+**MCP Integration Examples:**
+```
+# Status Agent + Infisical MCP
+Act as status_agent. Use Infisical MCP to check secret coverage, then analyze /root/infra. 
+Return global status in strict JSON.
+
+# Security Agent + Infisical MCP
+Act as security agent. Use Infisical MCP to audit secrets, then evaluate /root/infra. 
+Return vulnerabilities + fixes in strict JSON.
+
+# Ops Agent + Cloudflare MCP
+Act as ops_agent. Use Cloudflare MCP to check DNS records, then analyze /root/infra. 
+Return operational insights in strict JSON.
+
+# Docs Agent + WikiJS MCP
+Act as docs agent. Use WikiJS MCP to check existing documentation, then scan /root/infra. 
+Return missing docs + structure in strict JSON.
+```
+
+---
+
+### 13. Orchestrator Agent
 
 **Purpose:** Multi-agent orchestrator coordinating all agents
 
@@ -403,6 +456,7 @@ Return a single strict JSON object with aggregated output from:
 - release: Release readiness and blockers
 - development: Full technical sweep
 - ops: Operational insights and commands
+- mcp_agent: MCP server integration and opportunities
 
 Include:
 - global_next_steps: Prioritized actions across all agents
@@ -428,6 +482,12 @@ Act as status_agent. Analyze /root/infra. Return global status in strict JSON.
 
 # Security audit
 Act as security agent. Evaluate /root/infra. Return vulnerabilities + fixes in strict JSON.
+
+# MCP integration check
+Act as mcp_agent. Analyze /root/infra and identify MCP opportunities. Return MCP recommendations in strict JSON.
+
+# Security audit with Infisical MCP
+Act as security agent. Use Infisical MCP to audit secrets, then evaluate /root/infra. Return vulnerabilities + fixes in strict JSON.
 
 # Full orchestration
 Use Multi-Agent Orchestrator. Analyze /root/infra. Return aggregated report in strict JSON.
@@ -511,10 +571,41 @@ All agents output strict JSON. See individual agent files for detailed output sc
 - **release**: `{release_readiness, blockers, required_changes, draft_release_notes}`
 - **development**: `{project_summary, persistent_memory, technical_status, todos_and_issues, coding_standards_and_architecture_recommendations, large_scale_optimization_targets, task_breakdown, next_steps_plan, execution_commands}`
 - **ops**: `{infra_status, current_tasks, operational_insights, service_health, commands_available}`
+- **mcp**: `{mcp_servers_available, mcp_opportunities, mcp_integration_recommendations, mcp_usage_patterns, missing_mcp_integrations, mcp_best_practices}`
 - **orchestrator**: Aggregates all agent outputs + `{global_next_steps, exec}`
+
+## MCP Integration
+
+All agents can use MCP (Model Context Protocol) servers for infrastructure operations. See [MCP_INTEGRATION.md](./MCP_INTEGRATION.md) for complete documentation.
+
+### Available MCP Servers
+
+- **Infisical MCP** - Secrets management (`mcp_infisical_*` tools)
+- **Cloudflare MCP** - DNS management (`mcp_cloudflare_*` tools)
+- **WikiJS MCP** - Documentation management (`mcp_wikijs_*` tools)
+- **Browser MCP** - Browser automation (`mcp_cursor-ide-browser_*` tools)
+
+### MCP Usage Examples
+
+```
+# Use Infisical MCP with security agent
+Act as security agent. Use Infisical MCP to list secrets in /prod, then evaluate /root/infra. 
+Return vulnerabilities + fixes in strict JSON.
+
+# Use Cloudflare MCP with ops agent
+Act as ops_agent. Use Cloudflare MCP to list DNS zones, then analyze /root/infra. 
+Return operational insights in strict JSON.
+
+# Use WikiJS MCP with docs agent
+Act as docs agent. Use WikiJS MCP to check existing pages, then scan /root/infra. 
+Return missing docs + structure in strict JSON.
+
+# Use Browser MCP for visual verification
+Use browser MCP to navigate to https://wiki.freqkflag.co and take a screenshot
+```
 
 ---
 
-**Last Updated:** 2025-11-21  
+**Last Updated:** 2025-11-22  
 **Maintained by:** Infrastructure Agents
 

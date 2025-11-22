@@ -22,6 +22,7 @@ ai.engine/
 │   ├── release-agent.md
 │   ├── development-agent.md
 │   ├── ops-agent.md
+│   ├── mcp-agent.md
 │   ├── orchestrator-agent.md
 │   └── README.md
 ├── scripts/             # Helper scripts
@@ -40,6 +41,7 @@ ai.engine/
 │   ├── ops.sh
 │   └── orchestrator.sh
 ├── PROMPT_CATALOG.md    # Reusable prompt catalog
+├── MCP_INTEGRATION.md   # MCP server integration guide
 ├── README.md
 └── AGENTS_SUMMARY.md
 ```
@@ -177,7 +179,14 @@ Infrastructure operations and command control.
 
 **Use when:** Infrastructure operations management or service monitoring.
 
-### 12. **orchestrator** (`orchestrator-agent.md`)
+### 12. **mcp_agent** (`mcp-agent.md`)
+MCP server integration and tool usage guidance.
+
+**Output:** MCP server availability, opportunities, integration recommendations, usage patterns.
+
+**Use when:** Identifying MCP integration opportunities or verifying MCP server availability.
+
+### 13. **orchestrator** (`orchestrator-agent.md`)
 Multi-agent orchestrator that coordinates all agents.
 
 **Output:** Complete JSON report with all agent findings aggregated.
@@ -329,15 +338,33 @@ Each script provides:
 - Usage instructions
 - Output file handling
 
+## MCP Server Integration
+
+The AI Engine integrates with MCP (Model Context Protocol) servers to provide direct access to infrastructure services:
+
+- **Infisical MCP** - Secrets management (`mcp_infisical_*` tools)
+- **Cloudflare MCP** - DNS management (`mcp_cloudflare_*` tools)
+- **WikiJS MCP** - Documentation management (`mcp_wikijs_*` tools)
+- **Browser MCP** - Browser automation (`mcp_cursor-ide-browser_*` tools)
+
+**See [MCP_INTEGRATION.md](./MCP_INTEGRATION.md) for complete MCP integration documentation.**
+
+All agents can use MCP tools through function calling. Example:
+```
+Act as security agent. Use Infisical MCP to audit secrets, then evaluate /root/infra. 
+Return vulnerabilities + fixes in strict JSON.
+```
+
 ## Related Documentation
 
 - [Prompt Catalog](./PROMPT_CATALOG.md) - Reusable prompts for all agents
+- [MCP Integration](./MCP_INTEGRATION.md) - MCP server integration guide
 - [Agents README](./agents/README.md) - Detailed agent documentation
 - [Infrastructure Runbook](../runbooks/infra-runbook.md) - Orchestrator usage
 - [Infrastructure Cookbook](../INFRASTRUCTURE_COOKBOOK.md) - Infrastructure reference
 
 ---
 
-**Last Updated:** 2025-11-21  
+**Last Updated:** 2025-11-22  
 **Location:** `/root/infra/ai.engine/`
 
