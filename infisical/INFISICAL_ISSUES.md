@@ -10,7 +10,25 @@
 - **Fix:** URL-encoded password in connection string
 - **Status:** ✅ Resolved
 
-### 2. Encryption Key Length ⚠️ IN PROGRESS
+### 2. GitHub OAuth/SSO Not Configured ⚠️ LOW PRIORITY
+- **Issue:** Error when attempting GitHub login: "Unknown authentication strategy github, no strategy with this name has been registered"
+- **Error:** HTTP 500 when accessing `/api/v1/sso/redirect/github`
+- **Status:** ⚠️ Non-critical - Email/password login works fine
+- **Impact:** LOW - Users cannot use GitHub OAuth login, but standard login works
+- **Options:**
+  1. **Configure GitHub OAuth** (if you want GitHub login):
+     - Create GitHub OAuth App: https://github.com/settings/developers
+     - Add environment variables to `docker-compose.yml`:
+       - `GITHUB_CLIENT_ID`
+       - `GITHUB_CLIENT_SECRET`
+       - `GITHUB_OAUTH_ENABLED=true`
+     - Restart Infisical
+  2. **Disable GitHub Login Button** (if not needed):
+     - Disable in Infisical UI settings
+     - Or leave as-is (button will show error if clicked)
+- **Note:** This is a feature configuration issue, not a critical bug. The service is fully functional without GitHub OAuth.
+
+### 3. Encryption Key Length ✅ FIXED
 - **Issue:** "Invalid key length" error during migration
 - **Error:** `RangeError: Invalid key length` in KMS encryption
 - **Attempted Fixes:**
