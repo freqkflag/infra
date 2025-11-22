@@ -76,8 +76,20 @@ catalog:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Resource, Location]
+    - allow: [Component, System, API, Resource, Location, Domain]
   locations:
+    # Infrastructure domain - must be loaded before infrastructure-entities.yaml
+    - type: file
+      target: ../../examples/domain-infrastructure.yaml
+      rules:
+        - allow: [Domain]
+
+    # Infrastructure services - all infrastructure components
+    - type: file
+      target: ../../examples/infrastructure-entities.yaml
+      rules:
+        - allow: [Component, System, API, Resource]
+
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
       target: ../../examples/entities.yaml
