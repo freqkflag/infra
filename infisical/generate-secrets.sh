@@ -12,9 +12,9 @@ generate_secret() {
     openssl rand -base64 32 | tr -d '\n'
 }
 
-# Function to generate 16-byte hex string for ENCRYPTION_KEY
+# Function to generate 32-byte base64-encoded key for ENCRYPTION_KEY (matches generate_secret for AES-256)
 generate_encryption_key() {
-    openssl rand -hex 16 | tr -d '\n'
+    openssl rand -base64 32 | tr -d '\n'
 }
 
 echo "# Infisical Environment Variables"
