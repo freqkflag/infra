@@ -1,6 +1,6 @@
 # AI Interaction Preferences
 
-**Last Updated:** 2025-11-21  
+**Last Updated:** 2025-11-22  
 **Reference:** Use alongside [AGENTS.md](./AGENTS.md) for complete infrastructure context
 
 This document defines how AI assistants should interact with the infrastructure maintainer and approach technical tasks.
@@ -53,6 +53,10 @@ This document defines how AI assistants should interact with the infrastructure 
    - Include all necessary context, file paths, and specific actions required
    - Format: Clear, direct instructions that can be given to an AI agent to continue the work
    - Example: "Act as [agent role]. [Specific action]. [Context]. [Expected outcome]."
+
+5. **Embed agent prompts into planning docs**
+   - Every planning artifact (e.g., `REMEDIATION_PLAN.md`) must include per-phase `ai.engine` command prompts so follow-up agents know exactly which tools to run
+   - Keep those prompts current with the latest status and include referencing context such as service names or files being analyzed
 
 **These files must be maintained and followed for every request - no exceptions.**
 

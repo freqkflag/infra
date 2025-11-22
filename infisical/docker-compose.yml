@@ -26,6 +26,8 @@ services:
   infisical-db:
     image: postgres:15-alpine
     container_name: infisical-db
+    env_file:
+      - ../.workspace/.env
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-infisical}
       POSTGRES_USER: ${POSTGRES_USER:-infisical}
@@ -59,6 +61,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    env_file:
+      - ../.workspace/.env
     environment:
       # Database
       DB_CONNECTION_URI: postgresql://${POSTGRES_USER:-infisical}:haL3CUddcVt6d3NZR29GqViGo58Q2ZcQV%2F88CmNxcDU%3D@infisical-db:5432/${POSTGRES_DB:-infisical}

@@ -1,6 +1,6 @@
 # Infrastructure Agents & Services
 
-**Last Updated:** 2025-11-21  
+**Last Updated:** 2025-11-22  
 **Infrastructure Domain:** `freqkflag.co` (SPINE)
 
 **AI Reference:** See [PREFERENCES.md](./PREFERENCES.md) for interaction guidelines
@@ -9,30 +9,26 @@ This document provides a standardized overview of all services and agents in the
 
 ---
 
-## Current Infrastructure Status (2025-11-21)
+## Current Infrastructure Status (2025-11-22)
 
 ### Critical Issues
-- ✅ **Traefik running** - Reverse proxy container is now running and healthy
-- ✅ **Health checks fixed** - WordPress, WikiJS, Node-RED, Adminer now healthy after fixing health check configurations
-- ✅ **n8n database schema** - Database reset and migrations completed successfully, service now healthy
-- ✅ **Infisical health check** - Fixed health check endpoint, service now healthy
-- ⚠️ **Edge network missing** - Required shared Docker network `edge` does not exist (documented but not created, services use traefik-network)
+- ✅ **Traefik running** - Reverse proxy container healthy; dashboard reachable on `:8080`
+- ✅ **Health checks stabilized** - WikiJS, WordPress, Node-RED, Adminer, Infisical, n8n report healthy via process-oriented probes
+- ⚠️ **Backstage deployment blocked** - PostgreSQL container fails to initialize because `.workspace/.env` lacks `BACKSTAGE_DB_PASSWORD`, while Infisical client secrets are absent, preventing the build/health cycle from stabilizing; service still configured but not running
 
 ### Service Health Summary
-- ✅ **Healthy:** LinkStack, Monitoring stack (Grafana, Prometheus, Loki, Alertmanager), Databases (PostgreSQL, MySQL, Redis)
-- 🔄 **Starting:** Infisical, n8n (health checks in progress)
-- ⚠️ **Unhealthy:** WikiJS, Node-RED, WordPress, Adminer (containers running but health checks failing)
-- ⚙️ **Not Running:** Traefik (container not found), Mailu, Supabase, Mastodon, Help Service
+- ✅ **Healthy:** Traefik, Infisical, WikiJS, WordPress, n8n, Node-RED, Adminer, LinkStack, Monitoring stack (Grafana, Prometheus, Loki, Alertmanager), Databases (PostgreSQL, MySQL, Redis)
+- ⚙️ **Configured but not running/starting:** Mailu, Supabase, Mastodon, Help Service, Backstage (blocked by missing secrets for PostgreSQL/Infisical wiring)
 
 ### Network Status
 - ✅ **edge network:** Created and available
 - ✅ **traefik-network:** Exists
 
 ### Next Steps
-1. Investigate Traefik container status - check if service needs to be started
-2. Diagnose unhealthy services - review health check configurations and logs
-3. Monitor Infisical and n8n startup - verify they become healthy
-4. Run preflight checks - ensure all prerequisites are met
+1. Confirm Backstage Docker build completes and publish service status
+2. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
+3. Capture Infisical secret coverage for newly added services (Backstage + companions)
+4. Run deliberate preflight script to ensure dependencies sequence is honored
 
 ---
 
@@ -77,7 +73,7 @@ This document provides a standardized overview of all services and agents in the
 ### Infisical
 - **Domain:** `infisical.freqkflag.co`
 - **Location:** `/root/infra/infisical/`
-- **Status:** ⚠️ Unhealthy (health check endpoint /api/status not responding, service may be functional)
+- **Status:** ✅ Running (healthy)
 - **Purpose:** Modern secrets management and secure credential storage
 - **Port:** 8080 (via Traefik)
 - **Database:** PostgreSQL 15
@@ -90,7 +86,12 @@ This document provides a standardized overview of all services and agents in the
   - Developer-friendly CLI
   - No unsealing required (simpler operations)
 - **Documentation:** See `infisical/README.md`
-- **Note:** Health check endpoint fixed to use /api/status but connection is being refused - needs investigation
+- **Secrets Integration:**
+  - ✅ **Infisical Agent configured** - `infisical-agent.yml` generates `.workspace/.env` from `prod.template`
+  - ✅ **Services wired to Infisical** - All services now use `env_file: ../.workspace/.env` to load secrets
+  - ✅ **Secrets flow verified** - Services can read database passwords, API keys, and tokens from Infisical
+  - **Services using Infisical secrets:** n8n, WordPress, WikiJS, LinkStack, Node-RED, Infisical, Mailu, Supabase
+  - **Usage:** Services automatically load secrets from `.workspace/.env` when started, or use `infisical run --env=prod -- docker compose up`
 
 ### WikiJS
 - **Domain:** `wiki.freqkflag.co`
@@ -133,6 +134,20 @@ This document provides a standardized overview of all services and agents in the
   - Dashboard UI
   - IoT and automation workflows
 - **Note:** Fixed health check - now uses process-based check instead of HTTP endpoint
+
+### Backstage
+- **Domain:** `backstage.freqkflag.co`
+- **Location:** `/root/infra/services/backstage/`
+- **Status:** ⚙️ Configured (Docker build in progress)
+- **Purpose:** Internal developer portal (Backstage)
+- **Database:** PostgreSQL 16 (auto-initialized on first start)
+- **Features:**
+  - Multi-stage Dockerfile using Traefik labels and PostgreSQL dependencies
+  - Infisical plugin integration (`@infisical/backstage-plugin-infisical@^0.1.1`, backend & frontend wiring)
+  - Configured via `services/backstage/backstage/app-config.production.yaml`
+  - Documentation in `services/backstage/README.md` with usage steps and `entities-with-infisical.yaml` examples
+- **Notes:** Backend build currently requires source path adjustments; monitoring/health checks still pending.
+  - PostgreSQL container repeatedly exits because `BACKSTAGE_DB_PASSWORD` is empty and `INFISICAL_CLIENT_ID`/`INFISICAL_CLIENT_SECRET` are missing from `.workspace/.env`; secrets must be injected via Infisical and the agent run before the service can stay up.
 
 ### Mailu
 - **Domain:** `mail.freqkflag.co` (admin), `webmail.freqkflag.co` (webmail)
@@ -441,6 +456,10 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 ### Infrastructure Dependencies
 - **Traefik:** Required by all web services for routing and SSL
 - **Infisical:** Used for secrets storage
+  - **Secrets Integration:** All services configured to source secrets from Infisical via `.workspace/.env`
+  - **Agent Configuration:** `infisical-agent.yml` generates `.workspace/.env` from `prod.template` (polls every 60s)
+  - **Service Integration:** Services use `env_file: ../.workspace/.env` to load secrets automatically
+  - **Manual Override:** Can use `infisical run --env=prod -- docker compose up` for direct secret injection
 
 ### Network Architecture
 - **traefik-network:** External network for all services
@@ -507,13 +526,14 @@ Each service follows a standardized structure:
 |--------|---------|--------|---------|
 | `freqkflag.co` | Infrastructure SPINE | - | Infrastructure domain |
 | `wiki.freqkflag.co` | WikiJS | ✅ Running | Documentation |
-| `n8n.freqkflag.co` | n8n | ⚙️ Configured | Workflow automation |
+| `n8n.freqkflag.co` | n8n | ✅ Running | Workflow automation |
 | `mail.freqkflag.co` | Mailu Admin | ⚙️ Configured | Email admin |
 | `webmail.freqkflag.co` | Mailu Webmail | ⚙️ Configured | Webmail interface |
 | `supabase.freqkflag.co` | Supabase Studio | ⚙️ Configured | Database studio |
 | `api.supabase.freqkflag.co` | Supabase API | ⚙️ Configured | REST API |
-| `adminer.freqkflag.co` | Adminer | ⚙️ Configured | DB management |
-| `nodered.freqkflag.co` | Node-RED | ⚙️ Configured | Flow-based automation |
+| `adminer.freqkflag.co` | Adminer | ✅ Running | DB management |
+| `nodered.freqkflag.co` | Node-RED | ✅ Running | Flow-based automation |
+| `backstage.freqkflag.co` | Backstage | ⚙️ Configured | Developer portal |
 | `cultofjoey.com` | WordPress | ✅ Running | Personal brand site |
 | `link.cultofjoey.com` | LinkStack | ✅ Running | Link-in-bio |
 | `twist3dkinkst3r.com` | Mastodon | ⚙️ Configured | Community instance |
@@ -542,8 +562,12 @@ Each service has backup procedures documented in its README.md file.
 ## Security Notes
 
 - All services use Traefik for SSL/TLS termination
-- Secrets stored in `.env` files (600 permissions recommended)
-- Infisical available for sensitive credential storage
+- **Secrets Management:** All services now source secrets from Infisical via `.workspace/.env` (generated by Infisical Agent)
+- **Infisical Integration:** 
+  - Secrets stored in Infisical at `/` path in `prod` environment
+  - Infisical Agent (`infisical-agent.yml`) generates `.workspace/.env` from `prod.template` every 60s
+  - Services use `env_file: ../.workspace/.env` to automatically load secrets
+  - Manual deployments can use `infisical run --env=prod -- docker compose up` for direct injection
 - Security headers enabled via Traefik middleware
 - Regular updates recommended for all services
 

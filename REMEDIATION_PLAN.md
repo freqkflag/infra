@@ -1,8 +1,8 @@
 # Infrastructure Remediation Plan
 
 **Created:** 2025-11-21  
-**Last Updated:** 2025-11-21 (Updated with Phase 1 & 2 completion status)  
-**Status:** Active - Phase 1 in progress (2.5/3 tasks), Phase 2 completed (1/3 tasks)  
+**Last Updated:** 2025-11-22 (Reviewed for current infra status and agent prompts)  
+**Status:** Active - Phase 1 nearly complete (pending Infisical capture), Phase 2 validated, Phases 3-6 pending execution  
 **Priority:** High
 
 ---
@@ -21,6 +21,11 @@ This document outlines a phased plan to resolve critical security vulnerabilitie
 **Priority:** 🔴 CRITICAL  
 **Timeline:** Days 1-3  
 **Risk:** Security breach, credential compromise
+
+**Current Progress:**  
+- [x] Secrets removal, audit, and documentation mostly complete; Infisical ingestion pending.  
+- [x] PostgreSQL auth now scram-sha-256 and connected services healthy (Phase 1.2).  
+- [x] Secrets audit flagged weak passwords still in templates (Phase 1.3) and next-phase actions queued.  
 
 ### 1.1 Remove Plaintext Passwords from Repository
 
@@ -206,6 +211,9 @@ git log --all --full-history --source --pretty=format: --name-only | \
 **Owner:** Security Team  
 **Dependencies:** CI/CD pipeline access
 
+**Phase 1 Agent Prompt:**  
+`Act as ai.engine security-agent. Validate Phase 1 credentials/Infisical coverage and secrets audit gaps, then update REMEDIATION_PLAN.md with findings. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh security`
+
 ---
 
 ## Phase 2: Service Health Check Stabilization (Week 1-2)
@@ -213,6 +221,11 @@ git log --all --full-history --source --pretty=format: --name-only | \
 **Priority:** 🟠 HIGH  
 **Timeline:** Days 4-10  
 **Risk:** Service availability, monitoring accuracy
+
+**Current Progress:**  
+- [x] Health checks reconfigured and verified (Traefik, WikiJS, WordPress, Node-RED, Adminer, Infisical, n8n) as of 2025-11-21.  
+- [ ] Traefik ping endpoint fix pending - process check still in use.  
+- [ ] Health monitoring automation (metrics, alerts, remediation script) not yet implemented.
 
 ### 2.1 Verify Health Check Configurations
 
@@ -345,6 +358,9 @@ docker inspect traefik --format='{{.State.Health.Status}}'
 **Owner:** DevOps Team  
 **Dependencies:** Prometheus, Grafana, monitoring infrastructure
 
+**Phase 2 Agent Prompt:**  
+`Act as ai.engine status-agent. Confirm all health checks remain healthy, document monitoring gaps, and propose automation steps for metrics/alerts. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh status`
+
 ---
 
 ## Phase 3: Infrastructure Standardization (Week 2-3)
@@ -352,6 +368,12 @@ docker inspect traefik --format='{{.State.Health.Status}}'
 **Priority:** 🟡 MEDIUM  
 **Timeline:** Days 11-21  
 **Risk:** Configuration drift, maintenance burden
+
+**Current Progress:**  
+- [x] Backstage service skeleton deployed under `/root/infra/services/backstage/` with Traefik, PostgreSQL, and Infisical integration (per `server-changelog.md` entry); Docker build currently running but requires path adjustments before artifact creation.  
+- [ ] Backstage database container repeatedly restarts because `.workspace/.env` lacks `BACKSTAGE_DB_PASSWORD`, `INFISICAL_CLIENT_ID`, and `INFISICAL_CLIENT_SECRET`; Infisical wiring must inject these secrets before the build can finish.  
+- [ ] Service location audit and consolidation plan not started yet; existing root-level services still in place.  
+- [ ] Traefik configuration deduplication and health-check standardization work queued.
 
 ### 3.1 Consolidate Service Definitions
 
@@ -459,6 +481,9 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 **Owner:** DevOps Team  
 **Dependencies:** None
 
+**Phase 3 Agent Prompt:**  
+`Act as ai.engine compose-engineer. Audit service locations (including Backstage), capture drift, and recommend consolidation steps plus Traefik label templating updates. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh compose-engineer`
+
 ---
 
 ## Phase 4: Testing and Validation (Week 3-4)
@@ -466,6 +491,11 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 **Priority:** 🟡 MEDIUM  
 **Timeline:** Days 22-28  
 **Risk:** Production failures, deployment issues
+
+**Current Progress:**  
+- [ ] Compose validation script not yet created; preflight remains unchanged.  
+- [ ] Secret injection validation still pending; Infisical service coverage needs automated proof.  
+- [ ] Integration test suite unstarted; service interplay verification still manual.
 
 ### 4.1 Implement Compose Configuration Validation
 
@@ -568,6 +598,9 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 **Owner:** QA Team / DevOps Team  
 **Dependencies:** Test infrastructure
 
+**Phase 4 Agent Prompt:**  
+`Act as ai.engine tests-agent. Evaluate current validation gaps, propose compose/integration tests and secret injection checks, then document findings in REMEDIATION_PLAN.md. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh tests`
+
 ---
 
 ## Phase 5: Documentation and Monitoring (Week 4-5)
@@ -575,6 +608,11 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 **Priority:** 🟡 MEDIUM  
 **Timeline:** Days 29-35  
 **Risk:** Knowledge gaps, operational issues
+
+**Current Progress:**  
+- [x] Backstage README and config docs created (per `services/backstage/README.md`); shares Infisical usage instructions with sample `entities-with-infisical.yaml`.  
+- [ ] Security runbook, health troubleshooting, and dependency documents still missing.  
+- [ ] Monitoring enhancements (Prometheus/Grafana) not yet configured beyond existing dashboards.
 
 ### 5.1 Create Missing Documentation
 
@@ -692,6 +730,9 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 **Owner:** DevOps Team / SRE Team  
 **Dependencies:** Prometheus, Grafana, Alertmanager
 
+**Phase 5 Agent Prompt:**  
+`Act as ai.engine docs-agent. Capture documentation gaps (security runbook, health guide, dependencies), annotate Backstage references, and recommend monitoring artifacts updates in REMEDIATION_PLAN.md. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh docs`
+
 ---
 
 ## Phase 6: Continuous Improvement (Week 5-6)
@@ -699,6 +740,11 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 **Priority:** 🟢 LOW  
 **Timeline:** Days 36-42  
 **Risk:** Technical debt accumulation
+
+**Current Progress:**  
+- [ ] Automated security scanning not configured; gitleaks integration absent.  
+- [ ] Resource limits and monitoring continue at defaults.  
+- [ ] Maintenance schedule still informal; rely on manual checklists.
 
 ### 6.1 Implement Automated Security Scanning
 
@@ -799,6 +845,9 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 
 **Owner:** Infrastructure Lead  
 **Dependencies:** None
+
+**Phase 6 Agent Prompt:**  
+`Act as ai.engine orchestrator-agent. Review continuous-improvement backlog, note missing automation/maintenance tasks, and update REMEDIATION_PLAN.md with recommended next actions. Command: cd /root/infra/ai.engine/scripts && ./invoke-agent.sh orchestrator`
 
 ---
 
@@ -1000,4 +1049,3 @@ find . -name 'docker-compose.yml' -o -name 'compose.yml' | grep -v node_modules
 - 🔄 Phase 1.3 in progress: Template password replacement started but needs completion
 - 🔄 Phase 1.1 in progress: New passwords generated, documentation created, manual rotation required
 - ⚠️ CRITICAL: System password rotation pending (see `docs/CREDENTIAL_ROTATION.md`)
-

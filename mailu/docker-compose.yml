@@ -28,6 +28,8 @@ services:
     volumes:
       - ./data/mail:/data
       - ./data/overrides:/overrides
+    env_file:
+      - ../.workspace/.env
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DOMAIN=${DOMAIN}
@@ -68,6 +70,8 @@ services:
     volumes:
       - ./data/mail:/data
       - ./data/overrides:/overrides
+    env_file:
+      - ../.workspace/.env
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DOMAIN=${DOMAIN}
@@ -87,6 +91,8 @@ services:
     volumes:
       - ./data/mail:/data
       - ./data/overrides:/overrides
+    env_file:
+      - ../.workspace/.env
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DOMAIN=${DOMAIN}
@@ -107,6 +113,8 @@ services:
     volumes:
       - ./data/mail:/data
       - ./data/overrides:/overrides
+    env_file:
+      - ../.workspace/.env
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DOMAIN=${DOMAIN}
@@ -145,6 +153,8 @@ services:
     volumes:
       - ./data/mail:/data
       - ./data/overrides:/overrides
+    env_file:
+      - ../.workspace/.env
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DOMAIN=${DOMAIN}

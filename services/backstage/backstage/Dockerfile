@@ -1,58 +1,7 @@
-# Multi-stage Dockerfile for Backstage
-# This builds both frontend and backend in a single image
+# Use the official Backstage Dockerfile pattern
+# This expects pre-built artifacts (run yarn build:all first)
+# For now, we'll build in the Dockerfile but use the official pattern
 
-# Stage 1: Build frontend
-FROM node:22-bookworm-slim AS frontend-builder
-
-WORKDIR /app
-
-# Install dependencies for building
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 g++ build-essential && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy package files
-COPY package.json yarn.lock .yarnrc.yml backstage.json ./
-COPY .yarn ./.yarn
-
-# Copy workspace packages
-COPY packages ./packages
-# Create plugins directory (plugins are optional)
-RUN mkdir -p ./plugins
-
-# Install dependencies (allow lockfile updates for new plugins)
-RUN yarn install
-
-# Build frontend
-RUN yarn workspace app build
-
-# Stage 2: Build backend
-FROM node:22-bookworm-slim AS backend-builder
-
-WORKDIR /app
-
-# Install dependencies for building
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 g++ build-essential libsqlite3-dev && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy package files
-COPY package.json yarn.lock .yarnrc.yml backstage.json ./
-COPY .yarn ./.yarn
-
-# Copy workspace packages (including source files)
-COPY packages ./packages
-# Create plugins directory (plugins are optional)
-RUN mkdir -p ./plugins
-
-# Install dependencies (allow lockfile updates for new plugins)
-RUN yarn install
-
-# Build backend (need to be in workspace root)
-WORKDIR /app
-RUN yarn workspace backend build
-
-# Stage 3: Runtime
 FROM node:22-bookworm-slim
 
 # Set Python interpreter for node-gyp
@@ -60,7 +9,7 @@ ENV PYTHON=/usr/bin/python3
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--no-node-snapshot"
 
-# Install runtime dependencies
+# Install build dependencies
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
@@ -76,28 +25,25 @@ WORKDIR /app
 COPY --chown=node:node package.json yarn.lock .yarnrc.yml backstage.json ./
 COPY --chown=node:node .yarn ./.yarn
 
-# Copy built frontend from frontend-builder
-COPY --from=frontend-builder --chown=node:node /app/packages/app/dist ./packages/app/dist
-COPY --from=frontend-builder --chown=node:node /app/packages/app/package.json ./packages/app/package.json
-
-# Copy built backend from backend-builder
-COPY --from=backend-builder --chown=node:node /app/packages/backend/dist ./packages/backend/dist
-COPY --from=backend-builder --chown=node:node /app/packages/backend/package.json ./packages/backend/package.json
-
-# Copy skeleton and install production dependencies
-COPY --from=backend-builder --chown=node:node /app/packages/backend/dist/skeleton.tar.gz ./
-RUN tar xzf skeleton.tar.gz && rm skeleton.tar.gz
-
-RUN --mount=type=cache,target=/home/node/.cache/yarn,sharing=locked,uid=1000,gid=1000 \
-    yarn workspaces focus --all --production && rm -rf "$(yarn cache clean)"
-
-# Copy examples and config files
+# Copy all source files
+COPY --chown=node:node packages ./packages
 COPY --chown=node:node examples ./examples
 COPY --chown=node:node app-config*.yaml ./
 
-# Copy backend bundle
-COPY --from=backend-builder --chown=node:node /app/packages/backend/dist/bundle.tar.gz ./
-RUN tar xzf bundle.tar.gz && rm bundle.tar.gz
+# Install dependencies
+RUN yarn install --frozen-lockfile
+
+# Build everything
+RUN yarn tsc
+RUN yarn build:backend
+RUN yarn build:all
+
+# Install production dependencies only (after build)
+RUN --mount=type=cache,target=/home/node/.cache/yarn,sharing=locked,uid=1000,gid=1000 \
+    yarn workspaces focus --all --production && rm -rf "$(yarn cache clean)"
+
+# The build artifacts are already in packages/backend/dist from the build step above
+# No need to copy tar.gz files - the dist directory is already there
 
 EXPOSE 7007
 

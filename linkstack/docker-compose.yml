@@ -2,6 +2,8 @@ services:
   linkstack-db:
     image: mysql:8.0
     container_name: linkstack-db
+    env_file:
+      - ../.workspace/.env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -31,6 +33,8 @@ services:
   linkstack:
     image: linkstackorg/linkstack:v4.2.0
     container_name: linkstack
+    env_file:
+      - ../.workspace/.env
     environment:
       TZ: ${TZ:-America/New_York}
       SERVER_ADMIN: ${SERVER_ADMIN}
