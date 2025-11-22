@@ -30,7 +30,13 @@ backend:
 
 auth:
   providers:
-    guest: {}
+    guest:
+      dangerouslyAllowOutsideDevelopment: true
+
+permission:
+  enabled: true
+  policy:
+    pluginId: 'allow-all-policy'
 
 infisical:
   baseUrl: ${INFISICAL_PUBLIC_URL:-https://infisical.freqkflag.co}
