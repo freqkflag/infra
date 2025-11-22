@@ -7,9 +7,9 @@ set -euo pipefail
 echo "=== Generating Infisical Secrets ==="
 echo ""
 
-# Function to generate random secret (32 bytes = 64 hex chars for AES-256)
+# Function to generate random secret (32 bytes) encoded as base64 for AES-256
 generate_secret() {
-    openssl rand -hex 32 | tr -d '\n'
+    openssl rand -base64 32 | tr -d '\n'
 }
 
 echo "# Infisical Environment Variables"
@@ -43,4 +43,3 @@ echo ""
 echo "# Features"
 echo "ENABLE_SIGNUP=true"
 echo "LOG_LEVEL=info"
-

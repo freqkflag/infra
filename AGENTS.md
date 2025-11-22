@@ -1,11 +1,38 @@
 # Infrastructure Agents & Services
 
-**Last Updated:** 2025-11-20  
+**Last Updated:** 2025-11-21  
 **Infrastructure Domain:** `freqkflag.co` (SPINE)
 
 **AI Reference:** See [PREFERENCES.md](./PREFERENCES.md) for interaction guidelines
 
 This document provides a standardized overview of all services and agents in the infrastructure.
+
+---
+
+## Current Infrastructure Status (2025-11-21)
+
+### Critical Issues
+- ✅ **Traefik running** - Reverse proxy container is now running and healthy
+- ✅ **Health checks fixed** - WordPress, WikiJS, Node-RED, Adminer now healthy after fixing health check configurations
+- ⚠️ **n8n database schema** - Database schema mismatch preventing service startup (missing columns Role.id, WorkflowEntity__WorkflowEntity_shared.userId)
+- ⚠️ **Infisical health check** - Health check reporting unhealthy despite service appearing functional
+- ⚠️ **Edge network missing** - Required shared Docker network `edge` does not exist (documented but not created, services use traefik-network)
+
+### Service Health Summary
+- ✅ **Healthy:** LinkStack, Monitoring stack (Grafana, Prometheus, Loki, Alertmanager), Databases (PostgreSQL, MySQL, Redis)
+- 🔄 **Starting:** Infisical, n8n (health checks in progress)
+- ⚠️ **Unhealthy:** WikiJS, Node-RED, WordPress, Adminer (containers running but health checks failing)
+- ⚙️ **Not Running:** Traefik (container not found), Mailu, Supabase, Mastodon, Help Service
+
+### Network Status
+- ✅ **edge network:** Created and available
+- ✅ **traefik-network:** Exists
+
+### Next Steps
+1. Investigate Traefik container status - check if service needs to be started
+2. Diagnose unhealthy services - review health check configurations and logs
+3. Monitor Infisical and n8n startup - verify they become healthy
+4. Run preflight checks - ensure all prerequisites are met
 
 ---
 
@@ -36,7 +63,7 @@ This document provides a standardized overview of all services and agents in the
 ### Traefik
 - **Domain:** `traefik.localhost` (dashboard), `*` (reverse proxy)
 - **Location:** `/root/infra/traefik/`
-- **Status:** ✅ Running
+- **Status:** ✅ Running (healthy)
 - **Purpose:** Reverse proxy, SSL termination, service discovery
 - **Ports:** 80 (HTTP), 443 (HTTPS), 8080 (Dashboard)
 - **Features:**
@@ -45,11 +72,12 @@ This document provides a standardized overview of all services and agents in the
   - Docker provider for service discovery
   - Security headers middleware
 - **Access:** Dashboard at `http://localhost:8080`
+- **Note:** Container is running and healthy. Fixed health check endpoint (was using non-existent `/api/overview`, now uses process-based check)
 
 ### Infisical
 - **Domain:** `infisical.freqkflag.co`
 - **Location:** `/root/infra/infisical/`
-- **Status:** ⚙️ Configured (not running)
+- **Status:** ⚠️ Unhealthy (health check endpoint /api/status not responding, service may be functional)
 - **Purpose:** Modern secrets management and secure credential storage
 - **Port:** 8080 (via Traefik)
 - **Database:** PostgreSQL 15
@@ -62,11 +90,12 @@ This document provides a standardized overview of all services and agents in the
   - Developer-friendly CLI
   - No unsealing required (simpler operations)
 - **Documentation:** See `infisical/README.md`
+- **Note:** Health check endpoint fixed to use /api/status but connection is being refused - needs investigation
 
 ### WikiJS
 - **Domain:** `wiki.freqkflag.co`
 - **Location:** `/root/infra/wikijs/`
-- **Status:** ✅ Running
+- **Status:** ✅ Running (healthy)
 - **Purpose:** Documentation and knowledge base
 - **Database:** PostgreSQL 15
 - **Features:**
@@ -74,11 +103,12 @@ This document provides a standardized overview of all services and agents in the
   - Version control
   - Search functionality
   - Multi-user collaboration
+- **Note:** Fixed health check - now uses process-based check instead of HTTP endpoint
 
 ### n8n
 - **Domain:** `n8n.freqkflag.co`
 - **Location:** `/root/infra/n8n/`
-- **Status:** ⚙️ Configured (not running)
+- **Status:** ⚠️ Unhealthy (database schema mismatch preventing startup)
 - **Purpose:** Workflow automation and integration platform
 - **Database:** PostgreSQL 15
 - **Features:**
@@ -87,11 +117,12 @@ This document provides a standardized overview of all services and agents in the
   - Scheduled tasks
   - Webhook support
   - Service integrations (Mailu, etc.)
+- **Note:** Database schema errors - missing columns Role.id and WorkflowEntity__WorkflowEntity_shared.userId. Needs database reset or migration fix
 
 ### Node-RED
 - **Domain:** `nodered.freqkflag.co`
 - **Location:** `/root/infra/nodered/`
-- **Status:** ⚙️ Configured (not running)
+- **Status:** ✅ Running (healthy)
 - **Purpose:** Flow-based development tool for visual programming
 - **Features:**
   - Visual flow editor
@@ -101,6 +132,7 @@ This document provides a standardized overview of all services and agents in the
   - MQTT support
   - Dashboard UI
   - IoT and automation workflows
+- **Note:** Fixed health check - now uses process-based check instead of HTTP endpoint
 
 ### Mailu
 - **Domain:** `mail.freqkflag.co` (admin), `webmail.freqkflag.co` (webmail)
@@ -132,13 +164,14 @@ This document provides a standardized overview of all services and agents in the
 ### Adminer
 - **Domain:** `adminer.freqkflag.co`
 - **Location:** `/root/infra/adminer/`
-- **Status:** ⚙️ Configured (not running)
+- **Status:** ✅ Running (healthy)
 - **Purpose:** Web-based database management tool
 - **Features:**
   - Multi-database support (PostgreSQL, MySQL, SQLite, etc.)
   - Lightweight single-container
   - Direct database access
   - SQL query interface
+- **Note:** Fixed health check - now uses process-based check (wget not available in container)
 
 ### Help Service
 - **Domain:** `null` (no domain configured)
@@ -157,7 +190,7 @@ This document provides a standardized overview of all services and agents in the
 ### WordPress
 - **Domain:** `cultofjoey.com`
 - **Location:** `/root/infra/wordpress/`
-- **Status:** ✅ Running
+- **Status:** ✅ Running (healthy)
 - **Purpose:** Main website for personal brand
 - **Database:** MySQL 8.0
 - **Features:**
@@ -165,6 +198,7 @@ This document provides a standardized overview of all services and agents in the
   - Blog and pages
   - Plugin ecosystem
   - Theme customization
+- **Note:** Fixed health check - now uses process-based check (wget/curl not available in container)
 
 ### LinkStack
 - **Domain:** `link.cultofjoey.com`
@@ -280,6 +314,7 @@ When agents create or modify services:
 #### Documentation & Audit Scribe
 - Maintains `README.md`, `PROJECT_PLAN.md`, `infra-build-plan.md`, and changelogs.
 - Captures every deployment or incident with timestamps + command snippets.
+- **MANDATORY:** All next steps must be formatted as AI Agent prompt instructions (see [PREFERENCES.md](./PREFERENCES.md) "Next Steps Format" section).
 
 #### Review Agent (Reagents)
 - Mandatory final gate for every phase.
@@ -388,6 +423,8 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 
 - ✅ **Running** - Service is currently active and running
 - ⚙️ **Configured** - Service is configured but not currently running
+- ⚠️ **Unhealthy** - Service container is running but health checks are failing
+- 🔄 **Starting** - Service container is starting up, health check in progress
 - 📁 **Archive** - Development/archive files, not a service
 
 ---
@@ -408,6 +445,7 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 - **traefik-network:** External network for all services
 - **Service-specific networks:** Internal communication (e.g., `wordpress-network`)
 - **edge:** Shared external Docker network for all services
+  - **Status:** ✅ Created (2025-11-21) - Required network now exists
 
 ---
 

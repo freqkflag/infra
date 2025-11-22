@@ -6,6 +6,9 @@ api:
   dashboard: true
   insecure: false  # Secured with basic auth middleware
 
+ping:
+  entryPoint: web
+
 entryPoints:
   web:
     address: ":80"

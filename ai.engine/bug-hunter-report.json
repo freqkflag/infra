@@ -1,0 +1,107 @@
+{
+  "critical_bugs": [
+    {
+      "severity": "HIGH",
+      "location": "/root/infra/n8n/docker-compose.yml",
+      "issue": "n8n database schema mismatch - missing columns Role.id and WorkflowEntity__WorkflowEntity_shared.userId causing continuous startup failures",
+      "impact": "n8n service cannot start properly, workflow automation unavailable, database migrations not running automatically",
+      "fix": "Reset n8n database or run manual migrations: docker compose exec n8n-db psql -U n8n -d n8n -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' then restart n8n container to trigger fresh migrations"
+    },
+    {
+      "severity": "MEDIUM",
+      "location": "/root/infra/infisical/docker-compose.yml",
+      "issue": "Infisical health check shows unhealthy status despite service appearing to run",
+      "impact": "Service may be incorrectly marked as unhealthy, affecting orchestration and monitoring",
+      "fix": "Verify health check endpoint /api/status is responding correctly and increase start_period if needed"
+    },
+    {
+      "severity": "MEDIUM",
+      "location": "Multiple docker-compose.yml files",
+      "issue": "Edge network referenced but does not exist - services use traefik-network instead",
+      "impact": "Documentation mismatch, services may not be able to communicate if edge network is required",
+      "fix": "Create edge network: docker network create --driver bridge edge OR update all service configs to use traefik-network consistently"
+    }
+  ],
+  "warnings": [
+    {
+      "severity": "HIGH",
+      "location": "/root/infra/traefik/config/traefik.yml",
+      "issue": "Traefik dashboard configured for traefik.localhost which cannot get Let's Encrypt certificate",
+      "impact": "Certificate errors in logs, though service functions normally",
+      "fix": "Use external domain or disable SSL for localhost dashboard access"
+    },
+    {
+      "severity": "MEDIUM",
+      "location": "Multiple services",
+      "issue": "Health checks previously using wget/curl commands that may not be available in all containers",
+      "impact": "Health checks failing even when services are running correctly",
+      "fix": "Use process-based health checks (already fixed for WordPress, Adminer, Node-RED, WikiJS) or ensure curl/wget is installed"
+    },
+    {
+      "severity": "LOW",
+      "location": "/root/infra/wordpress/docker-compose.yml",
+      "issue": "Apache ServerName warning in logs - FQDN not set",
+      "impact": "Harmless warning in logs, minor performance impact",
+      "fix": "Add ServerName directive to Apache configuration or set via environment variable"
+    }
+  ],
+  "code_smells": [
+    {
+      "type": "Configuration Inconsistency",
+      "location": "Docker networks",
+      "issue": "Documentation references 'edge' network but services use 'traefik-network'",
+      "recommendation": "Standardize network naming - either create edge network or update all documentation to reflect traefik-network"
+    },
+    {
+      "type": "Health Check Pattern",
+      "location": "Multiple services",
+      "issue": "Mixed health check strategies (HTTP vs process-based) without clear rationale",
+      "recommendation": "Document health check strategy per service type and standardize approach"
+    },
+    {
+      "type": "Secret Management",
+      "location": "env/templates/*.env.example",
+      "issue": "Example files contain placeholder passwords that may be accidentally used",
+      "recommendation": "Ensure all secrets come from Infisical in production, example files should clearly indicate placeholders"
+    }
+  ],
+  "recommended_fixes": [
+    {
+      "priority": "CRITICAL",
+      "fix": "Fix n8n database schema issues",
+      "commands": [
+        "cd /root/infra/n8n",
+        "docker compose stop n8n",
+        "docker compose exec n8n-db psql -U n8n -d n8n -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\"",
+        "docker compose up -d n8n",
+        "Monitor logs for successful migration"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "fix": "Verify and fix Infisical health check",
+      "commands": [
+        "cd /root/infra/infisical",
+        "docker exec infisical wget --spider http://localhost:8080/api/status",
+        "Check health check logs: docker inspect infisical --format '{{range .State.Health.Log}}{{.Output}}{{end}}'",
+        "Adjust health check if needed"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "fix": "Create edge network or update documentation",
+      "commands": [
+        "docker network create --driver bridge edge",
+        "OR update AGENTS.md to reflect actual network usage (traefik-network)"
+      ]
+    },
+    {
+      "priority": "LOW",
+      "fix": "Fix Apache ServerName warning in WordPress",
+      "commands": [
+        "Add to wordpress docker-compose.yml environment: APACHE_SERVERNAME=cultofjoey.com"
+      ]
+    }
+  ]
+}
+
