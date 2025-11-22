@@ -1,0 +1,20 @@
+infisical:
+  address: "https://infisical.freqkflag.co"
+auth:
+  type: "universal-auth"
+  config:
+    client-id: "./.client-id"
+    client-secret: "./client-secret"
+    remove_client_secret_on_read: false
+sinks:
+  - type: "file"
+    config:
+      path: "/root/infra/.workspace/.infisical-agent-token"
+templates:
+  - source-path: prod   # Change this to match your Infisical secret path
+    destination-path: /root/infra/.workspace/.env
+    config:
+      polling-interval: 60s
+      execute:
+        timeout: 30
+        command: ./reload-app.sh

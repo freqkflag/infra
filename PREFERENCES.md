@@ -110,6 +110,7 @@ This document defines how AI assistants should interact with the infrastructure 
 - **Simplicity first** - simplest solution that works
 - **Docker Compose** for all services
 - **Traefik** for reverse proxy and SSL
+- **Infisical CLI (v0.43.30)** is installed globally (`infisical --version`) and should be used for secrets exports, workflow triggers, and automation touchpoints; document version changes here.
 - When invoking `docker compose` against the full orchestrator bundle, explicitly set `DEVTOOLS_WORKSPACE` (for example `/root/infra`) so the dev-tools bind mount does not resolve to an empty volume spec.
 - **Local data directories** (`./data/`) instead of named volumes when possible
 - **Environment variables** in `.env` files

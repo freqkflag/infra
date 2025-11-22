@@ -558,6 +558,16 @@ Each service has backup procedures documented in its README.md file.
 
 ---
 
+## Tooling
+
+### Infisical CLI
+- **Location:** `/root/.nvm/versions/node/v25.2.1/bin/infisical`
+- **Version:** 0.43.30 (installed globally via `npm install -g @infisical/cli`)
+- **Purpose:** Primary interface for secrets exports, automation triggers, and running `infisical run …` invocations required by Compose Engineer, Secrets Steward, and Deployment Runner.
+- **Note:** Keep the binary on PATH for all automation scripts and document future version changes here.
+
+---
+
 ## For AI Assistants
 
 **MANDATORY: Before completing ANY request, you MUST:**
