@@ -25,6 +25,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://traefik.freqkflag.co:8080
+      title: Dashboard
+      icon: dashboard
+      type: dashboard
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: infrastructure
   lifecycle: production
@@ -48,6 +57,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://infisical.freqkflag.co
+      title: Web UI
+      icon: dashboard
+      type: dashboard
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: service
   lifecycle: production
@@ -68,6 +86,11 @@ metadata:
   description: Infisical secrets management API
   annotations:
     backstage.io/view-url: https://infisical.freqkflag.co
+  links:
+    - url: https://infisical.freqkflag.co
+      title: API Documentation
+      icon: docs
+      type: documentation
 spec:
   type: rest
   lifecycle: production
@@ -91,6 +114,19 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://supabase.freqkflag.co
+      title: Studio
+      icon: dashboard
+      type: dashboard
+    - url: https://api.supabase.freqkflag.co
+      title: API
+      icon: api
+      type: api
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: service
   lifecycle: production
@@ -110,6 +146,15 @@ metadata:
   description: Supabase REST API generated from database schema
   annotations:
     backstage.io/view-url: https://api.supabase.freqkflag.co
+  links:
+    - url: https://api.supabase.freqkflag.co
+      title: API Endpoint
+      icon: api
+      type: api
+    - url: https://supabase.freqkflag.co
+      title: Studio
+      icon: dashboard
+      type: dashboard
 spec:
   type: rest
   lifecycle: production
@@ -133,6 +178,19 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://cultofjoey.com
+      title: Website
+      icon: web
+      type: website
+    - url: https://cultofjoey.com/wp-admin
+      title: Admin Dashboard
+      icon: dashboard
+      type: admin-dashboard
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: website
   lifecycle: production
@@ -155,6 +213,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://wiki.freqkflag.co
+      title: Wiki
+      icon: docs
+      type: documentation
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: service
   lifecycle: production
@@ -177,6 +244,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://n8n.freqkflag.co
+      title: Workflow Editor
+      icon: dashboard
+      type: dashboard
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: service
   lifecycle: production
@@ -199,6 +275,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://nodered.freqkflag.co
+      title: Flow Editor
+      icon: dashboard
+      type: dashboard
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: service
   lifecycle: production
@@ -219,6 +304,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://link.cultofjoey.com
+      title: Website
+      icon: web
+      type: website
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: website
   lifecycle: production
@@ -241,6 +335,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://gitlab.freqkflag.co
+      title: GitLab Instance
+      icon: code
+      type: source
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Infrastructure Repo
+      icon: code
+      type: source
 spec:
   type: service
   lifecycle: production
@@ -264,6 +367,15 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://adminer.freqkflag.co
+      title: Database Admin
+      icon: dashboard
+      type: admin-dashboard
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: tool
   lifecycle: production
@@ -287,6 +399,19 @@ metadata:
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
     backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://backstage.freqkflag.co
+      title: Portal
+      icon: dashboard
+      type: dashboard
+    - url: https://backstage.freqkflag.co/catalog
+      title: Software Catalog
+      icon: catalog
+      type: catalog
+    - url: https://gitlab.freqkflag.co/root/infra
+      title: Source Code
+      icon: code
+      type: source
 spec:
   type: service
   lifecycle: production

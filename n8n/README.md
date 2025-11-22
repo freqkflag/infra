@@ -60,6 +60,7 @@ Key variables in `.env`:
 
 **Application:**
 - `N8N_HOST`: Domain name (n8n.freqkflag.co)
+- **External Webhook Access:** Enabled - External systems can trigger webhooks without authentication
 - `TZ`: Timezone (default: America/New_York)
 - `LOG_LEVEL`: Logging level (info, debug, etc.)
 
