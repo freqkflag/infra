@@ -107,6 +107,12 @@ services:
       service: node-red
     profiles: ["vps"]
 
+  backstage:
+    extends:
+      file: ./services/backstage/compose.yml
+      service: backstage
+    profiles: ["vps"]
+
   cloudflared_mac:
     extends:
       file: ./services/cloudflared/compose.yml

@@ -11,7 +11,8 @@ sinks:
     config:
       path: "/root/infra/.workspace/.infisical-agent-token"
 templates:
-  - source-path: prod   # Change this to match your Infisical secret path
+  - source-path: ./prod.template   # Local template file that fetches from Infisical
+    environment: prod   # Environment where the secrets are stored
     destination-path: /root/infra/.workspace/.env
     config:
       polling-interval: 60s

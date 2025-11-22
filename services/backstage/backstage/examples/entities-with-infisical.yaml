@@ -1,0 +1,35 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: example-service
+  description: Example service with Infisical integration
+  annotations:
+    # Link this entity to an Infisical project
+    # Replace <your-project-id> with your actual Infisical project ID
+    infisical/projectId: <your-infisical-project-id>
+    # Optional: Link to GitHub repository
+    github.com/project-slug: your-org/example-service
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: example-system
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: example-api
+  description: Example API with Infisical secrets
+  annotations:
+    # Infisical project ID for this API's secrets
+    infisical/projectId: <your-infisical-project-id>
+    # API documentation
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: service
+  lifecycle: production
+  owner: api-team
+  system: example-system
+  providesApis:
+    - example-api
+

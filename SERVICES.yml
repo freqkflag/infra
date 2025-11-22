@@ -27,18 +27,6 @@ services:
     type: postgres
     version: '15'
     container: infisical-db
-- id: vault
-  name: Vault
-  dir: /root/infra/vault
-  url: https://vault.freqkflag.co
-  type: infra
-  status: deprecated
-  depends_on:
-  - traefik
-  description: Secrets management (deprecated - being replaced by Infisical)
-  mode: production
-  domain: vault.freqkflag.co
-  note: "Deprecated due to Docker restart issues. Migration to Infisical in progress. Infisical setup in progress - encryption key format issues being resolved."
 - id: monitoring
   name: Monitoring Stack
   dir: /root/infra/monitoring

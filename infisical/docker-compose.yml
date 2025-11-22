@@ -127,7 +127,7 @@ services:
       - "traefik.http.routers.infisical.rule=Host(`infisical.freqkflag.co`)"
       - "traefik.http.routers.infisical.entrypoints=websecure"
       - "traefik.http.routers.infisical.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.infisical.middlewares=security-headers@file,rate-limit-strict@file"
+      - "traefik.http.routers.infisical.middlewares=security-headers@file"
       - "traefik.http.services.infisical.loadbalancer.server.port=8080"
 
 networks:

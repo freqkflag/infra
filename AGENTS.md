@@ -406,6 +406,7 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 - Append operational notes to `~/server-changelog.md` after each deployment/incident.
 - Quarterly compliance review stored under `docs/compliance/`; co-signed by Security Sentinel + Orchestrator.
 - **All documentation updates initiated by agents must be committed and synchronized upstream.**
+- Record automation outputs (e.g., Infisical `run/export` commands) in documentation, referencing log files such as `/tmp/infisical-export.log` and noting workspace metadata (current slug: `prod`) so downstream agents understand the context and empty `{}` payload.
 
 ### Incident Escalation
 
@@ -565,6 +566,7 @@ Each service has backup procedures documented in its README.md file.
 - **Version:** 0.43.30 (installed globally via `npm install -g @infisical/cli`)
 - **Purpose:** Primary interface for secrets exports, automation triggers, and running `infisical run …` invocations required by Compose Engineer, Secrets Steward, and Deployment Runner.
 - **Note:** Keep the binary on PATH for all automation scripts and document future version changes here.
+- **Usage Tip:** This project exposes an `infisical` workspace whose only environment slug is `prod`; health exports must target `--env prod --path /` because `production`/`prod/` folders currently do not exist, so the CLI writes `{}` when no secrets are present.
 
 ---
 

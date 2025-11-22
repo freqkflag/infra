@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  backstage:
+    build:
+      context: ./backstage
+      dockerfile: Dockerfile
+    container_name: backstage
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      NODE_ENV: production
+      POSTGRES_HOST: backstage-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${BACKSTAGE_DB_USER:-backstage}
+      POSTGRES_PASSWORD: ${BACKSTAGE_DB_PASSWORD}
+      APP_BASE_URL: https://${BACKSTAGE_DOMAIN:-backstage.freqkflag.co}
+      BACKEND_BASE_URL: https://${BACKSTAGE_DOMAIN:-backstage.freqkflag.co}
+      INFISICAL_PUBLIC_URL: ${INFISICAL_PUBLIC_URL:-https://infisical.freqkflag.co}
+      INFISICAL_CLIENT_ID: ${INFISICAL_CLIENT_ID}
+      INFISICAL_CLIENT_SECRET: ${INFISICAL_CLIENT_SECRET}
+    depends_on:
+      backstage-db:
+        condition: service_healthy
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "ps aux | grep -v grep | grep -q 'node.*backend' && exit 0 || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backstage.rule=Host(`${BACKSTAGE_DOMAIN:-backstage.freqkflag.co}`)"
+      - "traefik.http.routers.backstage.entrypoints=websecure"
+      - "traefik.http.routers.backstage.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backstage.loadbalancer.server.port=7007"
+      - "traefik.http.routers.backstage.middlewares=secure-headers@file"
+
+  backstage-db:
+    image: postgres:16-alpine
+    container_name: backstage-db
+    env_file:
+      - ../../.workspace/.env
+    environment:
+      POSTGRES_DB: ${BACKSTAGE_DB_NAME:-backstage}
+      POSTGRES_USER: ${BACKSTAGE_DB_USER:-backstage}
+      POSTGRES_PASSWORD: ${BACKSTAGE_DB_PASSWORD}
+    volumes:
+      - backstage_db_data:/var/lib/postgresql/data
+    networks:
+      - edge
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "pg_isready -U ${BACKSTAGE_DB_USER:-backstage}"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  backstage_db_data:
+
