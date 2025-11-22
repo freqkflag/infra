@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: backstage
     env_file:
-      - ../../.workspace/.env
+      - /root/infra/.workspace/.env
     environment:
       NODE_ENV: production
       POSTGRES_HOST: backstage-db
@@ -45,11 +45,11 @@ services:
     image: postgres:16-alpine
     container_name: backstage-db
     env_file:
-      - ../../.workspace/.env
+      - /root/infra/.workspace/.env
     environment:
       POSTGRES_DB: ${BACKSTAGE_DB_NAME:-backstage}
       POSTGRES_USER: ${BACKSTAGE_DB_USER:-backstage}
-      POSTGRES_PASSWORD: ${BACKSTAGE_DB_PASSWORD}
+      POSTGRES_PASSWORD: ${BACKSTAGE_DB_PASSWORD:-backstage_249e1856dfb0bfe038154fa6}
     volumes:
       - backstage_db_data:/var/lib/postgresql/data
     networks:

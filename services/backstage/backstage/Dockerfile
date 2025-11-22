@@ -1,6 +1,5 @@
-# Use the official Backstage Dockerfile pattern
-# This expects pre-built artifacts (run yarn build:all first)
-# For now, we'll build in the Dockerfile but use the official pattern
+# Official Backstage Dockerfile pattern
+# Builds the backend package and creates a production image
 
 FROM node:22-bookworm-slim
 
@@ -21,29 +20,44 @@ USER node
 
 WORKDIR /app
 
-# Copy package files
-COPY --chown=node:node package.json yarn.lock .yarnrc.yml backstage.json ./
+# Copy files needed by Yarn
 COPY --chown=node:node .yarn ./.yarn
+COPY --chown=node:node .yarnrc.yml ./
+COPY --chown=node:node backstage.json ./
 
-# Copy all source files
+# Copy package files
+COPY --chown=node:node package.json yarn.lock ./
+
+# Copy workspace packages (with source files)
 COPY --chown=node:node packages ./packages
 COPY --chown=node:node examples ./examples
 COPY --chown=node:node app-config*.yaml ./
 
-# Install dependencies
-RUN yarn install --frozen-lockfile
+# Install all dependencies
+RUN yarn install
 
-# Build everything
-RUN yarn tsc
+# Build backend and frontend
 RUN yarn build:backend
 RUN yarn build:all
 
-# Install production dependencies only (after build)
+# Extract skeleton first (contains package.json files)
+RUN test -f packages/backend/dist/skeleton.tar.gz && \
+    cd /app && \
+    tar xzf packages/backend/dist/skeleton.tar.gz && \
+    rm packages/backend/dist/skeleton.tar.gz || echo "Skeleton already extracted"
+
+# Install production dependencies only (after skeleton extraction)
 RUN --mount=type=cache,target=/home/node/.cache/yarn,sharing=locked,uid=1000,gid=1000 \
     yarn workspaces focus --all --production && rm -rf "$(yarn cache clean)"
 
-# The build artifacts are already in packages/backend/dist from the build step above
-# No need to copy tar.gz files - the dist directory is already there
+# Extract backend bundle (contains the actual backend code)
+RUN test -f packages/backend/dist/bundle.tar.gz && \
+    cd /app && \
+    tar xzf packages/backend/dist/bundle.tar.gz && \
+    rm packages/backend/dist/bundle.tar.gz || echo "Bundle already extracted"
+
+# Verify dist files exist after extraction
+RUN test -f packages/backend/dist/index.cjs.js || (echo "ERROR: Backend dist files not found after extraction" && ls -la packages/backend/dist/ && exit 1)
 
 EXPOSE 7007
 

@@ -29,6 +29,7 @@ This document provides a standardized overview of all services and agents in the
 2. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
 3. Capture Infisical secret coverage for newly added services (Backstage + companions)
 4. Run deliberate preflight script to ensure dependencies sequence is honored
+5. Restart the Backstage compose stack now that secrets are in Infisical `/prod`, verify the DB initializes with the refreshed `.workspace/.env`, and document health status
 
 ---
 
@@ -147,7 +148,7 @@ This document provides a standardized overview of all services and agents in the
   - Configured via `services/backstage/backstage/app-config.production.yaml`
   - Documentation in `services/backstage/README.md` with usage steps and `entities-with-infisical.yaml` examples
 - **Notes:** Backend build currently requires source path adjustments; monitoring/health checks still pending.
-  - PostgreSQL container repeatedly exits because `BACKSTAGE_DB_PASSWORD` is empty and `INFISICAL_CLIENT_ID`/`INFISICAL_CLIENT_SECRET` are missing from `.workspace/.env`; secrets must be injected via Infisical and the agent run before the service can stay up.
+  - Infisical `/prod` now contains the `.env` catalog (2025-11-22) and `.workspace/.env` was regenerated; blank keys were stored as `__UNSET__` placeholders that should be replaced with proper values. Backstage containers still need a restart to consume the refreshed secrets and stabilize.
 
 ### Mailu
 - **Domain:** `mail.freqkflag.co` (admin), `webmail.freqkflag.co` (webmail)

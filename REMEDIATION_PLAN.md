@@ -371,7 +371,8 @@ docker inspect traefik --format='{{.State.Health.Status}}'
 
 **Current Progress:**  
 - [x] Backstage service skeleton deployed under `/root/infra/services/backstage/` with Traefik, PostgreSQL, and Infisical integration (per `server-changelog.md` entry); Docker build currently running but requires path adjustments before artifact creation.  
-- [ ] Backstage database container repeatedly restarts because `.workspace/.env` lacks `BACKSTAGE_DB_PASSWORD`, `INFISICAL_CLIENT_ID`, and `INFISICAL_CLIENT_SECRET`; Infisical wiring must inject these secrets before the build can finish.  
+- [x] Entire `.env` catalog injected into Infisical `prod` at path `/prod` (2025-11-22); `.workspace/.env` refreshed via `infisical export --env prod --path /prod`. Blank values were stored as the placeholder `__UNSET__` and need real credentials later.  
+- [ ] Backstage database container still needs to be restarted now that `BACKSTAGE_DB_PASSWORD`, `INFISICAL_CLIENT_ID`, and `INFISICAL_CLIENT_SECRET` are present in `.workspace/.env`; health verification pending.  
 - [ ] Service location audit and consolidation plan not started yet; existing root-level services still in place.  
 - [ ] Traefik configuration deduplication and health-check standardization work queued.
 
