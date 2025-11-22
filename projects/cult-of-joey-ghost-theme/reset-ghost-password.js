@@ -13,7 +13,11 @@ const rl = readline.createInterface({
 });
 
 const email = process.argv[2] || 'joey@cultofjoey.com';
-const password = process.argv[3] || 'Warren7882??';
+const password = process.argv[3] || (() => {
+  console.error('ERROR: Password must be provided as third argument');
+  console.error('Usage: node reset-ghost-password.js <email> <password>');
+  process.exit(1);
+})();
 
 console.log(`Generating password hash for: ${email}`);
 console.log(`Password: ${password.replace(/./g, '*')}`);
