@@ -69,8 +69,8 @@ check_nodered() {
 }
 
 check_scheduled_tasks() {
-    local cron_jobs=()
-    local systemd_timers=()
+    local cron_jobs="[]"
+    local systemd_timers="[]"
     local missing_tasks=()
     local failed_tasks=()
     

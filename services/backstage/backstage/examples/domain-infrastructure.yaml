@@ -1,0 +1,26 @@
+---
+# Infrastructure Domain - freqkflag.co
+# This domain represents the core infrastructure services and systems
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: infrastructure
+  description: Core infrastructure domain for freqkflag.co - includes reverse proxy, secrets management, databases, monitoring, and automation services
+  annotations:
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+  links:
+    - url: https://traefik.freqkflag.co:8080
+      title: Traefik Dashboard
+      icon: dashboard
+      type: dashboard
+    - url: https://infisical.freqkflag.co
+      title: Infisical
+      icon: security
+      type: tool
+    - url: https://backstage.freqkflag.co
+      title: Backstage Portal
+      icon: catalog
+      type: catalog
+spec:
+  owner: admins
+
