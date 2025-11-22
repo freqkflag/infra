@@ -76,8 +76,10 @@ class CloudflareDNSManager:
             'name': name,
             'content': content,
             'ttl': ttl,
-            'proxied': proxied
         }
+        # Only set proxied for A, AAAA, and CNAME records
+        if record_type in ['A', 'AAAA', 'CNAME']:
+            data['proxied'] = proxied
         
         result = self._request('POST', f"zones/{zone_id}/dns_records", data)
         return result.get('result', {})
@@ -89,8 +91,10 @@ class CloudflareDNSManager:
             'name': name,
             'content': content,
             'ttl': ttl,
-            'proxied': proxied
         }
+        # Only set proxied for A, AAAA, and CNAME records
+        if record_type in ['A', 'AAAA', 'CNAME']:
+            data['proxied'] = proxied
         
         result = self._request('PUT', f"zones/{zone_id}/dns_records/{record_id}", data)
         return result.get('result', {})
@@ -119,16 +123,38 @@ class CloudflareDNSManager:
         else:
             # Create new
             return self.create_dns_record(zone_id, 'CNAME', record_name, target, proxied=proxied)
+    
+    def upsert_a_record(self, zone_name: str, subdomain: str, ip_address: str, proxied: bool = True) -> Dict:
+        """Create or update an A record"""
+        zone = self.get_zone_by_name(zone_name)
+        if not zone:
+            raise ValueError(f"Zone not found: {zone_name}")
+        
+        zone_id = zone['id']
+        record_name = f"{subdomain}.{zone_name}" if subdomain else zone_name
+        
+        # Check if record exists (A or CNAME)
+        records = self.get_dns_records(zone_id, name=record_name)
+        a_records = [r for r in records if r['type'] == 'A']
+        
+        if a_records:
+            # Update existing A record
+            record = a_records[0]
+            return self.update_dns_record(zone_id, record['id'], 'A', record_name, ip_address, proxied=proxied)
+        else:
+            # Create new A record
+            return self.create_dns_record(zone_id, 'A', record_name, ip_address, proxied=proxied)
 
 def main():
     """CLI interface"""
     import argparse
     
     parser = argparse.ArgumentParser(description='Cloudflare DNS Manager')
-    parser.add_argument('action', choices=['list-zones', 'list-records', 'create-cname', 'update-cname', 'upsert-cname'], help='Action to perform')
+    parser.add_argument('action', choices=['list-zones', 'list-records', 'create-cname', 'update-cname', 'upsert-cname', 'upsert-a'], help='Action to perform')
     parser.add_argument('--zone', help='Zone name (domain)')
-    parser.add_argument('--subdomain', help='Subdomain (e.g., "infisical" for infisical.example.com)')
+    parser.add_argument('--subdomain', help='Subdomain (e.g., "infisical" for infisical.example.com, or "" for root)')
     parser.add_argument('--target', help='Target for CNAME record')
+    parser.add_argument('--ip', help='IP address for A record')
     parser.add_argument('--proxied', action='store_true', default=True, help='Enable Cloudflare proxy')
     parser.add_argument('--no-proxied', dest='proxied', action='store_false', help='Disable Cloudflare proxy')
     
@@ -162,6 +188,15 @@ def main():
                 sys.exit(1)
             result = manager.upsert_cname(args.zone, args.subdomain, args.target, proxied=args.proxied)
             print(f"✓ {'Updated' if 'id' in result else 'Created'} CNAME: {args.subdomain}.{args.zone} -> {args.target}")
+        
+        elif args.action == 'upsert-a':
+            if not all([args.zone, args.ip]):
+                print("Error: --zone and --ip required")
+                sys.exit(1)
+            subdomain = args.subdomain if args.subdomain else ""
+            result = manager.upsert_a_record(args.zone, subdomain, args.ip, proxied=args.proxied)
+            record_name = f"{subdomain}.{args.zone}" if subdomain else args.zone
+            print(f"✓ {'Updated' if 'id' in result else 'Created'} A: {record_name} -> {args.ip}")
         
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

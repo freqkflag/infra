@@ -25,21 +25,12 @@ services:
     networks:
       - edge
     restart: unless-stopped
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - "ps aux | grep -v grep | grep -q 'node.*backend' && exit 0 || exit 1"
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backstage.rule=Host(`${BACKSTAGE_DOMAIN:-backstage.freqkflag.co}`)"
       - "traefik.http.routers.backstage.entrypoints=websecure"
       - "traefik.http.routers.backstage.tls.certresolver=letsencrypt"
       - "traefik.http.services.backstage.loadbalancer.server.port=7007"
-      - "traefik.http.routers.backstage.middlewares=secure-headers@file"
 
   backstage-db:
     image: postgres:16-alpine

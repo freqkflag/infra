@@ -24,6 +24,18 @@ This document provides a standardized overview of all services and agents in the
 - ✅ **edge network:** Created and available
 - ✅ **traefik-network:** Exists
 
+### DNS Status (freqkflag.co)
+- ⚙️ **DNS Records:** 19 expected A records pointing to `62.72.26.113`
+- 📋 **Documentation:** See `docs/DNS_CONFIGURATION.md` for complete DNS record inventory
+- 🔧 **Management Tools:**
+  - `scripts/cloudflare-dns-manager.py` - DNS record management (supports A and CNAME records)
+  - `scripts/audit-dns-records.py` - DNS audit and expected records report
+- **Expected Domains:** See DNS_CONFIGURATION.md for complete list including:
+  - Infrastructure: `traefik.freqkflag.co`, `infisical.freqkflag.co`, `adminer.freqkflag.co`, `ops.freqkflag.co`
+  - Applications: `wiki.freqkflag.co`, `n8n.freqkflag.co`, `nodered.freqkflag.co`, `backstage.freqkflag.co`, `gitlab.freqkflag.co`
+  - Monitoring: `grafana.freqkflag.co`, `prometheus.freqkflag.co`, `alertmanager.freqkflag.co`, `loki.freqkflag.co`
+  - And more (19 total expected records)
+
 ### Next Steps
 1. ✅ **Backstage fully operational** (2025-11-22) - Both containers healthy; database ready; main app listening on port 7007; Infisical plugin initialized successfully
 2. ✅ **Environment variable naming fixed** (2025-11-22) - Fixed invalid environment variable names in Infisical (hyphens replaced with underscores, colons replaced with equals signs); all Cloudflare and API keys now use proper naming conventions
@@ -669,19 +681,36 @@ Each service follows a standardized structure:
 
 ## Domain Assignment Summary
 
+### freqkflag.co Infrastructure Domain
+
 | Domain | Service | Status | Purpose |
 |--------|---------|--------|---------|
-| `freqkflag.co` | Infrastructure SPINE | - | Infrastructure domain |
+| `freqkflag.co` | Infrastructure SPINE | - | Infrastructure domain (root) |
+| `traefik.freqkflag.co` | Traefik Dashboard | ✅ Running | Reverse proxy dashboard |
+| `infisical.freqkflag.co` | Infisical | ✅ Running | Secrets management |
 | `wiki.freqkflag.co` | WikiJS | ✅ Running | Documentation |
 | `n8n.freqkflag.co` | n8n | ✅ Running | Workflow automation |
+| `nodered.freqkflag.co` | Node-RED | ✅ Running | Flow-based automation |
+| `backstage.freqkflag.co` | Backstage | ✅ Running | Developer portal |
+| `gitlab.freqkflag.co` | GitLab CE | ✅ Running | Git repository hosting |
+| `adminer.freqkflag.co` | Adminer | ✅ Running | DB management |
+| `ops.freqkflag.co` | Ops Control Plane | ⚙️ Configured | Infrastructure operations UI |
 | `mail.freqkflag.co` | Mailu Admin | ⚙️ Configured | Email admin |
 | `webmail.freqkflag.co` | Mailu Webmail | ⚙️ Configured | Webmail interface |
 | `supabase.freqkflag.co` | Supabase Studio | ⚙️ Configured | Database studio |
 | `api.supabase.freqkflag.co` | Supabase API | ⚙️ Configured | REST API |
-| `adminer.freqkflag.co` | Adminer | ✅ Running | DB management |
-| `nodered.freqkflag.co` | Node-RED | ✅ Running | Flow-based automation |
-| `backstage.freqkflag.co` | Backstage | ✅ Running | Developer portal |
-| `gitlab.freqkflag.co` | GitLab CE | ✅ Running | Git repository hosting |
+| `vault.freqkflag.co` | Vault | ⚙️ Configured | Secrets management (legacy) |
+| `grafana.freqkflag.co` | Grafana | ⚙️ Configured | Monitoring dashboard |
+| `prometheus.freqkflag.co` | Prometheus | ⚙️ Configured | Metrics collection |
+| `alertmanager.freqkflag.co` | Alertmanager | ⚙️ Configured | Alert management |
+| `loki.freqkflag.co` | Loki | ⚙️ Configured | Log aggregation |
+
+**Note:** All freqkflag.co subdomains should have A records pointing to `62.72.26.113`. See `docs/DNS_CONFIGURATION.md` for complete DNS management guide and `scripts/audit-dns-records.py` for DNS audit tool.
+
+### Other Domains
+
+| Domain | Service | Status | Purpose |
+|--------|---------|--------|---------|
 | `cultofjoey.com` | WordPress | ✅ Running | Personal brand site |
 | `link.cultofjoey.com` | LinkStack | ✅ Running | Link-in-bio |
 | `twist3dkinkst3r.com` | Mastodon | ⚙️ Configured | Community instance |
@@ -726,6 +755,7 @@ Each service has backup procedures documented in its README.md file.
 - **Main README:** `/root/infra/README.md`
 - **AI Preferences:** `/root/infra/PREFERENCES.md` - How AI should interact
 - **Domain Architecture:** `/root/infra/DOMAIN_ARCHITECTURE.md`
+- **DNS Configuration:** `/root/infra/docs/DNS_CONFIGURATION.md` - Complete DNS records inventory and management
 - **Service Documentation:** Each service has its own `README.md`
 - **DevContainer Guide:** `/root/infra/.devcontainer/README.md`
 
