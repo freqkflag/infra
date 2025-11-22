@@ -1,0 +1,178 @@
+{
+  "name": "Agent Event Router",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "agent-events",
+        "options": {}
+      },
+      "id": "webhook-agent-events",
+      "name": "Webhook - Agent Events",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "agent-events"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "agent",
+              "name": "agent",
+              "value": "={{$json.body.agent}}",
+              "type": "string"
+            },
+            {
+              "id": "output_file",
+              "name": "output_file",
+              "value": "={{$json.body.output_file || '/root/infra/orchestration/' + $json.body.agent + '-' + $now.format('YYYYMMDD-HHmmss') + '.json'}}",
+              "type": "string"
+            },
+            {
+              "id": "trigger",
+              "name": "trigger",
+              "value": "={{$json.body.trigger || 'webhook'}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "prepare-params",
+      "name": "Prepare Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "=bash -c '/root/infra/ai.engine/scripts/invoke-agent.sh \"{{ $json.agent }}\" \"{{ $json.output_file }}\"'",
+        "options": {}
+      },
+      "id": "invoke-agent-exec",
+      "name": "Execute Agent Script",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}",
+              "type": "string"
+            },
+            {
+              "id": "agent",
+              "name": "agent",
+              "value": "={{$('Prepare Parameters').item.json.agent}}",
+              "type": "string"
+            },
+            {
+              "id": "status",
+              "name": "status",
+              "value": "triggered",
+              "type": "string"
+            },
+            {
+              "id": "output",
+              "name": "output",
+              "value": "={{$json.stdout || $json.stderr || 'completed'}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify({status: 'success', message: 'Agent triggered', agent: $json.agent, timestamp: $json.timestamp, output: $json.output})}}",
+        "options": {}
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - Agent Events": {
+      "main": [
+        [
+          {
+            "node": "Prepare Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Parameters": {
+      "main": [
+        [
+          {
+            "node": "Execute Agent Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Agent Script": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-11-22T12:00:00.000Z",
+      "updatedAt": "2025-11-22T12:00:00.000Z",
+      "id": "automation",
+      "name": "automation"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-22T12:00:00.000Z",
+  "versionId": "1",
+  "active": false
+}
+

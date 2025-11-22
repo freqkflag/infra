@@ -390,7 +390,7 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: backstage
+  name: backstage-portal
   description: Internal developer portal and software catalog
   annotations:
     backstage.io/view-url: https://backstage.freqkflag.co

@@ -277,16 +277,22 @@ Check n8n execution logs at `https://n8n.freqkflag.co/executions`
 
 ## Next Steps
 
+**See [NEXT_STEPS_AI_PROMPT.md](./NEXT_STEPS_AI_PROMPT.md) for detailed AI prompts to continue implementation.**
+
 1. ✅ **Documentation created** - This README
-2. ✅ **Workflows created** - n8n and Node-RED workflows
+2. ✅ **Workflows created** - n8n workflow JSON files
 3. ✅ **Scripts created** - Setup and trigger scripts
-4. ⏭️ **Import workflows** - Import into n8n and Node-RED
-5. ⏭️ **Run setup script** - Execute `setup-automation.sh`
-6. ⏭️ **Test automation** - Verify all trigger types work
-7. ⏭️ **Monitor execution** - Track agent runs and results
+4. ✅ **External webhook access enabled** - n8n configured for external triggers
+5. ⏭️ **Import workflows** - Import into n8n and Node-RED
+6. ⏭️ **Configure agent invocation** - Set up n8n to invoke agent scripts
+7. ⏭️ **Run setup script** - Execute `setup-automation.sh`
+8. ⏭️ **Test automation** - Verify all trigger types work
+9. ⏭️ **Monitor execution** - Track agent runs and results
+
+**For AI assistants continuing this work, use the prompts in NEXT_STEPS_AI_PROMPT.md.**
 
 ---
 
-**Status:** ✅ Complete  
+**Status:** ✅ Documentation Complete, ⏭️ Implementation Ready  
 **Last Updated:** 2025-11-22
 

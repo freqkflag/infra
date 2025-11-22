@@ -389,9 +389,12 @@ cd /root/infra/ai.engine/workflows/scripts
 - [MCP Integration](./MCP_INTEGRATION.md) - MCP server integration guide
 - [Automation Workflows](./AUTOMATION_WORKFLOWS.md) - Complete automation system
 - [Workflows README](./workflows/README.md) - Workflow setup and usage
+- [Next Steps AI Prompt](./workflows/NEXT_STEPS_AI_PROMPT.md) - **AI prompts for continuing implementation**
 - [Agents README](./agents/README.md) - Detailed agent documentation
 - [Infrastructure Runbook](../runbooks/infra-runbook.md) - Orchestrator usage
 - [Infrastructure Cookbook](../INFRASTRUCTURE_COOKBOOK.md) - Infrastructure reference
+
+**For AI assistants:** Use [NEXT_STEPS_AI_PROMPT.md](./workflows/NEXT_STEPS_AI_PROMPT.md) to continue automating agent workflows.
 
 ---
 
