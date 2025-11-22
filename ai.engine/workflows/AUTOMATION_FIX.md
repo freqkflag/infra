@@ -246,5 +246,27 @@ git status
 ---
 
 **Last Updated:** 2025-11-22  
-**Status:** ✅ Post-agent automation script created, n8n workflow integration pending
+**Status:** ✅ Post-agent automation script created, medic-agent created for self-healing, n8n workflow integration pending
+
+**Medic-Agent Integration (2025-11-22):**
+- ✅ **Medic-Agent Created:** `ai.engine/agents/medic-agent.md` - Self-healing agent for automation system
+- ✅ **Health Check Script:** `ai.engine/scripts/check-automation-health.sh` - Automated health check for automation system
+- ✅ **Auto-Medic Script:** `ai.engine/workflows/scripts/auto-medic.sh` - Automatic medic execution on failures
+- ✅ **Features:**
+  - Self-diagnosis of automation system health
+  - Detection of missed triggers and failed flows
+  - Automatic fix planning and execution
+  - Task creation for automation maintenance
+  - Integration with n8n, Node-RED, webhooks, and scheduled tasks
+- ✅ **Usage:**
+  ```bash
+  # Manual diagnosis
+  ./ai.engine/scripts/invoke-agent.sh medic /tmp/medic-report.json
+  
+  # Scheduled health check
+  0 0 * * * /root/infra/ai.engine/workflows/scripts/auto-medic.sh scheduled
+  
+  # Health check only
+  ./ai.engine/scripts/check-automation-health.sh /tmp/health.json
+  ```
 

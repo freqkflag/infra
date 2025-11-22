@@ -496,6 +496,20 @@ When agents create or modify services:
   - Daily catalog health check: `./backstage.sh /tmp/backstage-health-$(date +%Y%m%d).json`
   - Pre-deployment validation: `./backstage.sh /tmp/backstage-pre-deploy.json`
 
+#### Medic Agent
+- Self-healing agent for AI Engine automation system.
+- Diagnoses automation failures, missed triggers, and broken flows.
+- Analyzes automation system health (n8n, Node-RED, webhooks, scheduled tasks).
+- Creates fix plans and executes fixes automatically.
+- Sets tasks for automation maintenance.
+- Monitors automation patterns and learns from failures.
+- Triggers:
+  - `cd /root/infra/ai.engine/scripts && ./invoke-agent.sh medic [output_file]`
+  - `cd /root/infra/ai.engine/scripts && ./medic.sh [output_file]`
+  - `cd /root/infra/ai.engine/scripts && ./check-automation-health.sh [output_file]`
+  - `cd /root/infra/ai.engine/workflows/scripts && ./auto-medic.sh [trigger_reason]`
+  - Scheduled: `0 0 * * * /root/infra/ai.engine/workflows/scripts/auto-medic.sh scheduled`
+
 ### AI Engine Integration
 
 **Location:** `/root/infra/ai.engine/`  
