@@ -1,0 +1,307 @@
+---
+# Infrastructure System - freqkflag.co
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: infrastructure
+  description: Core infrastructure services for freqkflag.co
+  annotations:
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+spec:
+  owner: admins
+  domain: infrastructure
+
+---
+# Traefik - Reverse Proxy and Load Balancer
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: traefik
+  description: Reverse proxy, SSL termination, and service discovery
+  annotations:
+    backstage.io/view-url: https://traefik.freqkflag.co:8080
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: infrastructure
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+    - resource:redis
+
+---
+# Infisical - Secrets Management
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: infisical
+  description: Modern secrets management and secure credential storage
+  annotations:
+    backstage.io/view-url: https://infisical.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: service
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+    - resource:redis
+  providesApis:
+    - infisical-api
+
+---
+# Infisical API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: infisical-api
+  description: Infisical secrets management API
+  annotations:
+    backstage.io/view-url: https://infisical.freqkflag.co
+spec:
+  type: rest
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  definition: |
+    OpenAPI 3.0 specification for Infisical API
+    Base URL: https://infisical.freqkflag.co
+
+---
+# Supabase - Database Platform
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: supabase
+  description: Backend-as-a-Service (BaaS) with PostgreSQL and management tools
+  annotations:
+    backstage.io/view-url: https://supabase.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: service
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+  providesApis:
+    - supabase-api
+
+---
+# Supabase API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: supabase-api
+  description: Supabase REST API generated from database schema
+  annotations:
+    backstage.io/view-url: https://api.supabase.freqkflag.co
+spec:
+  type: rest
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  definition: |
+    REST API auto-generated from PostgreSQL schema
+    Base URL: https://api.supabase.freqkflag.co
+
+---
+# WordPress - Content Management System
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: wordpress
+  description: WordPress CMS for cultofjoey.com personal brand site
+  annotations:
+    backstage.io/view-url: https://cultofjoey.com
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: website
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:mariadb
+
+---
+# WikiJS - Documentation Platform
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: wikijs
+  description: Documentation and knowledge base platform
+  annotations:
+    backstage.io/view-url: https://wiki.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: service
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+
+---
+# n8n - Workflow Automation
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: n8n
+  description: Workflow automation and integration platform
+  annotations:
+    backstage.io/view-url: https://n8n.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: service
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+
+---
+# Node-RED - Flow-based Development
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: node-red
+  description: Flow-based development tool for visual programming
+  annotations:
+    backstage.io/view-url: https://nodered.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: service
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+
+---
+# LinkStack - Link-in-Bio Page
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: linkstack
+  description: Link-in-bio page for cultofjoey.com
+  annotations:
+    backstage.io/view-url: https://link.cultofjoey.com
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: website
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:mariadb
+
+---
+# GitLab - Version Control
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: gitlab
+  description: Git repository hosting and DevOps platform
+  annotations:
+    backstage.io/view-url: https://gitlab.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: service
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+    - resource:redis
+
+---
+# Adminer - Database Management
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: adminer
+  description: Web-based database administration tool
+  annotations:
+    backstage.io/view-url: https://adminer.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: tool
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+    - resource:mariadb
+
+---
+# Backstage - Developer Portal
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage
+  description: Internal developer portal and software catalog
+  annotations:
+    backstage.io/view-url: https://backstage.freqkflag.co
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+    github.com/project-slug: freqkflag/infra
+spec:
+  type: service
+  lifecycle: production
+  owner: admins
+  system: infrastructure
+  dependsOn:
+    - resource:postgres
+    - component:infisical
+
+---
+# PostgreSQL - Database Resource
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: postgres
+  description: PostgreSQL database cluster for infrastructure services
+  annotations:
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+spec:
+  type: database
+  owner: admins
+  system: infrastructure
+
+---
+# MariaDB - Database Resource
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: mariadb
+  description: MariaDB/MySQL database cluster for WordPress and LinkStack
+  annotations:
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+spec:
+  type: database
+  owner: admins
+  system: infrastructure
+
+---
+# Redis - Cache Resource
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: redis
+  description: Redis cache and queue service
+  annotations:
+    infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
+spec:
+  type: cache
+  owner: admins
+  system: infrastructure
+

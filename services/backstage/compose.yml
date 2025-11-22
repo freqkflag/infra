@@ -8,6 +8,7 @@ services:
     container_name: backstage
     volumes:
       - ./backstage/app-config.production.yaml:/app/app-config.production.yaml:ro
+      - ./backstage/examples:/app/examples:ro
     env_file:
       - ../../.workspace/.env
     environment:

@@ -42,6 +42,10 @@ import { infisicalPlugin } from '@infisical/backstage-plugin-infisical';
 
 const app = createApp({
   apis,
+  plugins: [
+    infisicalPlugin,
+    // ...other plugins are auto-discovered by app-defaults
+  ],
   bindRoutes({ bind }) {
     bind(catalogPlugin.externalRoutes, {
       createComponent: scaffolderPlugin.routes.root,
