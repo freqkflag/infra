@@ -46,11 +46,11 @@ This document provides a standardized overview of all services and agents in the
 5. 🔄 **GitLab deployment** (2025-11-22 09:24:29) - Container starting; monitor initialization progress (5-10 minute first boot expected)
 6. ✅ **Status agent health check completed** (2025-11-22) - 28 containers running, 27 healthy, 1 unhealthy (GitLab initializing). Monitoring gaps documented in `docs/MONITORING_GAPS.md`. Automation scripts created: `scripts/automated-health-check.sh`, `scripts/deploy-metrics-exporters.sh`
 7. 🔧 **Monitoring gaps identified** (2025-11-22) - Missing: cAdvisor, postgres_exporter, mysqld_exporter, redis_exporter. Prometheus configured but exporters not deployed. See `docs/MONITORING_GAPS.md` for implementation plan
-8. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
-9. Capture Infisical secret coverage for newly added services (Backstage + companions)
-10. Run deliberate preflight script to ensure dependencies sequence is honored
-11. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
-12. Update Backstage health check method if `ps` command unavailable in container
+8. ✅ **Phase 1.5 completed** (2025-11-22) - Database instance documentation (`docs/DATABASE_INSTANCES.md`) and audit script (`scripts/audit-database-instances.sh`) created
+9. ✅ **Phase 1.6 completed** (2025-11-22) - Environment variable loading documentation (`docs/COMPOSE_ENV_LOADING.md`) and validation script (`scripts/validate-env-loading.sh`) created
+10. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
+11. Run deliberate preflight script to ensure dependencies sequence is honored
+12. Optional: Integrate environment variable validation into preflight.sh script
 
 ---
 

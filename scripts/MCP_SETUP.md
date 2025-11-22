@@ -6,6 +6,8 @@ This directory contains MCP (Model Context Protocol) servers for infrastructure 
 
 - **Cloudflare MCP Server** - DNS management
 - **WikiJS MCP Server** - Wiki page management
+- **Supabase MCP Server** - Supabase database and API management
+- **GitHub MCP Server** - GitHub repository and issue management
 
 ## WikiJS MCP Server
 
@@ -36,6 +38,16 @@ Add to your MCP configuration file (typically `~/.config/cursor/mcp.json` or sim
       "env": {
         "CLOUDFLARE_API_TOKEN": "your-cloudflare-token"
       }
+    },
+    "supabase": {
+      "command": "node",
+      "args": ["/root/infra/scripts/supabase-mcp-server.js"],
+      "env": {
+        "SUPABASE_URL": "https://api.supabase.freqkflag.co",
+        "SUPABASE_ANON_KEY": "your-anon-key",
+        "SUPABASE_SERVICE_KEY": "your-service-key",
+        "POSTGRES_PASSWORD": "your-db-password"
+      }
     }
   }
 }
@@ -58,6 +70,27 @@ Add to your MCP configuration file (typically `~/.config/cursor/mcp.json` or sim
 - `update_dns_record` - Update DNS record
 - `delete_dns_record` - Delete DNS record
 
+#### Supabase Tools
+- `get_project_info` - Get Supabase project information
+- `list_tables` - List all tables in a schema
+- `describe_table` - Get table structure and columns
+- `execute_query` - Execute SQL SELECT query (read-only)
+- `list_extensions` - List installed PostgreSQL extensions
+- `enable_extension` - Enable a PostgreSQL extension
+- `list_functions` - List database functions
+- `rest_query` - Query table via REST API
+- `rest_insert` - Insert data via REST API
+- `rest_update` - Update data via REST API
+- `rest_delete` - Delete data via REST API
+
+#### GitHub Tools
+- `list_repositories` - List repositories
+- `get_repository` - Get repository information
+- `list_issues` - List issues
+- `create_issue` - Create issue
+- `list_pull_requests` - List pull requests
+- And more (see `github-mcp-server.md`)
+
 ### Usage Examples
 
 Once configured, you can use the MCP tools in your AI assistant:
@@ -79,6 +112,16 @@ Use the cloudflare create_dns_record tool to create an A record
 for subdomain.example.com pointing to 1.2.3.4
 ```
 
+**List Supabase Tables:**
+```
+Use the supabase list_tables tool to see all tables in the public schema
+```
+
+**Query Supabase Data:**
+```
+Use the supabase rest_query tool to get users from the users table with a limit of 10
+```
+
 ## Testing
 
 ### Test WikiJS MCP Server
@@ -96,6 +139,25 @@ node wikijs-mcp-server.js
 cd /root/infra/scripts
 export CLOUDFLARE_API_TOKEN="your-token"
 node cloudflare-mcp-server.js
+```
+
+### Test Supabase MCP Server
+
+```bash
+cd /root/infra/scripts
+source /root/infra/.workspace/.env
+node supabase-mcp-server.js
+```
+
+Or with explicit environment variables:
+
+```bash
+cd /root/infra/scripts
+export SUPABASE_URL="https://api.supabase.freqkflag.co"
+export SUPABASE_ANON_KEY="your-anon-key"
+export SUPABASE_SERVICE_KEY="your-service-key"
+export POSTGRES_PASSWORD="your-db-password"
+node supabase-mcp-server.js
 ```
 
 ## Troubleshooting
