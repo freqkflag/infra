@@ -90,6 +90,29 @@ This document provides a standardized overview of all services and agents in the
   - Developer-friendly CLI
   - No unsealing required (simpler operations)
 - **Documentation:** See `infisical/README.md`
+
+### Infisical MCP Server
+- **Domain:** N/A (MCP server, not HTTP)
+- **Location:** `/root/infra/infisical-mcp/`
+- **Status:** ⚙️ Configured (requires Machine Identity credentials)
+- **Purpose:** Model Context Protocol server for AI clients (Cursor IDE) to interact with Infisical secrets
+- **Features:**
+  - Official Infisical MCP server (`@infisical/mcp`)
+  - Enables AI assistants to read/update Infisical secrets
+  - Secure authentication via Machine Identity Universal Auth
+  - Integrates with Cursor IDE and other MCP-compatible clients
+  - Supports function calling for secret management
+- **Configuration:**
+  - Requires `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID` and `INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET`
+  - Configured in Cursor IDE via `~/.config/cursor/mcp.json` (or workspace-level config)
+  - Runs via `npx -y @infisical/mcp`
+- **Documentation:** See `infisical-mcp/README.md` and `infisical-mcp/CURSOR_CONFIG.md`
+- **Setup:** Run `./setup.sh` to verify configuration and get setup instructions
+- **Next Steps:**
+  - Create Machine Identity in Infisical with Universal Auth
+  - Set credentials in Infisical `/prod` path
+  - Configure Cursor IDE MCP settings
+  - Restart Cursor IDE to load MCP server
 - **Secrets Integration:**
   - ✅ **Infisical Agent configured and running** - `infisical-agent.yml` generates `.workspace/.env` from `prod.template` every 60 seconds
   - ✅ **Agent Status (2025-11-22):** Infisical Agent is running and syncing secrets from `/prod` path to `.workspace/.env`

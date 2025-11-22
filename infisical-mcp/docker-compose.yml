@@ -1,0 +1,40 @@
+services:
+  infisical-mcp:
+    image: node:20-alpine
+    container_name: infisical-mcp
+    restart: unless-stopped
+    env_file:
+      - ../.workspace/.env
+    environment:
+      - INFISICAL_UNIVERSAL_AUTH_CLIENT_ID=${INFISICAL_UNIVERSAL_AUTH_CLIENT_ID}
+      - INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET=${INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET}
+      - INFISICAL_HOST_URL=${INFISICAL_HOST_URL:-https://infisical.freqkflag.co}
+      - NODE_ENV=production
+    command: >
+      sh -c 'apk add --no-cache git &&
+      npm install -g @infisical/mcp &&
+      infisical-mcp'
+    networks:
+      - traefik-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep -v grep | grep -q 'infisical-mcp' || ps aux | grep -v grep | grep -q 'node.*mcp' && exit 0 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  traefik-network:
+    external: true
+    name: traefik-network
+
