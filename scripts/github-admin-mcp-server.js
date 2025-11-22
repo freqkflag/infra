@@ -1887,7 +1887,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (args.name) payload.name = args.name;
         if (args.url) payload.url = args.url;
         if (args.description) payload.description = args.description;
-        if (args.callback_url) payload.callback_url = args.callback_url;
+        if (args.callback_url) payload.redirect_uri = args.callback_url;
+        if (args.redirect_uri) payload.redirect_uri = args.redirect_uri;
 
         const data = await apiRequest(
           "PATCH",

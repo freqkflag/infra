@@ -3,3 +3,22 @@
 {{ .Key }}={{ .Value }}
 {{- end }}
 {{- end }}
+# Service-specific GitHub OAuth credentials (from service folders)
+{{- $backstage := secret "8c430744-1a5b-4426-af87-e96d6b9c91e3" "prod" "/backstage" }}
+{{- range $backstage }}
+{{- if eq .Key "GITHUB_CLIENT_ID" }}
+BACKSTAGE_GITHUB_CLIENT_ID={{ .Value }}
+{{- end }}
+{{- if eq .Key "GITHUB_CLIENT_SECRET" }}
+BACKSTAGE_GITHUB_CLIENT_SECRET={{ .Value }}
+{{- end }}
+{{- end }}
+{{- $infsical := secret "8c430744-1a5b-4426-af87-e96d6b9c91e3" "prod" "/infsical" }}
+{{- range $infsical }}
+{{- if eq .Key "GITHUB_CLIENT_ID" }}
+INFISICAL_GITHUB_CLIENT_ID={{ .Value }}
+{{- end }}
+{{- if eq .Key "GITHUB_CLIENT_SECRET" }}
+INFISICAL_GITHUB_CLIENT_SECRET={{ .Value }}
+{{- end }}
+{{- end }}

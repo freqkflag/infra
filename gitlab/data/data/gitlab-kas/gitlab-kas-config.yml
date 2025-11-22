@@ -13,8 +13,8 @@ agent:
   info_cache_ttl: 300s
   info_cache_error_ttl: 60s
 gitlab:
-  address: https://
-  external_url: https://
+  address: https://gitlab.freqkflag.co
+  external_url: https://gitlab.freqkflag.co
   authentication_secret_file: /var/opt/gitlab/gitlab-kas/authentication_secret_file
 observability:
   listen:

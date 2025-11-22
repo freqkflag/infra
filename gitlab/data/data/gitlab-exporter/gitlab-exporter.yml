@@ -2,7 +2,7 @@ db_common: &db_common
   methods:
     - probe_db
   opts:
-    connection_string: dbname=gitlab user=gitlab host=infisical-db port=5432 password=wJOBfNCBJHrYbOsXkK9OTuYS6
+    connection_string: dbname=gitlab user=gitlab host=postgres-postgres-1 port=5432 password=Warren7882??
 
 # Web server config
 server:

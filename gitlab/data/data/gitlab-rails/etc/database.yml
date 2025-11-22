@@ -7,9 +7,9 @@ production:
     adapter: postgresql
     encoding: unicode
     collation: 
-    database: 
-    username: ""
-    password: ""
+    database: gitlab
+    username: "gitlab"
+    password: "Warren7882??"
     host: "postgres-postgres-1"
     port: 5432
     socket: 
@@ -34,9 +34,9 @@ production:
     adapter: postgresql
     encoding: unicode
     collation: 
-    database: 
-    username: ""
-    password: ""
+    database: gitlab
+    username: "gitlab"
+    password: "Warren7882??"
     host: "postgres-postgres-1"
     port: 5432
     socket: 

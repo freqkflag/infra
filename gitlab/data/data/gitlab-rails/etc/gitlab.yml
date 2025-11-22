@@ -10,7 +10,7 @@ production: &base
   ## GitLab settings
   gitlab:
     ## Web server settings (note: host is the FQDN, do not include http://)
-    host: 
+    host: gitlab.freqkflag.co
     port: 443
     https: true
 
@@ -49,7 +49,7 @@ production: &base
     # Uncomment and set to false if you need to disable email sending from GitLab (default: true)
     email_enabled: 
     # Email address used in the "From" field in mails sent by GitLab
-    email_from: gitlab@
+    email_from: gitlab@gitlab.freqkflag.co
     email_display_name: 
     email_reply_to: 
     email_subject_suffix: 
@@ -207,7 +207,7 @@ production: &base
     # mailroom can contact to. Note that the combined url must not end with "/".
     # At the moment, the webhook delivery method doesn't support HTTP/HTTPs via
     # UNIX socket.
-    gitlab_url: https:/
+    gitlab_url: https://gitlab.freqkflag.co
 
     # When the delivery method is webhook, this config is the file that
     # contains the shared secret key for verifying access for mailroom's
@@ -263,7 +263,7 @@ production: &base
     # mailroom can contact to. Note that the combined url must not end with "/".
     # At the moment, the webhook delivery method doesn't support HTTP/HTTPs via
     # UNIX socket.
-    gitlab_url: https:/
+    gitlab_url: https://gitlab.freqkflag.co
 
     # When the delivery method is webhook, this config is the file that
     # contains the shared secret key for verifying access for mailroom's
@@ -357,11 +357,11 @@ production: &base
 
   ## Container Registry
   registry:
-    enabled: true
+    enabled: false
     host: 
-    port: 5050
-    api_url: http://127.0.0.1:5000 # internal address to the registry, will be used by GitLab to directly communicate with API
-    path: /var/opt/gitlab/gitlab-rails/shared/registry
+    port: 
+    api_url:  # internal address to the registry, will be used by GitLab to directly communicate with API
+    path: 
     key: /var/opt/gitlab/gitlab-rails/etc/gitlab-registry.key
     issuer: omnibus-gitlab-issuer
     notification_secret: 
@@ -370,8 +370,8 @@ production: &base
   gitlab_kas:
     enabled: true
     internal_url: grpc://localhost:8153
-    external_url: wss:///-/kubernetes-agent/
-    external_k8s_proxy_url: https:///-/kubernetes-agent/k8s-proxy/
+    external_url: wss://gitlab.freqkflag.co/-/kubernetes-agent/
+    external_k8s_proxy_url: https://gitlab.freqkflag.co/-/kubernetes-agent/k8s-proxy/
 
   ## Error Reporting and Logging with Sentry
   sentry:
