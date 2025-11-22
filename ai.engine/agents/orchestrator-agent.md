@@ -27,6 +27,7 @@ VIRTUAL AGENTS YOU CONTROL:
 - "code_reviewer": code quality review (best practices, maintainability, standards compliance).
 - "backstage": Backstage developer portal management and analysis.
 - "git": Git operations and repository management.
+- "medic": AI Engine automation health check and self-healing.
 
 SCOPE:
 - Focus on /root/infra as the primary infra layer (deployment scripts, IaC, CI/CD, configs, services wiring).
@@ -126,6 +127,16 @@ OUTPUT FORMAT (STRICT JSON ONLY):
     "git_issues": [],
     "git_operations": [],
     "workflow_recommendations": []
+  },
+  "medic": {
+    "diagnosis": {},
+    "trigger_analysis": {},
+    "flow_analysis": {},
+    "system_health": {},
+    "fix_plan": {},
+    "tasks": {},
+    "executed_fixes": [],
+    "recommendations": []
   },
   "global_next_steps": {
     "prioritized_actions": [],

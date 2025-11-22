@@ -26,6 +26,7 @@ This catalog provides ready-to-use prompts for invoking each agent in the AI Eng
 | **ops** | `Act as ops_agent. Analyze /root/infra. Return operational insights + commands in strict JSON.` | Operations management |
 | **backstage** | `Act as backstage_agent. Analyze /root/infra/services/backstage. Return Backstage health + catalog status in strict JSON.` | Backstage portal management |
 | **git** | `Act as git_agent. Analyze /root/infra Git repository. Return repository health + Git operations in strict JSON.` | Git operations and repository management |
+| **medic** | `Act as medic_agent. Diagnose /root/infra/ai.engine automation system. Return automation health + fixes in strict JSON.` | AI Engine automation health check and self-healing |
 | **mcp** | `Act as mcp_agent. Analyze /root/infra and identify MCP opportunities. Return MCP recommendations in strict JSON.` | MCP integration guidance |
 | **orchestrator** | `Use Multi-Agent Orchestrator. Analyze /root/infra. Return aggregated report in strict JSON.` | Comprehensive analysis |
 
