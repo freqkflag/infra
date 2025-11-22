@@ -22,6 +22,9 @@ metadata:
     backstage.io/view-url: https://traefik.freqkflag.co:8080
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: infrastructure
   lifecycle: production
@@ -42,6 +45,9 @@ metadata:
     backstage.io/view-url: https://infisical.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   lifecycle: production
@@ -82,6 +88,9 @@ metadata:
     backstage.io/view-url: https://supabase.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   lifecycle: production
@@ -121,6 +130,9 @@ metadata:
     backstage.io/view-url: https://cultofjoey.com
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: website
   lifecycle: production
@@ -140,6 +152,9 @@ metadata:
     backstage.io/view-url: https://wiki.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   lifecycle: production
@@ -159,6 +174,9 @@ metadata:
     backstage.io/view-url: https://n8n.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   lifecycle: production
@@ -178,6 +196,9 @@ metadata:
     backstage.io/view-url: https://nodered.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   lifecycle: production
@@ -195,6 +216,9 @@ metadata:
     backstage.io/view-url: https://link.cultofjoey.com
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: website
   lifecycle: production
@@ -214,6 +238,9 @@ metadata:
     backstage.io/view-url: https://gitlab.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   lifecycle: production
@@ -234,6 +261,9 @@ metadata:
     backstage.io/view-url: https://adminer.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: tool
   lifecycle: production
@@ -254,6 +284,9 @@ metadata:
     backstage.io/view-url: https://backstage.freqkflag.co
     infisical/projectId: 8c430744-1a5b-4426-af87-e96d6b9c91e3
     github.com/project-slug: freqkflag/infra
+    gitlab.com/project-slug: root/infra
+    gitlab.com/instance-url: https://gitlab.freqkflag.co
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   lifecycle: production

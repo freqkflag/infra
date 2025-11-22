@@ -16,7 +16,7 @@ services:
         gitlab_rails['db_host'] = 'postgres-postgres-1'
         gitlab_rails['db_port'] = 5432
         gitlab_rails['db_username'] = 'gitlab'
-        gitlab_rails['db_password'] = 'Warren7882??'
+        gitlab_rails['db_password'] = '${GITLAB_DB_PASSWORD}'
         gitlab_rails['db_database'] = 'gitlab'
         
         # Redis configuration
@@ -29,7 +29,7 @@ services:
         gitlab_rails['smtp_enable'] = false
         
         # Security settings
-        gitlab_rails['initial_root_password'] = 'Warren7882??'
+        gitlab_rails['initial_root_password'] = '${GITLAB_ROOT_PASSWORD}'
         
         # Performance tuning
         puma['worker_processes'] = 2
