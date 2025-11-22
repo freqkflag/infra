@@ -1,0 +1,258 @@
+[
+  {
+    "id": "flow-n8n-integration",
+    "type": "tab",
+    "label": "n8n Integration",
+    "disabled": false,
+    "info": "Integration flow for n8n communication"
+  },
+  {
+    "id": "n8n-webhook-in",
+    "type": "http in",
+    "z": "flow-n8n-integration",
+    "name": "n8n Webhook",
+    "url": "/n8n/webhook",
+    "method": "post",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 120,
+    "y": 100,
+    "wires": [["format-n8n-request"]]
+  },
+  {
+    "id": "format-n8n-request",
+    "type": "function",
+    "z": "flow-n8n-integration",
+    "name": "Format Request",
+    "func": "// Format incoming n8n webhook request\nconst payload = msg.payload;\nconst headers = msg.req.headers;\n\nmsg.payload = {\n  source: 'n8n',\n  timestamp: new Date().toISOString(),\n  data: payload,\n  headers: headers\n};\n\nreturn msg;",
+    "outputs": 1,
+    "outputCount": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 320,
+    "y": 100,
+    "wires": [["route-by-type"]]
+  },
+  {
+    "id": "route-by-type",
+    "type": "switch",
+    "z": "flow-n8n-integration",
+    "name": "Route by Type",
+    "property": "payload.data.type",
+    "propertyType": "msg",
+    "rules": [
+      { "t": "eq", "v": "agent-event", "vt": "str" },
+      { "t": "eq", "v": "health-alert", "vt": "str" },
+      { "t": "else" }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 3,
+    "x": 320,
+    "y": 180,
+    "wires": [
+      ["handle-agent-event"],
+      ["handle-health-alert"],
+      ["handle-other"]
+    ]
+  },
+  {
+    "id": "handle-agent-event",
+    "type": "function",
+    "z": "flow-n8n-integration",
+    "name": "Handle Agent Event",
+    "func": "// Process agent event from n8n\nconst data = msg.payload.data;\n\nmsg.payload = {\n  event: 'agent-event',\n  agent: data.agent,\n  trigger: data.trigger,\n  output_file: data.output_file,\n  timestamp: msg.payload.timestamp\n};\n\nreturn msg;",
+    "outputs": 1,
+    "outputCount": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 540,
+    "y": 100,
+    "wires": [["call-agent-api"]]
+  },
+  {
+    "id": "handle-health-alert",
+    "type": "function",
+    "z": "flow-n8n-integration",
+    "name": "Handle Health Alert",
+    "func": "// Process health alert from n8n\nconst data = msg.payload.data;\n\nmsg.payload = {\n  event: 'health-alert',\n  service: data.service,\n  status: data.status,\n  health_check: data.health_check,\n  timestamp: msg.payload.timestamp\n};\n\nreturn msg;",
+    "outputs": 1,
+    "outputCount": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 540,
+    "y": 140,
+    "wires": [["send-alert"]]
+  },
+  {
+    "id": "handle-other",
+    "type": "function",
+    "z": "flow-n8n-integration",
+    "name": "Handle Other",
+    "func": "// Process other events\nreturn msg;",
+    "outputs": 1,
+    "outputCount": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 540,
+    "y": 180,
+    "wires": [["log-event"]]
+  },
+  {
+    "id": "call-agent-api",
+    "type": "http request",
+    "z": "flow-n8n-integration",
+    "name": "Call Agent API",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://host.docker.internal:8081/api/v1/agents/invoke",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 760,
+    "y": 100,
+    "wires": [["format-response"]]
+  },
+  {
+    "id": "format-response",
+    "type": "function",
+    "z": "flow-n8n-integration",
+    "name": "Format Response",
+    "func": "// Format response for n8n\nconst response = msg.payload;\n\nmsg.payload = {\n  status: response.status || 'success',\n  agent: response.agent,\n  output_file: response.output_file,\n  message: response.message || 'Agent executed'\n};\n\nreturn msg;",
+    "outputs": 1,
+    "outputCount": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 980,
+    "y": 100,
+    "wires": [["http-response"]]
+  },
+  {
+    "id": "send-alert",
+    "type": "http request",
+    "z": "flow-n8n-integration",
+    "name": "Send Alert",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://alertmanager:9093/api/v1/alerts",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 760,
+    "y": 140,
+    "wires": [["log-event"]]
+  },
+  {
+    "id": "http-response",
+    "type": "http response",
+    "z": "flow-n8n-integration",
+    "name": "Response",
+    "statusCode": "200",
+    "headers": {},
+    "x": 1180,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "log-event",
+    "type": "debug",
+    "z": "flow-n8n-integration",
+    "name": "Log Event",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 760,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "trigger-n8n-webhook",
+    "type": "http request",
+    "z": "flow-n8n-integration",
+    "name": "Trigger n8n",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://n8n:5678/webhook/health-alert",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 540,
+    "y": 240,
+    "wires": [["log-event"]]
+  },
+  {
+    "id": "docker-event-inject",
+    "type": "inject",
+    "z": "flow-n8n-integration",
+    "name": "Test Docker Event",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"event\":\"health_status: unhealthy\",\"container\":\"traefik\"}",
+    "payloadType": "json",
+    "x": 320,
+    "y": 240,
+    "wires": [["trigger-n8n-webhook"]]
+  }
+]
+

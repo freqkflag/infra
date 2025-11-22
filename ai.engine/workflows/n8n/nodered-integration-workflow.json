@@ -1,0 +1,261 @@
+{
+  "name": "Node-RED Integration",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "nodered/trigger",
+        "options": {}
+      },
+      "id": "webhook-nodered-trigger",
+      "name": "Webhook - Node-RED Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "nodered-trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "type",
+              "name": "type",
+              "value": "={{$json.body.type || 'generic'}}",
+              "type": "string"
+            },
+            {
+              "id": "data",
+              "name": "data",
+              "value": "={{$json.body}}",
+              "type": "object"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-request",
+      "name": "Format Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://nodered:1880/n8n/webhook",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "={{$json.type}}"
+            },
+            {
+              "name": "data",
+              "value": "={{JSON.stringify($json.data)}}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{$json.timestamp}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "call-nodered",
+      "name": "Call Node-RED",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify({status: 'success', message: 'Sent to Node-RED', data: $json})}}",
+        "options": {}
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "schedule-nodered-sync",
+      "name": "Schedule - Node-RED Sync",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 500]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://nodered:1880/flows",
+        "options": {}
+      },
+      "id": "get-nodered-flows",
+      "name": "Get Node-RED Flows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status",
+              "name": "status",
+              "value": "={{$json.length || 0}} flows found",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-sync-result",
+      "name": "Format Sync Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://nodered:1880/n8n/webhook",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "sync-status"
+            },
+            {
+              "name": "data",
+              "value": "={{JSON.stringify($json)}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-sync-status",
+      "name": "Send Sync Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 500]
+    }
+  ],
+  "connections": {
+    "Webhook - Node-RED Trigger": {
+      "main": [
+        [
+          {
+            "node": "Format Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Request": {
+      "main": [
+        [
+          {
+            "node": "Call Node-RED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Node-RED": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Node-RED Sync": {
+      "main": [
+        [
+          {
+            "node": "Get Node-RED Flows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Node-RED Flows": {
+      "main": [
+        [
+          {
+            "node": "Format Sync Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Sync Result": {
+      "main": [
+        [
+          {
+            "node": "Send Sync Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-11-22T12:00:00.000Z",
+      "updatedAt": "2025-11-22T12:00:00.000Z",
+      "id": "automation",
+      "name": "automation"
+    },
+    {
+      "createdAt": "2025-11-22T12:00:00.000Z",
+      "updatedAt": "2025-11-22T12:00:00.000Z",
+      "id": "integration",
+      "name": "integration"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-22T12:00:00.000Z",
+  "versionId": "1"
+}
+
