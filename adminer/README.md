@@ -94,10 +94,11 @@ Adminer is a single-file PHP application for managing databases. It supports:
 
 **Supabase Database:**
 - System: PostgreSQL
-- Server: `supabase-db`
+- Server: `supabase-db` (requires Supabase to be running and Adminer on `supabase-network)
 - Username: `supabase_admin`
-- Password: From `/root/infra/supabase/.env`
+- Password: From `.workspace/.env` (loaded from Infisical `/prod` path)
 - Database: `postgres`
+- **Note:** Adminer is configured to access Supabase database via `supabase-network` when Supabase is running
 
 ### Database Operations
 

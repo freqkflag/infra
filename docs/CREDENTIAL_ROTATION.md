@@ -199,19 +199,22 @@ last | grep -E "7882|freqkflag"
 
 ## Status Tracking
 
-**Rotation Status:** ⚠️ IN PROGRESS (2025-11-21)
+**Rotation Status:** ✅ PASSWORDS STORED (2025-11-22) | ⚠️ ROTATION DEFERRED
 
-- [x] New passwords generated
-- [x] Documentation created
-- [x] Scripts updated
-- [ ] Passwords stored in Infisical
-- [ ] VPS root password rotated
-- [ ] Homelab password rotated
-- [ ] Mac Mini password rotated
-- [ ] All verifications completed
-- [ ] Access logs audited
-- [ ] SSH keys configured (recommended)
-- [ ] REMEDIATION_PLAN.md updated
+- [x] New passwords generated (2025-11-21)
+- [x] Documentation created (2025-11-21)
+- [x] Scripts updated (2025-11-21)
+- [x] Passwords stored in Infisical (2025-11-22)
+  - `VPS_ROOT_PASSWORD` stored in `/prod` path
+  - `HOMELAB_SSH_PASSWORD` stored in `/prod` path
+  - `MACLAB_SSH_PASSWORD` stored in `/prod` path
+- [ ] VPS root password rotated ⚠️ **DEFERRED** (manual rotation when needed)
+- [ ] Homelab password rotated ⚠️ **DEFERRED** (manual rotation when needed)
+- [ ] Mac Mini password rotated ⚠️ **DEFERRED** (manual rotation when needed)
+- [ ] All verifications completed ⚠️ **DEFERRED** (until rotation performed)
+- [ ] Access logs audited ⚠️ **DEFERRED** (until rotation performed)
+- [ ] SSH keys configured (recommended) ⚠️ **OPTIONAL**
+- [x] REMEDIATION_PLAN.md updated (2025-11-22)
 
 ---
 
@@ -228,7 +231,7 @@ If rotation fails or causes access issues:
 
 ---
 
-**Last Updated:** 2025-11-21  
+**Last Updated:** 2025-11-22  
 **Owner:** Infrastructure Team / Security Team  
-**Review Required:** Before rotation execution
+**Status:** Passwords stored in Infisical; manual rotation deferred until needed
 

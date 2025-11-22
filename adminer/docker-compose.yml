@@ -24,6 +24,8 @@ services:
     networks:
       - adminer-network
       - traefik-network
+      - edge
+      - supabase-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.adminer.rule=Host(`adminer.freqkflag.co`)"
@@ -38,3 +40,9 @@ networks:
   traefik-network:
     external: true
     name: traefik-network
+  edge:
+    external: true
+    name: edge
+  supabase-network:
+    external: true
+    name: supabase_supabase-network

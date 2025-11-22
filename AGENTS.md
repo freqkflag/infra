@@ -221,13 +221,27 @@ This document provides a standardized overview of all services and agents in the
 - **Domain:** `supabase.freqkflag.co` (studio), `api.supabase.freqkflag.co` (API)
 - **Location:** `/root/infra/supabase/`
 - **Status:** ⚙️ Configured (not running)
-- **Purpose:** Backend-as-a-Service (BaaS) platform
+- **Purpose:** **Authoritative database platform** - Backend-as-a-Service (BaaS) with PostgreSQL and management tools
 - **Database:** PostgreSQL 15 with Supabase extensions
 - **Features:**
-  - PostgreSQL database
-  - Auto-generated REST API
-  - Web-based Studio interface
-  - Schema management
+  - PostgreSQL database with Supabase extensions
+  - Auto-generated REST API from database schema
+  - Web-based Studio interface for database management
+  - Schema management and migrations
+  - Real-time subscriptions (requires additional setup)
+  - Authentication service (requires additional setup)
+  - File storage service (requires additional setup)
+- **Authoritative Role:**
+  - Primary PostgreSQL instance for Supabase-based applications
+  - Database management via Studio interface
+  - REST API generation from database schema
+  - Secure authentication: `POSTGRES_HOST_AUTH_METHOD: scram-sha-256` configured
+  - Access credentials stored in Infisical and loaded via `.workspace/.env`
+- **Security:**
+  - PostgreSQL authentication enforced via `scram-sha-256`
+  - Database password stored in Infisical `/prod` path
+  - JWT secret for API authentication
+  - Network isolation via `supabase-network`
 
 ### GitLab
 - **Domain:** `gitlab.freqkflag.co`
@@ -255,12 +269,23 @@ This document provides a standardized overview of all services and agents in the
 - **Domain:** `adminer.freqkflag.co`
 - **Location:** `/root/infra/adminer/`
 - **Status:** ✅ Running (healthy)
-- **Purpose:** Web-based database management tool
+- **Purpose:** **Authoritative database management tool** - Web-based database administration for all infrastructure databases
 - **Features:**
   - Multi-database support (PostgreSQL, MySQL, SQLite, etc.)
   - Lightweight single-container
-  - Direct database access
+  - Direct database access with authentication
   - SQL query interface
+  - Database structure management
+  - User and permission management
+- **Authoritative Role:**
+  - Primary interface for database administration across all services
+  - Connects to all PostgreSQL and MySQL instances via Docker networks
+  - Supports scram-sha-256 authentication for PostgreSQL
+  - Access credentials stored in Infisical and loaded via `.workspace/.env`
+- **Database Access:**
+  - **PostgreSQL:** All services using PostgreSQL (WikiJS, n8n, Supabase, Backstage, GitLab, etc.)
+  - **MySQL/MariaDB:** WordPress, LinkStack, and other MySQL-based services
+  - **Connection:** Use container names as server hostnames (e.g., `postgres`, `supabase-db`, `wordpress-db`)
 - **Note:** Fixed health check - now uses process-based check (wget not available in container)
 
 ### Help Service
@@ -568,10 +593,15 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 ## Service Dependencies
 
 ### Database Services
-- **PostgreSQL:** Used by WikiJS, Mastodon, n8n, Supabase
+- **PostgreSQL:** Used by WikiJS, Mastodon, n8n, Supabase, Backstage, GitLab
   - **Recent Action:** Restarted (2025-11-21) via `DEVTOOLS_WORKSPACE=/root/infra docker compose -f compose.orchestrator.yml restart postgres` so `scram-sha-256` authentication takes effect.
-  - **Status:** Authentication enforced; dependent services may need to reconnect, monitor once they come back up.
-- **MySQL:** Used by WordPress, LinkStack
+  - **Status:** Authentication enforced via `POSTGRES_HOST_AUTH_METHOD: scram-sha-256`; all PostgreSQL instances configured with secure authentication.
+  - **Authoritative Management:**
+    - **Adminer:** Primary web-based database management tool (`adminer.freqkflag.co`)
+    - **Supabase Studio:** Database management for Supabase instance (`supabase.freqkflag.co`)
+    - Both tools support scram-sha-256 authentication
+- **MySQL/MariaDB:** Used by WordPress, LinkStack
+  - **Authoritative Management:** Adminer provides web-based management interface
 
 ### Infrastructure Dependencies
 - **Traefik:** Required by all web services for routing and SSL
