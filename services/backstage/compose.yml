@@ -7,6 +7,7 @@ services:
     volumes:
       - ./backstage/app-config.production.yaml:/app/app-config.production.yaml:ro
       - ./backstage/examples:/app/examples:ro
+      - backstage_techdocs:/tmp/techdocs
     env_file:
       - ../../.workspace/.env
     environment:
@@ -74,4 +75,5 @@ networks:
 
 volumes:
   backstage_db_data:
+  backstage_techdocs:
 

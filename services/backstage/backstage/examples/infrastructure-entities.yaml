@@ -274,7 +274,7 @@ metadata:
     github.com/project-slug: freqkflag/infra
     gitlab.com/project-slug: root/infra
     gitlab.com/instance-url: https://gitlab.freqkflag.co
-    backstage.io/techdocs-ref: dir:.
+    # backstage.io/techdocs-ref: dir:.  # Removed until documentation is available to prevent EROFS errors
   links:
     - url: https://nodered.freqkflag.co
       title: Flow Editor

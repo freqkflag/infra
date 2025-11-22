@@ -52,6 +52,17 @@ infisical:
       clientId: ${INFISICAL_CLIENT_ID}
       clientSecret: ${INFISICAL_CLIENT_SECRET}
 
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'docker'
+  publisher:
+    type: 'local'
+    local:
+      # Use writable directory for TechDocs working files
+      # This prevents EROFS errors when TechDocs preparer tries to generate mkdocs.yml
+      storageDir: /tmp/techdocs
+
 catalog:
   # Overrides the default list locations from app-config.yaml as these contain example data.
   # See https://backstage.io/docs/features/software-catalog/#adding-components-to-the-catalog for more details

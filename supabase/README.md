@@ -83,6 +83,12 @@ Key variables in `.env`:
 - `ANON_KEY`: Anonymous/public API key
 - `SERVICE_ROLE_KEY`: Service role API key
 
+**Ask Assistant (AI Features):**
+- `ANTHROPIC_API_KEY`: Anthropic Claude API key for Ask Assistant
+- `OPENAI_API_KEY`: OpenAI API key (alternative to Anthropic)
+- `ENABLE_AI_FEATURES`: Set to `"true"` to enable AI features in Studio
+- `OPENAI_API_BASE_URL`: Custom API endpoint (e.g., for Cursor Client or LocalAI)
+
 ### Networking
 
 - **supabase-network**: Internal network for Supabase services
@@ -92,6 +98,49 @@ Key variables in `.env`:
 
 - `./data/postgres`: PostgreSQL database files
 - `./data/kong`: Kong API Gateway configuration
+
+### Extensions
+
+Supabase includes **64+ PostgreSQL extensions** installed in the `extensions` schema (security best practice). Key extensions include:
+
+**Core:**
+- `pg_stat_statements` - Query performance monitoring
+- `pgcrypto` - Cryptographic functions
+- `uuid-ossp` - UUID generation
+
+**Text Search:**
+- `pg_trgm` - Text similarity (trigrams)
+- `unaccent` - Remove accents from text
+- `fuzzystrmatch` - String similarity
+
+**Data Types:**
+- `citext` - Case-insensitive text
+- `hstore` - Key-value storage
+- `ltree` - Hierarchical data
+- `vector` - Vector similarity search
+- `intarray` - Integer arrays
+
+**Spatial:**
+- `postgis` - Geographic objects
+- `postgis_raster` - Raster data
+- `pgrouting` - Routing functionality
+
+**Performance:**
+- `pg_prewarm` - Cache prewarming
+- `pg_buffercache` - Buffer cache stats
+- `pg_stat_monitor` - Advanced query monitoring
+
+**Networking:**
+- `http` - HTTP client
+- `pg_net` - Async HTTP
+- `dblink` - Connect to other databases
+
+**Full List:** See `enable-all-extensions.sql` for complete list of enabled extensions.
+
+**To enable additional extensions:**
+```bash
+docker compose exec -T supabase-db psql -h localhost -U supabase_admin -d postgres -c "CREATE EXTENSION IF NOT EXISTS extension_name WITH SCHEMA extensions;"
+```
 
 ## Management
 
@@ -217,6 +266,15 @@ docker compose logs supabase-studio --tail=100
    - Verify database is running
    - Check database credentials
    - Review database logs
+   - **Password authentication failed**: If you see "password authentication failed for user supabase_admin", the database was initialized with a different password. Reset it using:
+     ```bash
+     docker compose exec supabase-db psql -h localhost -U supabase_admin -d postgres -c "ALTER USER supabase_admin WITH PASSWORD 'your-password';"
+     ```
+
+4. **Extension Schema Security**:
+   - Extensions should be installed in the `extensions` schema, not `public`
+   - To move existing extensions: `docker compose exec -T supabase-db psql -h localhost -U supabase_admin -d postgres < move-extensions.sql`
+   - See `init-supabase.sql` for proper extension installation
 
 ## Security Notes
 

@@ -29,7 +29,9 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     networks:
-      - supabase-network
+      supabase-network:
+        aliases:
+          - db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U supabase_admin"]
       interval: 10s
@@ -61,12 +63,21 @@ services:
       PORT: 3000
       STUDIO_PG_META_URL: http://supabase-meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
       DEFAULT_ORGANIZATION_NAME: ${ORG_NAME:-Default Org}
       DEFAULT_PROJECT_NAME: ${PROJECT_NAME:-Default Project}
       SUPABASE_URL: http://supabase-kong:8000
       SUPABASE_PUBLIC_URL: https://${SUPABASE_HOST:-supabase.freqkflag.co}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      # Ask Assistant Configuration
+      # Supports OpenAI, Anthropic, or custom endpoints
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # For Cursor Client or custom AI endpoints, use OPENAI_API_BASE_URL
+      # OPENAI_API_BASE_URL: ${CURSOR_API_URL:-https://api.openai.com/v1}
+      # Enable AI features in Studio
+      ENABLE_AI_FEATURES: "true"
     networks:
       - supabase-network
       - traefik-network
@@ -109,6 +120,7 @@ services:
       PG_META_DB_NAME: postgres
       PG_META_DB_USER: supabase_admin
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
     networks:
       - supabase-network
     depends_on:

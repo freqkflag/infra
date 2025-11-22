@@ -1,10 +1,16 @@
 # Next Steps: AI Prompt for Automation Workflows
 
-**Context:** The AI Engine automation workflow system has been fully documented and configured. n8n external webhook access is now enabled. The following steps need to be completed to fully operationalize the automation system.
+**Context:** The AI Engine automation workflow system has been fully documented and configured.
+
+n8n external webhook access is now enabled.
+
+The following steps need to be completed to fully operationalize the automation system.
 
 **Status:** ✅ Documentation complete, ⏭️ Implementation in progress
 
----
+<!-- Horizontal rule -->
+
+**Note:** This is a Markdown documentation file, not YAML.
 
 ## Immediate Next Steps (Priority Order)
 
@@ -13,7 +19,8 @@
 **Action:** Import the created n8n workflow JSON files into the n8n instance.
 
 **Prompt:**
-```
+
+```text
 Access the n8n instance at https://n8n.freqkflag.co and import the following workflow files:
 
 1. Import workflow: /root/infra/ai.engine/workflows/n8n/agent-event-router.json
@@ -31,16 +38,19 @@ After importing, test each webhook endpoint:
 - Test health-check-monitor: curl -X POST https://n8n.freqkflag.co/webhook/health-alert -H "Content-Type: application/json" -d '{"service":"traefik","status":"unhealthy","health_check":"failed","timestamp":"2025-11-22T12:00:00Z"}'
 
 Update the workflows if needed to properly invoke agent scripts (may need to configure HTTP Request nodes to call agent scripts via SSH or local API).
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 2. Configure Agent Script Invocation in n8n Workflows
 
 **Action:** Update n8n workflows to properly invoke agent scripts on the server.
 
 **Prompt:**
-```
+
+
+```text
 The n8n workflows need to actually invoke the AI Engine agent scripts. The current workflow JSON files have placeholder HTTP Request nodes. Update them to:
 
 1. For agent-event-router workflow:
@@ -55,16 +65,19 @@ The n8n workflows need to actually invoke the AI Engine agent scripts. The curre
 2. Verify the workflow can successfully trigger agents and receive results.
 
 3. Test with: curl -X POST https://n8n.freqkflag.co/webhook/agent-events -H "Content-Type: application/json" -d '{"agent":"status","trigger":"manual"}'
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 3. Set Up Scheduled Tasks (Cron Jobs)
 
 **Action:** Install the scheduled agent runs as cron jobs.
 
 **Prompt:**
-```
+
+
+```text
 Run the automation setup script to install scheduled tasks:
 
 cd /root/infra/ai.engine/workflows/scripts
@@ -91,16 +104,19 @@ Expected cron jobs:
 - Monthly MCP: 0 7 15 * *
 
 If setup script needs modifications, update it based on actual agent script locations and paths.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 4. Create Node-RED Flows
 
 **Action:** Create Node-RED flows for event-driven automation and result aggregation.
 
 **Prompt:**
-```
+
+
+```text
 Access Node-RED at https://nodered.freqkflag.co and create the following flows:
 
 1. Docker Event Handler Flow:
@@ -136,16 +152,19 @@ Access Node-RED at https://nodered.freqkflag.co and create the following flows:
    - Output: Appropriate notification channel
 
 Save these flows and ensure they're active. Test each flow to verify functionality.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 5. Test Complete Automation System
 
 **Action:** Test all automation triggers and verify end-to-end functionality.
 
 **Prompt:**
-```
+
+
+```text
 Test the complete automation system:
 
 1. Test Webhook Triggering:
@@ -181,16 +200,19 @@ Test the complete automation system:
    - Docker event monitor: journalctl -u docker-event-monitor -f
 
 Document any issues found and create fixes.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 6. Set Up Docker Event Monitoring
 
 **Action:** Create and start the Docker event monitoring service.
 
 **Prompt:**
-```
+
+
+```text
 Set up Docker event monitoring:
 
 1. Review the event monitoring script created by setup-automation.sh:
@@ -209,16 +231,19 @@ Set up Docker event monitoring:
 4. If the monitoring script needs updates, modify it and restart the service.
 
 Ensure the service automatically starts on boot and handles restarts gracefully.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 7. Configure Notification Channels
 
 **Action:** Set up notification endpoints (Discord, Email, etc.) for agent alerts.
 
 **Prompt:**
-```
+
+
+```text
 Configure notification channels for agent alerts:
 
 1. Discord Webhook (for critical alerts):
@@ -243,16 +268,19 @@ Configure notification channels for agent alerts:
    - Test alert routing
 
 Document all notification endpoints and test each channel.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 8. Create Agent API Endpoint (Optional Enhancement)
 
 **Action:** Create a simple API endpoint for agent invocation if n8n SSH/command execution doesn't work well.
 
 **Prompt:**
-```
+
+
+```text
 If n8n workflows cannot directly invoke agent scripts, create a simple API endpoint:
 
 1. Create a simple HTTP API service (Python/Node.js) that:
@@ -276,16 +304,19 @@ If n8n workflows cannot directly invoke agent scripts, create a simple API endpo
      -d '{"agent":"status","output_file":"/tmp/test.json"}'
 
 Alternative: Use the existing scripts/agents/run-agent.py if it supports HTTP API mode.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 9. Monitor and Verify Automation
 
 **Action:** Set up monitoring for the automation system itself.
 
 **Prompt:**
-```
+
+
+```text
 Create monitoring and verification for the automation system:
 
 1. Create a health check for automation system:
@@ -313,16 +344,19 @@ Create monitoring and verification for the automation system:
    - Document and fix issues
 
 5. Update documentation with any changes or improvements discovered.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ### 10. Documentation Updates
 
 **Action:** Keep documentation current as implementation progresses.
 
 **Prompt:**
-```
+
+
+```text
 Update documentation as automation system is implemented:
 
 1. Update AUTOMATION_WORKFLOWS.md with:
@@ -345,9 +379,10 @@ Update documentation as automation system is implemented:
 4. Document any custom configurations or deviations from planned setup.
 
 Keep all documentation current and accurate.
-```
 
----
+```text
+
+<!-- Horizontal rule -->
 
 ## Quick Reference: Current Status
 
@@ -360,41 +395,57 @@ Keep all documentation current and accurate.
 - Event-driven trigger documentation created
 
 ⏭️ **Next Actions:**
+
 1. Import n8n workflows
+
 2. Configure agent script invocation
+
 3. Set up scheduled tasks
+
 4. Create Node-RED flows
+
 5. Test complete system
 
----
+<!-- Horizontal rule -->
 
 ## Usage Instructions for AI
 
 **When continuing this work, use this format:**
 
-```
+```text
 I need to continue implementing the AI Engine automation workflows. 
 The current status is: [specify which step you're on]
 
 Please:
+
 1. [Specific action from the prompts above]
+
 2. [Any additional context or requirements]
+
 3. [Test and verify the implementation]
-```
+
+```text
 
 **Example:**
-```
+
+
+```text
 I need to continue implementing the AI Engine automation workflows.
 The current status is: Ready to import n8n workflows.
 
 Please:
-1. Import the n8n workflows from /root/infra/ai.engine/workflows/n8n/
-2. Configure the workflows to properly invoke agent scripts
-3. Test each webhook endpoint to verify they work
-4. Document any configuration changes needed
-```
 
----
+1. Import the n8n workflows from /root/infra/ai.engine/workflows/n8n/
+
+2. Configure the workflows to properly invoke agent scripts
+
+3. Test each webhook endpoint to verify they work
+
+4. Document any configuration changes needed
+
+```text
+
+<!-- Horizontal rule -->
 
 **Last Updated:** 2025-11-22  
 **Location:** `/root/infra/ai.engine/workflows/NEXT_STEPS_AI_PROMPT.md`
