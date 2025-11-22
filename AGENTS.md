@@ -1,6 +1,6 @@
 # Infrastructure Agents & Services
 
-**Last Updated:** 2025-11-22  
+**Last Updated:** 2025-11-22 09:25:14  
 **Infrastructure Domain:** `freqkflag.co` (SPINE)
 
 **AI Reference:** See [PREFERENCES.md](./PREFERENCES.md) for interaction guidelines
@@ -18,7 +18,9 @@ This document provides a standardized overview of all services and agents in the
 
 ### Service Health Summary
 - ✅ **Healthy:** Traefik, Infisical, WikiJS, WordPress, n8n, Node-RED, Adminer, LinkStack, Monitoring stack (Grafana, Prometheus, Loki, Alertmanager), Databases (PostgreSQL, MySQL, Redis), Backstage (app + DB)
-- ⚙️ **Configured but not running/starting:** Mailu, Supabase, Mastodon, Help Service
+- ⚠️ **Running with issues:** Supabase (Kong restarting, Studio/Meta unhealthy; database healthy)
+- 🔄 **Starting/Initializing:** GitLab (first boot, ~45 seconds since start)
+- ⚙️ **Configured but not running:** Mailu, Mastodon, Help Service
 
 ### Network Status
 - ✅ **edge network:** Created and available
@@ -39,11 +41,13 @@ This document provides a standardized overview of all services and agents in the
 ### Next Steps
 1. ✅ **Backstage fully operational** (2025-11-22) - Both containers healthy; database ready; main app listening on port 7007; Infisical plugin initialized successfully
 2. ✅ **Environment variable naming fixed** (2025-11-22) - Fixed invalid environment variable names in Infisical (hyphens replaced with underscores, colons replaced with equals signs); all Cloudflare and API keys now use proper naming conventions
-3. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
-4. Capture Infisical secret coverage for newly added services (Backstage + companions)
-5. Run deliberate preflight script to ensure dependencies sequence is honored
-6. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
-7. Update Backstage health check method if `ps` command unavailable in container
+3. ⚠️ **Supabase deployment** (2025-11-22 08:28:14) - Services deployed but Kong restarting and Studio/Meta unhealthy; investigate health check failures and Kong restart loop
+4. 🔄 **GitLab deployment** (2025-11-22 09:24:29) - Container starting; monitor initialization progress (5-10 minute first boot expected)
+5. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
+6. Capture Infisical secret coverage for newly added services (Backstage + companions)
+7. Run deliberate preflight script to ensure dependencies sequence is honored
+8. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
+9. Update Backstage health check method if `ps` command unavailable in container
 
 ---
 
@@ -229,7 +233,7 @@ This document provides a standardized overview of all services and agents in the
 ### Supabase
 - **Domain:** `supabase.freqkflag.co` (studio), `api.supabase.freqkflag.co` (API)
 - **Location:** `/root/infra/supabase/`
-- **Status:** ⚙️ Configured (not running)
+- **Status:** ⚠️ Running (partially healthy - deployed 2025-11-22 08:28:14)
 - **Purpose:** **Authoritative database platform** - Backend-as-a-Service (BaaS) with PostgreSQL and management tools
 - **Database:** PostgreSQL 15 with Supabase extensions
 - **Features:**
@@ -251,11 +255,17 @@ This document provides a standardized overview of all services and agents in the
   - Database password stored in Infisical `/prod` path
   - JWT secret for API authentication
   - Network isolation via `supabase-network`
+- **Current Status (2025-11-22 09:25:14):**
+  - ✅ **supabase-db:** Healthy (PostgreSQL 15.1.0.147, up 57 minutes)
+  - ⚠️ **supabase-studio:** Unhealthy (up 57 minutes, health check failing)
+  - ⚠️ **supabase-meta:** Unhealthy (up 57 minutes, health check failing)
+  - ⚠️ **supabase-kong:** Restarting (API gateway, restart loop detected)
+  - **Validation:** `docker compose -f supabase/docker-compose.yml ps` executed at 09:25:14
 
 ### GitLab
 - **Domain:** `gitlab.freqkflag.co`
 - **Location:** `/root/infra/gitlab/`
-- **Status:** ✅ Running (initializing, first boot takes 5-10 minutes)
+- **Status:** 🔄 Starting (initializing, first boot takes 5-10 minutes - deployed 2025-11-22 09:24:29)
 - **Purpose:** Git repository hosting and DevOps platform (Community Edition)
 - **Database:** PostgreSQL (shared postgres service)
 - **Cache/Queue:** Redis (shared redis service)
@@ -272,7 +282,10 @@ This document provides a standardized overview of all services and agents in the
   - Set secrets in Infisical `/prod` environment (see `gitlab/README.md`)
   - Create database: `CREATE USER gitlab WITH PASSWORD '<password>'; CREATE DATABASE gitlab OWNER gitlab;`
   - Access at `https://gitlab.freqkflag.co` with root user and password from `GITLAB_ROOT_PASSWORD`
-- **Note:** First boot takes 5-10 minutes for initialization
+- **Current Status (2025-11-22 09:25:14):**
+  - 🔄 **gitlab:** Starting (health: starting, up 45 seconds)
+  - **Validation:** `docker compose -f gitlab/docker-compose.yml ps` executed at 09:25:14
+  - **Note:** First boot takes 5-10 minutes for initialization; container is in startup phase
 
 ### Adminer
 - **Domain:** `adminer.freqkflag.co`
@@ -437,6 +450,7 @@ When agents create or modify services:
 
 #### Documentation & Audit Scribe
 - Maintains `README.md`, `PROJECT_PLAN.md`, `infra-build-plan.md`, and changelogs.
+- Keeps `docs/INFRASTRUCTURE_MAP.md` current so reviewers have an up-to-date service tree.
 - Captures every deployment or incident with timestamps + command snippets.
 - **MANDATORY:** All next steps must be formatted as AI Agent prompt instructions (see [PREFERENCES.md](./PREFERENCES.md) "Next Steps Format" section).
 
@@ -498,6 +512,12 @@ The AI Engine integrates with MCP (Model Context Protocol) servers to provide di
   - Custom implementation
   - Tools: list_pages, get_page, create_page, update_page, delete_page, search_pages
 
+- **GitHub MCP** - GitHub repository and issue management (`mcp_github_*` tools)
+  - Location: `/root/infra/scripts/github-mcp-server.js`
+  - Custom implementation
+  - Tools: list_repositories, get_repository, search_repositories, list_issues, get_issue, create_issue, update_issue, list_pull_requests, get_pull_request, create_pull_request, list_branches, get_file_contents
+  - Requires: `GITHUB_TOKEN` stored in Infisical `/prod` path
+
 - **Browser MCP** - Browser automation (`mcp_cursor-ide-browser_*` tools)
   - Built-in Cursor IDE feature
   - Tools: navigate, snapshot, click, type, hover, select_option, press_key, wait_for, navigate_back, resize, console_messages, network_requests, take_screenshot
@@ -517,8 +537,23 @@ The AI Engine integrates with MCP (Model Context Protocol) servers to provide di
   - Suggested Tools: `prom_query`, `grafana_dashboard`, `alertmanager_list`, `ack_alert`.
 
 - **GitLab MCP** (`gitlab/`, API at `https://gitlab.freqkflag.co/api/v4`)
-  - Purpose: Help Release/Development agents open issues, inspect pipelines, manage runners, and set variables directly from GitLab’s REST API.
+  - Purpose: Help Release/Development agents open issues, inspect pipelines, manage runners, and set variables directly from GitLab's REST API.
   - Suggested Tools: `list_projects`, `get_pipeline_status`, `create_issue`, `update_variable`.
+
+- **GitHub MCP** (`scripts/github-mcp-server.js`) ✅ **DEPLOYED (2025-11-22)**
+  - Purpose: Enable Release/Development agents to manage GitHub repositories, issues, pull requests, and branches programmatically through GitHub's REST API.
+  - Status: ✅ Implemented and configured
+  - Tools: `list_repositories`, `get_repository`, `search_repositories`, `list_issues`, `get_issue`, `create_issue`, `update_issue`, `list_pull_requests`, `get_pull_request`, `create_pull_request`, `list_branches`, `get_file_contents`
+  - Configuration: Requires `GITHUB_TOKEN` in Infisical `/prod` path
+  - Documentation: See `/root/infra/scripts/github-mcp-server.md`
+
+- **GitHub Admin MCP** (`scripts/github-admin-mcp-server.js`) ✅ **DEPLOYED (2025-11-22)**
+  - Purpose: Provide comprehensive administrative access to GitHub account including GitHub Apps, OAuth Apps, Organizations, Teams, Webhooks, Actions secrets/variables, Runners, and full repository management.
+  - Status: ✅ Implemented and configured (62 administrative tools)
+  - Tools: GitHub Apps (8), OAuth Apps (6), Organizations (6), Teams (8), Webhooks (10), Actions (10), Runners (4), Repositories (7), Branch Protection (3)
+  - Configuration: Requires `GITHUB_TOKEN` with full account access in Infisical `/prod` path
+  - Documentation: See `/root/infra/scripts/github-admin-mcp-server.md`
+  - Reference: [GitHub REST API Documentation](https://docs.github.com/en/rest?apiVersion=2022-11-28)
 
 **Quick Usage:**
 ```bash
@@ -596,6 +631,31 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 - ⚠️ **Unhealthy** - Service container is running but health checks are failing
 - 🔄 **Starting** - Service container is starting up, health check in progress
 - 📁 **Archive** - Development/archive files, not a service
+
+## Post-Deployment Validation (2025-11-22 09:25:14)
+
+**Validation Commands Executed:**
+```bash
+# Full container status check
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+# Network validation
+docker network ls | grep -E "(edge|traefik)"
+# Result: edge and traefik-network both exist and active
+
+# Supabase service status
+docker compose -f supabase/docker-compose.yml ps
+# Result: supabase-db healthy, supabase-studio/meta unhealthy, supabase-kong restarting
+
+# GitLab service status  
+docker compose -f gitlab/docker-compose.yml ps
+# Result: gitlab starting (health: starting, up 45 seconds)
+```
+
+**Status Changes Identified:**
+- ⚠️ **Supabase:** Deployed at 08:28:14 - Database healthy, but Kong restarting and Studio/Meta services unhealthy
+- 🔄 **GitLab:** Deployed at 09:24:29 - Starting initialization (first boot in progress)
+- ✅ **All other services:** Status unchanged from previous review
 
 ---
 
@@ -692,13 +752,13 @@ Each service follows a standardized structure:
 | `n8n.freqkflag.co` | n8n | ✅ Running | Workflow automation |
 | `nodered.freqkflag.co` | Node-RED | ✅ Running | Flow-based automation |
 | `backstage.freqkflag.co` | Backstage | ✅ Running | Developer portal |
-| `gitlab.freqkflag.co` | GitLab CE | ✅ Running | Git repository hosting |
+| `gitlab.freqkflag.co` | GitLab CE | 🔄 Starting | Git repository hosting |
 | `adminer.freqkflag.co` | Adminer | ✅ Running | DB management |
 | `ops.freqkflag.co` | Ops Control Plane | ⚙️ Configured | Infrastructure operations UI |
 | `mail.freqkflag.co` | Mailu Admin | ⚙️ Configured | Email admin |
 | `webmail.freqkflag.co` | Mailu Webmail | ⚙️ Configured | Webmail interface |
-| `supabase.freqkflag.co` | Supabase Studio | ⚙️ Configured | Database studio |
-| `api.supabase.freqkflag.co` | Supabase API | ⚙️ Configured | REST API |
+| `supabase.freqkflag.co` | Supabase Studio | ⚠️ Running (unhealthy) | Database studio |
+| `api.supabase.freqkflag.co` | Supabase API | ⚠️ Running (Kong restarting) | REST API |
 | `vault.freqkflag.co` | Vault | ⚙️ Configured | Secrets management (legacy) |
 | `grafana.freqkflag.co` | Grafana | ⚙️ Configured | Monitoring dashboard |
 | `prometheus.freqkflag.co` | Prometheus | ⚙️ Configured | Metrics collection |

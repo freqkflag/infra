@@ -112,7 +112,81 @@ Use the WikiJS MCP server to create a new page titled "Infrastructure Guide"
 at path "docs/infrastructure-guide"
 ```
 
-### 4. Cursor IDE Browser MCP Server
+### 4. GitHub MCP Server
+
+**Type:** Custom implementation  
+**Location:** `/root/infra/scripts/github-mcp-server.js`  
+**Status:** ✅ Configured and available
+
+**Purpose:** GitHub repository, issue, and pull request management
+
+**Available Tools:**
+
+- `mcp_github_list_repositories` - List repositories for user or organization
+- `mcp_github_get_repository` - Get repository information
+- `mcp_github_search_repositories` - Search repositories with query
+- `mcp_github_list_issues` - List issues for a repository
+- `mcp_github_get_issue` - Get a specific issue
+- `mcp_github_create_issue` - Create a new issue
+- `mcp_github_update_issue` - Update an existing issue
+- `mcp_github_list_pull_requests` - List pull requests for a repository
+- `mcp_github_get_pull_request` - Get a specific pull request
+- `mcp_github_create_pull_request` - Create a new pull request
+- `mcp_github_list_branches` - List branches for a repository
+- `mcp_github_get_file_contents` - Get file contents from a repository
+
+**Configuration:**
+
+- Requires `GITHUB_TOKEN` or `GH_TOKEN` environment variable
+- Configured in Cursor IDE via `~/.config/cursor/mcp.json`
+- Token stored in Infisical `/prod` path and synced to `.workspace/.env`
+
+**Documentation:** See `/root/infra/scripts/github-mcp-server.md`
+
+**Usage Example:**
+
+```text
+Use the GitHub MCP server to create an issue in the infra repository titled
+"Add GitHub MCP integration"
+```
+
+### 4b. GitHub Admin MCP Server
+
+**Type:** Custom implementation (Comprehensive Administrative Tools)  
+**Location:** `/root/infra/scripts/github-admin-mcp-server.js`  
+**Status:** ✅ Configured and available  
+**Version:** 2.0.0
+
+**Purpose:** Full administrative access to GitHub account including GitHub Apps, OAuth Apps, Organizations, Teams, Webhooks, Actions, and more
+
+**Available Tools (62 total):**
+
+**GitHub Apps (8 tools):** list, get, create, update, delete apps and installations  
+**OAuth Apps (6 tools):** list, get, create, update, delete, reset token  
+**Organizations (6 tools):** list, get, update, manage members  
+**Teams (8 tools):** list, get, create, update, delete, manage members  
+**Webhooks (10 tools):** manage org and repo webhooks  
+**Actions (10 tools):** manage secrets and variables (repo and org)  
+**Runners (4 tools):** list, get, delete self-hosted runners  
+**Repositories (7 tools):** create, update, delete, transfer, manage collaborators  
+**Branch Protection (3 tools):** get, update, delete protection rules
+
+**Configuration:**
+
+- Requires `GITHUB_TOKEN` with full account access
+- Configured in Cursor IDE via `~/.config/cursor/mcp.json`
+- Token stored in Infisical `/prod` path and synced to `.workspace/.env`
+
+**Documentation:** See `/root/infra/scripts/github-admin-mcp-server.md`
+
+**Usage Example:**
+
+```text
+Use the GitHub Admin MCP server to create a new GitHub App, list all
+organizations, or manage organization webhooks
+```
+
+### 5. Cursor IDE Browser MCP Server
 
 **Type:** Built-in Cursor IDE feature  
 **Status:** ✅ Available by default
@@ -415,6 +489,20 @@ Act as docs agent. Use WikiJS MCP to check existing documentation, then scan
         "WIKIJS_API_KEY": "${WIKIJS_API_KEY}",
         "WIKIJS_API_URL": "https://wiki.freqkflag.co"
       }
+    },
+    "github": {
+      "command": "node",
+      "args": ["/root/infra/scripts/github-mcp-server.js"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "github-admin": {
+      "command": "node",
+      "args": ["/root/infra/scripts/github-admin-mcp-server.js"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
     }
   }
 }
@@ -429,6 +517,8 @@ Act as docs agent. Use WikiJS MCP to check existing documentation, then scan
 - [MCP Setup Guide](../scripts/MCP_SETUP.md) - General MCP setup
 - [Cloudflare MCP Server](../scripts/cloudflare-mcp-server.md) - Cloudflare MCP docs
 - [WikiJS MCP Server](../scripts/wikijs-mcp-server.md) - WikiJS MCP docs
+- [GitHub MCP Server](../scripts/github-mcp-server.md) - GitHub MCP docs
+- [GitHub Admin MCP Server](../scripts/github-admin-mcp-server.md) - GitHub Admin MCP docs
 - [MCP Protocol Specification](https://modelcontextprotocol.io) - Official MCP docs
 
 ---

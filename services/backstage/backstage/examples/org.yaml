@@ -3,9 +3,20 @@
 apiVersion: backstage.io/v1alpha1
 kind: User
 metadata:
-  name: guest
+  name: freqkflag
+  description: Admin user for freqkflag.co
 spec:
-  memberOf: [guests]
+  memberOf: [admins]
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: admins
+  description: Administrators for freqkflag.co
+spec:
+  type: team
+  children: []
 ---
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
 apiVersion: backstage.io/v1alpha1

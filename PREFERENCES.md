@@ -1,6 +1,6 @@
 # AI Interaction Preferences
 
-**Last Updated:** 2025-11-22  
+**Last Updated:** 2025-11-22 09:25:14  
 **Reference:** Use alongside [AGENTS.md](./AGENTS.md) for complete infrastructure context
 
 This document defines how AI assistants should interact with the infrastructure maintainer and approach technical tasks.
@@ -126,6 +126,7 @@ This document defines how AI assistants should interact with the infrastructure 
 - **Centralized secrets** in `~/.env` (when applicable)
 - **Service-specific configs** in each service's `.env`
 - **Documentation** in `README.md` for each service
+- **Infrastructure map** lives at `docs/INFRASTRUCTURE_MAP.md` and must mirror the live topology
 - **Projects** in `/root/infra/projects/`
 - **Build plans** in `~/dev/docs/build_plans/` (if applicable)
 

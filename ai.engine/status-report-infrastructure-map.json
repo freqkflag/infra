@@ -1,0 +1,121 @@
+{
+  "summary": "Status agent analysis comparing live container/service states against docs/INFRASTRUCTURE_MAP.md. Identified 6 mismatches requiring map updates.",
+  "architecture": "Multi-node infrastructure with vps.host (freqkflag.co/SPINE), home.macmini (twist3dkink.online), and home.linux (cult-of-joey.com). Services run via Docker Compose with shared 'edge' network and Infisical-managed secrets.",
+  "current_phase": "Operational - Services running but documentation requires updates to reflect actual state",
+  "overall_health": "Degraded - Multiple services have health issues (Supabase components unhealthy/restarting, GitLab starting, one postgres container exited)",
+  "key_findings": [
+    "GitLab is starting (health: starting) but map shows as 'Configured but not running'",
+    "Supabase is running with unhealthy components (studio, meta unhealthy; kong restarting) but map shows as 'Configured but not running'",
+    "ops-control-plane service is running healthy but not listed in infrastructure tree",
+    "infra-postgres-1 container is stopped (Exited 3 hours ago) but not documented in map",
+    "WordPress domain mapping mismatch: map shows 'wp.freqkflag.co' but should be 'cultofjoey.com' per AGENTS.md",
+    "LinkStack domain mapping: map shows both 'link.freqkflag.co' and 'link.cultofjoey.com' - need to clarify which service uses which domain"
+  ],
+  "service_status": {
+    "running": [
+      "traefik",
+      "infisical",
+      "infisical-db",
+      "infisical-redis",
+      "adminer",
+      "wikijs",
+      "wikijs-db",
+      "n8n",
+      "n8n-db",
+      "nodered",
+      "wordpress",
+      "wordpress-db",
+      "linkstack",
+      "linkstack-db",
+      "backstage",
+      "backstage-db",
+      "grafana",
+      "prometheus",
+      "loki",
+      "alertmanager",
+      "promtail",
+      "node-exporter",
+      "ops-control-plane",
+      "postgres-postgres-1",
+      "infra-redis-1",
+      "supabase-db"
+    ],
+    "unhealthy": [
+      "supabase-studio",
+      "supabase-meta"
+    ],
+    "starting": [
+      "gitlab"
+    ],
+    "stopped": [
+      "infra-postgres-1"
+    ],
+    "restarting": [
+      "supabase-kong"
+    ],
+    "configured_not_running": [
+      "mailu",
+      "mastodon",
+      "help-service"
+    ]
+  },
+  "mismatches": [
+    {
+      "service": "GitLab",
+      "map_status": "⚙️ Configured but not currently running",
+      "actual_status": "Starting (health: starting, Up 39 seconds)",
+      "recommendation": "Update map to ⚠️ Running but starting, or wait for health check to complete then update to ✅",
+      "location": "vps.host tree, line 31"
+    },
+    {
+      "service": "Supabase",
+      "map_status": "⚙️ Configured but not currently running",
+      "actual_status": "Running with issues (supabase-db healthy, supabase-studio unhealthy, supabase-meta unhealthy, supabase-kong restarting)",
+      "recommendation": "Update map to ⚠️ Running but has a known issue",
+      "location": "vps.host tree, line 29"
+    },
+    {
+      "service": "ops-control-plane",
+      "map_status": "Not listed in infrastructure tree",
+      "actual_status": "Running healthy (Up 11 hours)",
+      "recommendation": "Add to vps.host tree under monitoring stack or as separate entry: '├─ ✅ Ops Control Plane – Infrastructure operations UI (`ops.freqkflag.co`)'",
+      "location": "vps.host tree - missing entry"
+    },
+    {
+      "service": "infra-postgres-1",
+      "map_status": "Not documented",
+      "actual_status": "Stopped (Exited (1) 3 hours ago)",
+      "recommendation": "Investigate why container exited and either fix or document as removed/stopped service",
+      "location": "vps.host tree - missing entry"
+    },
+    {
+      "service": "WordPress domain",
+      "map_status": "`wp.freqkflag.co`",
+      "actual_status": "Should be `cultofjoey.com` per AGENTS.md",
+      "recommendation": "Update domain mapping in map from 'wp.freqkflag.co' to 'cultofjoey.com'",
+      "location": "vps.host tree, line 27"
+    },
+    {
+      "service": "LinkStack domains",
+      "map_status": "Both 'link.freqkflag.co' (vps.host) and 'link.cultofjoey.com' (home.linux) listed",
+      "actual_status": "Need clarification - is LinkStack running on both nodes?",
+      "recommendation": "Verify which LinkStack instance uses which domain and update map accordingly",
+      "location": "vps.host tree line 23, home.linux tree line 39"
+    }
+  ],
+  "blockers": [
+    "Supabase health issues (kong restarting, studio/meta unhealthy) need investigation",
+    "infra-postgres-1 container exit needs investigation - may indicate service failure or intentional stop"
+  ],
+  "recurring_issues": [],
+  "next_actions": [
+    "Update INFRASTRUCTURE_MAP.md to reflect actual GitLab status (starting)",
+    "Update INFRASTRUCTURE_MAP.md to reflect actual Supabase status (running with issues)",
+    "Add ops-control-plane to infrastructure tree",
+    "Investigate and document infra-postgres-1 container exit",
+    "Fix WordPress domain mapping in map (wp.freqkflag.co → cultofjoey.com)",
+    "Clarify LinkStack domain assignments between vps.host and home.linux",
+    "Investigate Supabase component health issues (studio, meta, kong)"
+  ]
+}
+

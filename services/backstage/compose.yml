@@ -6,6 +6,8 @@ services:
       context: ./backstage
       dockerfile: Dockerfile
     container_name: backstage
+    volumes:
+      - ./backstage/app-config.production.yaml:/app/app-config.production.yaml:ro
     env_file:
       - ../../.workspace/.env
     environment:
@@ -19,6 +21,8 @@ services:
       INFISICAL_PUBLIC_URL: ${INFISICAL_PUBLIC_URL:-https://infisical.freqkflag.co}
       INFISICAL_CLIENT_ID: ${INFISICAL_CLIENT_ID}
       INFISICAL_CLIENT_SECRET: ${INFISICAL_CLIENT_SECRET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
     depends_on:
       backstage-db:
         condition: service_healthy

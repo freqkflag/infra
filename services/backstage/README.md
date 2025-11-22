@@ -12,7 +12,7 @@ Backstage is an open-source platform for building developer portals. This instan
 - PostgreSQL database for persistent storage
 - Infisical plugin for secrets management integration
 - Traefik reverse proxy with SSL/TLS termination
-- Guest authentication (can be extended with other providers)
+- GitHub OAuth authentication (production-ready)
 
 ## Services
 
@@ -35,6 +35,10 @@ BACKSTAGE_DB_PASSWORD=<generated_password>
 INFISICAL_PUBLIC_URL=https://infisical.freqkflag.co
 INFISICAL_CLIENT_ID=<client_id>
 INFISICAL_CLIENT_SECRET=<client_secret>
+
+# GitHub OAuth (required for authentication)
+GITHUB_CLIENT_ID=<github_oauth_client_id>
+GITHUB_CLIENT_SECRET=<github_oauth_client_secret>
 ```
 
 ### Infisical Plugin Configuration
@@ -171,11 +175,43 @@ yarn start
 
 3. Rebuild the Docker image
 
+## GitHub OAuth Setup
+
+Backstage is configured to use GitHub OAuth for authentication. To complete the setup:
+
+1. **Create a GitHub OAuth App:**
+   - Go to https://github.com/settings/applications/new
+   - Set **Application name**: `Backstage - freqkflag.co`
+   - Set **Homepage URL**: `https://backstage.freqkflag.co`
+   - Set **Authorization callback URL**: `https://backstage.freqkflag.co/api/auth/github/handler/frame`
+   - Click "Register application"
+
+2. **Get OAuth Credentials:**
+   - Copy the **Client ID**
+   - Click "Generate a new client secret" and copy the **Client Secret**
+
+3. **Add to Infisical:**
+   - Update `GITHUB_CLIENT_ID` secret in Infisical `/prod` path with your Client ID
+   - Update `GITHUB_CLIENT_SECRET` secret in Infisical `/prod` path with your Client Secret
+   - The Infisical Agent will sync these to `.workspace/.env` automatically
+
+4. **Restart Backstage:**
+   ```bash
+   cd /root/infra/services/backstage
+   docker compose restart backstage
+   ```
+
+5. **User Setup:**
+   - The `freqkflag` user is configured as admin in `examples/org.yaml`
+   - When you sign in with GitHub, your GitHub username must match `freqkflag` to be recognized as the admin user
+   - If your GitHub username is different, update `examples/org.yaml` to use your actual GitHub username
+
 ## Security Notes
 
 - All secrets should be stored in Infisical, not in Backstage configuration
 - Use the Infisical plugin to access secrets from within Backstage
-- Guest authentication is enabled by default; consider adding other auth providers for production
+- GitHub OAuth is configured for production authentication
+- The `freqkflag` user is set as the admin/owner for all systems
 
 ## References
 

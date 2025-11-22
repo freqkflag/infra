@@ -29,9 +29,15 @@ backend:
       #     $file: <file-path>/ca/server.crt
 
 auth:
+  environment: production
   providers:
-    guest:
-      dangerouslyAllowOutsideDevelopment: true
+    github:
+      production:
+        clientId: ${GITHUB_CLIENT_ID}
+        clientSecret: ${GITHUB_CLIENT_SECRET}
+        signIn:
+          resolvers:
+            - resolver: usernameMatchingUserEntityName
 
 permission:
   enabled: true
