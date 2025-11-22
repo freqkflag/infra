@@ -1,0 +1,180 @@
+[
+    {
+        "id": "agent-aggregator-flow",
+        "type": "tab",
+        "label": "Agent Result Aggregator",
+        "disabled": false,
+        "info": "Aggregates agent results from orchestration directory and generates reports",
+        "env": []
+    },
+    {
+        "id": "aggregator-inject",
+        "type": "inject",
+        "z": "agent-aggregator-flow",
+        "name": "Aggregate Now",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "0 */6 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "aggregator-file-list"
+            ]
+        ]
+    },
+    {
+        "id": "aggregator-file-list",
+        "type": "file in",
+        "z": "agent-aggregator-flow",
+        "name": "List Orchestration Files",
+        "filename": "/root/infra/orchestration",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 380,
+        "y": 100,
+        "wires": [
+            [
+                "aggregator-parse"
+            ]
+        ]
+    },
+    {
+        "id": "aggregator-parse",
+        "type": "function",
+        "z": "agent-aggregator-flow",
+        "name": "Parse & Aggregate",
+        "func": "// Read orchestration directory and aggregate results\nconst fs = require('fs');\nconst path = require('path');\n\nconst orchestrationDir = '/root/infra/orchestration';\nconst results = {\n    timestamp: new Date().toISOString(),\n    agents: {},\n    summary: {\n        total_agents: 0,\n        total_issues: 0,\n        critical_count: 0,\n        warning_count: 0\n    }\n};\n\ntry {\n    const files = fs.readdirSync(orchestrationDir);\n    const jsonFiles = files.filter(f => f.endsWith('.json'));\n    \n    jsonFiles.forEach(file => {\n        try {\n            const filePath = path.join(orchestrationDir, file);\n            const content = fs.readFileSync(filePath, 'utf8');\n            const data = JSON.parse(content);\n            \n            // Extract agent name from filename\n            const agentName = file.replace(/\\d{8}.*\\.json$/, '').replace(/-/g, '_');\n            \n            results.agents[agentName] = {\n                file: file,\n                timestamp: data.timestamp || data.created_at || 'unknown',\n                results: data.results || data,\n                issue_count: (data.results?.critical_bugs?.length || 0) + \n                            (data.results?.warnings?.length || 0) +\n                            (data.results?.vulnerabilities?.length || 0)\n            };\n            \n            // Update summary\n            if (data.results) {\n                results.summary.total_issues += results.agents[agentName].issue_count;\n                results.summary.critical_count += data.results.critical_bugs?.length || 0;\n                results.summary.warning_count += data.results.warnings?.length || 0;\n            }\n            \n        } catch (e) {\n            node.warn('Failed to parse ' + file + ': ' + e.message);\n        }\n    });\n    \n    results.summary.total_agents = Object.keys(results.agents).length;\n    \n} catch (e) {\n    node.error('Failed to read orchestration directory: ' + e.message);\n    return null;\n}\n\nmsg.payload = results;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 100,
+        "wires": [
+            [
+                "aggregator-switch"
+            ]
+        ]
+    },
+    {
+        "id": "aggregator-switch",
+        "type": "switch",
+        "z": "agent-aggregator-flow",
+        "name": "Route by Severity",
+        "property": "payload.summary.critical_count",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 820,
+        "y": 100,
+        "wires": [
+            [
+                "aggregator-save",
+                "aggregator-notify-critical"
+            ],
+            [
+                "aggregator-save",
+                "aggregator-notify-info"
+            ]
+        ]
+    },
+    {
+        "id": "aggregator-save",
+        "type": "file",
+        "z": "agent-aggregator-flow",
+        "name": "Save Aggregated Report",
+        "filename": "/root/infra/orchestration/aggregated-{{$now | date: 'YYYYMMDD-HHmmss'}}.json",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "utf8",
+        "x": 1080,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "aggregator-notify-critical",
+        "type": "http request",
+        "z": "agent-aggregator-flow",
+        "name": "Notify Critical",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://n8n:5678/webhook/notifications",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "str",
+                "keyValue": "Content-Type",
+                "valueType": "str",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 1080,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aggregator-notify-info",
+        "type": "http request",
+        "z": "agent-aggregator-flow",
+        "name": "Log to WikiJS",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://wiki:3000/api/rest/v1/pages",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "str",
+                "keyValue": "Content-Type",
+                "valueType": "str",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 1080,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    }
+]
+

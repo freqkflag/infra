@@ -21,9 +21,13 @@
 
 10. **mcp_agent** (`mcp-agent.md`) - MCP server integration and tool usage guidance
 
+### Service-Specific Agents
+
+11. **backstage** (`backstage-agent.md`) - Backstage developer portal management and analysis
+
 ### Orchestration Agent
 
-11. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
+12. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
 
 ## Helper Scripts
 
@@ -108,6 +112,7 @@ All agents output strict JSON with structured fields:
 - **tests**: `{ coverage_summary, missing_tests, flaky_tests, high_priority_test_targets }`
 - **refactor**: `{ refactor_targets, duplication_groups, legacy_patterns, simplifications }`
 - **release**: `{ release_readiness, blockers, required_changes, draft_release_notes }`
+- **backstage**: `{ backstage_status, catalog_health, plugin_status, entity_analysis, configuration_analysis, operational_insights, integration_health, recommendations }`
 - **mcp_agent**: `{ mcp_servers_available, mcp_opportunities, mcp_integration_recommendations, mcp_usage_patterns, missing_mcp_integrations, mcp_best_practices }`
 - **orchestrator**: Aggregates all agent outputs + `{ global_next_steps, exec }`
 
@@ -127,11 +132,13 @@ All agents output strict JSON with structured fields:
 │   ├── release-agent.md         ✅
 │   ├── development-agent.md     ✅
 │   ├── ops-agent.md             ✅
+│   ├── backstage-agent.md       ✅
 │   ├── mcp-agent.md             ✅
 │   ├── orchestrator-agent.md    ✅
 │   └── README.md                ✅
 ├── scripts/
 │   ├── invoke-agent.sh          ✅
+│   ├── backstage.sh             ✅
 │   └── list-agents.sh           ✅
 ├── PROMPT_CATALOG.md            ✅
 ├── MCP_INTEGRATION.md           ✅

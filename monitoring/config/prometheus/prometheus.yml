@@ -34,37 +34,30 @@ scrape_configs:
       - targets: ['traefik:8080']
     metrics_path: '/metrics'
 
-  # Docker containers (via cAdvisor or Docker exporter)
-  - job_name: 'docker'
+  # Container metrics via cAdvisor
+  - job_name: 'cadvisor'
     static_configs:
-      - targets: ['host.docker.internal:9323']
-    # Note: Requires Docker metrics endpoint enabled
+      - targets: ['cadvisor:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
 
-  # PostgreSQL databases
-  - job_name: 'postgres'
+  # PostgreSQL databases via postgres_exporter
+  - job_name: 'postgres-exporter'
     static_configs:
-      - targets:
-          - 'wikijs-db:5432'
-          - 'n8n-db:5432'
-          - 'mastodon-db:5432'
-          - 'supabase-db:5432'
-    # Note: Requires postgres_exporter sidecar containers
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
 
-  # MySQL databases
-  - job_name: 'mysql'
+  # MySQL/MariaDB databases via mysqld_exporter
+  - job_name: 'mysql-exporter'
     static_configs:
-      - targets:
-          - 'wordpress-db:3306'
-          - 'linkstack-db:3306'
-    # Note: Requires mysqld_exporter sidecar containers
+      - targets: ['mysql-exporter:9104']
+    scrape_interval: 30s
 
-  # Redis
-  - job_name: 'redis'
+  # Redis via redis_exporter
+  - job_name: 'redis-exporter'
     static_configs:
-      - targets:
-          - 'mastodon-redis:6379'
-          - 'mailu-redis:6379'
-    # Note: Requires redis_exporter sidecar containers
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
 
   # Application services (if they expose metrics)
   - job_name: 'n8n'

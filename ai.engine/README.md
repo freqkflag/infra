@@ -179,14 +179,21 @@ Infrastructure operations and command control.
 
 **Use when:** Infrastructure operations management or service monitoring.
 
-### 12. **mcp_agent** (`mcp-agent.md`)
+### 12. **backstage** (`backstage-agent.md`)
+Backstage developer portal management and analysis.
+
+**Output:** Backstage service health, catalog status, plugin configurations, entity analysis, integration health.
+
+**Use when:** Managing Backstage portal, analyzing catalog, checking plugin health, or entity registration.
+
+### 13. **mcp_agent** (`mcp-agent.md`)
 MCP server integration and tool usage guidance.
 
 **Output:** MCP server availability, opportunities, integration recommendations, usage patterns.
 
 **Use when:** Identifying MCP integration opportunities or verifying MCP server availability.
 
-### 13. **orchestrator** (`orchestrator-agent.md`)
+### 14. **orchestrator** (`orchestrator-agent.md`)
 Multi-agent orchestrator that coordinates all agents.
 
 **Output:** Complete JSON report with all agent findings aggregated.
@@ -355,10 +362,33 @@ Act as security agent. Use Infisical MCP to audit secrets, then evaluate /root/i
 Return vulnerabilities + fixes in strict JSON.
 ```
 
+## Automation Workflows
+
+**See [AUTOMATION_WORKFLOWS.md](./AUTOMATION_WORKFLOWS.md) for complete automation system documentation.**
+
+The AI Engine includes a comprehensive automation system for triggering and orchestrating all agents:
+
+- **n8n Workflows** - Webhook-based agent triggering and orchestration
+- **Node-RED Flows** - Event-driven agent automation and result aggregation
+- **Scheduled Tasks** - Cron/systemd timers for regular agent runs
+- **Event-Driven Triggers** - Docker events, health checks, Git events
+- **Webhook Endpoints** - Manual and programmatic agent triggering
+
+### Quick Setup
+
+```bash
+cd /root/infra/ai.engine/workflows/scripts
+./setup-automation.sh
+```
+
+**See [workflows/README.md](./workflows/README.md) for detailed workflow documentation.**
+
 ## Related Documentation
 
 - [Prompt Catalog](./PROMPT_CATALOG.md) - Reusable prompts for all agents
 - [MCP Integration](./MCP_INTEGRATION.md) - MCP server integration guide
+- [Automation Workflows](./AUTOMATION_WORKFLOWS.md) - Complete automation system
+- [Workflows README](./workflows/README.md) - Workflow setup and usage
 - [Agents README](./agents/README.md) - Detailed agent documentation
 - [Infrastructure Runbook](../runbooks/infra-runbook.md) - Orchestrator usage
 - [Infrastructure Cookbook](../INFRASTRUCTURE_COOKBOOK.md) - Infrastructure reference

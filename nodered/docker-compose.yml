@@ -13,7 +13,7 @@ services:
       - ./data:/data
     networks:
       - nodered-network
-      - traefik-network
+      - edge
     deploy:
       resources:
         limits:
@@ -31,19 +31,13 @@ services:
       retries: 5
       start_period: 30s
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nodered.rule=Host(`nodered.freqkflag.co`)"
-      - "traefik.http.routers.nodered.entrypoints=websecure"
-      - "traefik.http.routers.nodered.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.nodered.middlewares=security-headers@file,rate-limit@file"
-      - "traefik.http.services.nodered.loadbalancer.server.port=1880"
       - "prometheus.io/scrape=true"
       - "prometheus.io/port=1880"
 
 networks:
   nodered-network:
     driver: bridge
-  traefik-network:
+  edge:
     external: true
-    name: traefik-network
+    name: edge
 

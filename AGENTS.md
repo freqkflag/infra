@@ -43,12 +43,14 @@ This document provides a standardized overview of all services and agents in the
 2. ✅ **Environment variable naming fixed** (2025-11-22) - Fixed invalid environment variable names in Infisical (hyphens replaced with underscores, colons replaced with equals signs); all Cloudflare and API keys now use proper naming conventions
 3. ✅ **Supabase Kong fixed** (2025-11-22 09:29:00) - Kong restart loop resolved by creating missing `/var/lib/kong/kong.yml` with format version 2.1; Kong now healthy and stable
 4. ✅ **Supabase Studio/Meta health checks fixed** (2025-11-22) - Health check failures resolved by replacing `wget`-based checks with container-appropriate methods: Studio uses `/proc/net/tcp` port check (port 3000), Meta uses Node.js HTTP request to `/health` endpoint; both services now reporting healthy
-4. 🔄 **GitLab deployment** (2025-11-22 09:24:29) - Container starting; monitor initialization progress (5-10 minute first boot expected)
-5. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
-6. Capture Infisical secret coverage for newly added services (Backstage + companions)
-7. Run deliberate preflight script to ensure dependencies sequence is honored
-8. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
-9. Update Backstage health check method if `ps` command unavailable in container
+5. 🔄 **GitLab deployment** (2025-11-22 09:24:29) - Container starting; monitor initialization progress (5-10 minute first boot expected)
+6. ✅ **Status agent health check completed** (2025-11-22) - 28 containers running, 27 healthy, 1 unhealthy (GitLab initializing). Monitoring gaps documented in `docs/MONITORING_GAPS.md`. Automation scripts created: `scripts/automated-health-check.sh`, `scripts/deploy-metrics-exporters.sh`
+7. 🔧 **Monitoring gaps identified** (2025-11-22) - Missing: cAdvisor, postgres_exporter, mysqld_exporter, redis_exporter. Prometheus configured but exporters not deployed. See `docs/MONITORING_GAPS.md` for implementation plan
+8. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
+9. Capture Infisical secret coverage for newly added services (Backstage + companions)
+10. Run deliberate preflight script to ensure dependencies sequence is honored
+11. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` to fix plugin initialization
+12. Update Backstage health check method if `ps` command unavailable in container
 
 ---
 
@@ -482,6 +484,18 @@ When agents create or modify services:
   - `infisical run --env=production -- n8n execute --workflow daily-maintenance`
   - `infisical run --env=production -- n8n execute --workflow post-recovery-audit`
 
+#### Backstage Agent
+- Manages Backstage developer portal at `backstage.freqkflag.co`.
+- Monitors Backstage service health, catalog status, and plugin configurations.
+- Analyzes entity catalog structure and relationships.
+- Validates plugin integrations (Infisical, GitHub OAuth).
+- Provides Backstage-specific operational commands and recommendations.
+- Triggers:
+  - `cd /root/infra/ai.engine/scripts && ./invoke-agent.sh backstage [output_file]`
+  - `cd /root/infra/ai.engine/scripts && ./backstage.sh [output_file]`
+  - Daily catalog health check: `./backstage.sh /tmp/backstage-health-$(date +%Y%m%d).json`
+  - Pre-deployment validation: `./backstage.sh /tmp/backstage-pre-deploy.json`
+
 ### AI Engine Integration
 
 **Location:** `/root/infra/ai.engine/`  
@@ -499,6 +513,7 @@ All agents must utilize the AI Engine system for:
 - **Testing** - Use `tests-agent` for test coverage analysis
 - **Refactoring** - Use `refactor-agent` for code quality improvements
 - **Release readiness** - Use `release-agent` for deployment validation
+- **Backstage management** - Use `backstage-agent` for Backstage portal health, catalog analysis, and entity management
 - **MCP integration** - Use `mcp-agent` for MCP server integration guidance
 - **Comprehensive analysis** - Use `orchestrator-agent` for full infrastructure analysis
 
@@ -572,6 +587,7 @@ cd /root/infra/ai.engine/scripts && ./list-agents.sh
 # Invoke specific agent
 ./invoke-agent.sh bug-hunter
 ./invoke-agent.sh security
+./invoke-agent.sh backstage
 ./invoke-agent.sh mcp
 ./invoke-agent.sh orchestrator /root/infra/orchestration-report.json
 ```

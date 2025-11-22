@@ -1,0 +1,166 @@
+[
+    {
+        "id": "docker-events-flow",
+        "type": "tab",
+        "label": "Docker Event Handler",
+        "disabled": false,
+        "info": "Monitors Docker events and triggers ops-agent on container failures",
+        "env": []
+    },
+    {
+        "id": "docker-events-inject",
+        "type": "inject",
+        "z": "docker-events-flow",
+        "name": "Start Monitor",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 2,
+        "topic": "",
+        "payload": "start",
+        "payloadType": "str",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "docker-events-exec"
+            ]
+        ]
+    },
+    {
+        "id": "docker-events-exec",
+        "type": "exec",
+        "z": "docker-events-flow",
+        "command": "docker",
+        "addpay": false,
+        "append": "events",
+        "useSpawn": false,
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Docker Events",
+        "x": 320,
+        "y": 100,
+        "wires": [
+            [
+                "docker-events-parse"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "docker-events-parse",
+        "type": "function",
+        "z": "docker-events-flow",
+        "name": "Parse Docker Event",
+        "func": "// Parse Docker event JSON\nconst event = msg.payload.toString().trim();\n\n// Skip empty lines\nif (!event || event.length === 0) {\n    return null;\n}\n\nlet eventData;\n\ntry {\n    eventData = JSON.parse(event);\n} catch (e) {\n    // Silently skip invalid JSON (common with Docker events stream)\n    return null;\n}\n\n// Filter for critical events\nconst criticalEvents = ['die', 'health_status: unhealthy', 'oom'];\nconst isCritical = criticalEvents.some(evt => \n    eventData.status && eventData.status.includes(evt)\n);\n\nif (!isCritical) {\n    return null; // Ignore non-critical events\n}\n\n// Format payload for n8n webhook\nmsg.payload = {\n    event: eventData.status || eventData.Action,\n    container: eventData.Actor?.Attributes?.name || eventData.from || 'unknown',\n    timestamp: new Date().toISOString(),\n    trigger_agent: \"ops\",\n    metadata: {\n        id: eventData.id,\n        type: eventData.Type,\n        action: eventData.Action\n    }\n};\n\nmsg.headers = {\n    'Content-Type': 'application/json'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 100,
+        "wires": [
+            [
+                "docker-events-switch"
+            ]
+        ]
+    },
+    {
+        "id": "docker-events-switch",
+        "type": "switch",
+        "z": "docker-events-flow",
+        "name": "Route by Event",
+        "property": "payload.event",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "die",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "health_status: unhealthy",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "oom",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 3,
+        "x": 720,
+        "y": 100,
+        "wires": [
+            [
+                "docker-events-webhook"
+            ],
+            [
+                "docker-events-webhook"
+            ],
+            [
+                "docker-events-webhook"
+            ]
+        ]
+    },
+    {
+        "id": "docker-events-webhook",
+        "type": "http request",
+        "z": "docker-events-flow",
+        "name": "Trigger Ops Agent",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://n8n:5678/webhook/docker-events",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "msg",
+                "keyValue": "headers",
+                "valueType": "msg",
+                "valueValue": "headers"
+            }
+        ],
+        "x": 960,
+        "y": 100,
+        "wires": [
+            [
+                "docker-events-debug"
+            ]
+        ]
+    },
+    {
+        "id": "docker-events-debug",
+        "type": "debug",
+        "z": "docker-events-flow",
+        "name": "Event Log",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1180,
+        "y": 100,
+        "wires": []
+    }
+]
+

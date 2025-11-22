@@ -1,0 +1,859 @@
+[
+  {
+    "id": "docker-events-flow",
+    "type": "tab",
+    "label": "Docker Event Handler",
+    "disabled": false,
+    "info": "Monitors Docker events and triggers ops-agent on container failures",
+    "env": []
+  },
+  {
+    "id": "docker-events-inject",
+    "type": "inject",
+    "z": "docker-events-flow",
+    "name": "Start Monitor",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 2,
+    "topic": "",
+    "payload": "start",
+    "payloadType": "str",
+    "x": 130,
+    "y": 100,
+    "wires": [
+      [
+        "docker-events-exec"
+      ]
+    ]
+  },
+  {
+    "id": "docker-events-exec",
+    "type": "exec",
+    "z": "docker-events-flow",
+    "command": "docker",
+    "addpay": false,
+    "append": "events",
+    "useSpawn": false,
+    "timer": "",
+    "winHide": false,
+    "oldrc": false,
+    "name": "Docker Events",
+    "x": 320,
+    "y": 100,
+    "wires": [
+      [
+        "docker-events-parse"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "docker-events-parse",
+    "type": "function",
+    "z": "docker-events-flow",
+    "name": "Parse Docker Event",
+    "func": "// Parse Docker event JSON\nconst event = msg.payload.toString().trim();\n\n// Skip empty lines\nif (!event || event.length === 0) {\n    return null;\n}\n\nlet eventData;\n\ntry {\n    eventData = JSON.parse(event);\n} catch (e) {\n    // Silently skip invalid JSON (common with Docker events stream)\n    return null;\n}\n\n// Filter for critical events\nconst criticalEvents = ['die', 'health_status: unhealthy', 'oom'];\nconst isCritical = criticalEvents.some(evt => \n    eventData.status && eventData.status.includes(evt)\n);\n\nif (!isCritical) {\n    return null; // Ignore non-critical events\n}\n\n// Format payload for n8n webhook\nmsg.payload = {\n    event: eventData.status || eventData.Action,\n    container: eventData.Actor?.Attributes?.name || eventData.from || 'unknown',\n    timestamp: new Date().toISOString(),\n    trigger_agent: \"ops\",\n    metadata: {\n        id: eventData.id,\n        type: eventData.Type,\n        action: eventData.Action\n    }\n};\n\nmsg.headers = {\n    'Content-Type': 'application/json'\n};\n\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 520,
+    "y": 100,
+    "wires": [
+      [
+        "docker-events-switch"
+      ]
+    ]
+  },
+  {
+    "id": "docker-events-switch",
+    "type": "switch",
+    "z": "docker-events-flow",
+    "name": "Route by Event",
+    "property": "payload.event",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "cont",
+        "v": "die",
+        "vt": "str"
+      },
+      {
+        "t": "cont",
+        "v": "health_status: unhealthy",
+        "vt": "str"
+      },
+      {
+        "t": "cont",
+        "v": "oom",
+        "vt": "str"
+      }
+    ],
+    "checkall": "false",
+    "repair": false,
+    "outputs": 3,
+    "x": 720,
+    "y": 100,
+    "wires": [
+      [
+        "docker-events-webhook"
+      ],
+      [
+        "docker-events-webhook"
+      ],
+      [
+        "docker-events-webhook"
+      ]
+    ]
+  },
+  {
+    "id": "docker-events-webhook",
+    "type": "http request",
+    "z": "docker-events-flow",
+    "name": "Trigger Ops Agent",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://n8n:5678/webhook/docker-events",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "msg",
+        "keyValue": "headers",
+        "valueType": "msg",
+        "valueValue": "headers"
+      }
+    ],
+    "x": 960,
+    "y": 100,
+    "wires": [
+      [
+        "docker-events-debug"
+      ]
+    ]
+  },
+  {
+    "id": "docker-events-debug",
+    "type": "debug",
+    "z": "docker-events-flow",
+    "name": "Event Log",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1180,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "agent-aggregator-flow",
+    "type": "tab",
+    "label": "Agent Result Aggregator",
+    "disabled": false,
+    "info": "Aggregates agent results from orchestration directory and generates reports",
+    "env": []
+  },
+  {
+    "id": "aggregator-inject",
+    "type": "inject",
+    "z": "agent-aggregator-flow",
+    "name": "Aggregate Now",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "0 */6 * * *",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 150,
+    "y": 100,
+    "wires": [
+      [
+        "aggregator-file-list"
+      ]
+    ]
+  },
+  {
+    "id": "aggregator-file-list",
+    "type": "file in",
+    "z": "agent-aggregator-flow",
+    "name": "List Orchestration Files",
+    "filename": "/root/infra/orchestration",
+    "format": "utf8",
+    "chunk": false,
+    "sendError": false,
+    "encoding": "none",
+    "allProps": false,
+    "x": 380,
+    "y": 100,
+    "wires": [
+      [
+        "aggregator-parse"
+      ]
+    ]
+  },
+  {
+    "id": "aggregator-parse",
+    "type": "function",
+    "z": "agent-aggregator-flow",
+    "name": "Parse & Aggregate",
+    "func": "// Read orchestration directory and aggregate results\nconst fs = require('fs');\nconst path = require('path');\n\nconst orchestrationDir = '/root/infra/orchestration';\nconst results = {\n    timestamp: new Date().toISOString(),\n    agents: {},\n    summary: {\n        total_agents: 0,\n        total_issues: 0,\n        critical_count: 0,\n        warning_count: 0\n    }\n};\n\ntry {\n    const files = fs.readdirSync(orchestrationDir);\n    const jsonFiles = files.filter(f => f.endsWith('.json'));\n    \n    jsonFiles.forEach(file => {\n        try {\n            const filePath = path.join(orchestrationDir, file);\n            const content = fs.readFileSync(filePath, 'utf8');\n            const data = JSON.parse(content);\n            \n            // Extract agent name from filename\n            const agentName = file.replace(/\\d{8}.*\\.json$/, '').replace(/-/g, '_');\n            \n            results.agents[agentName] = {\n                file: file,\n                timestamp: data.timestamp || data.created_at || 'unknown',\n                results: data.results || data,\n                issue_count: (data.results?.critical_bugs?.length || 0) + \n                            (data.results?.warnings?.length || 0) +\n                            (data.results?.vulnerabilities?.length || 0)\n            };\n            \n            // Update summary\n            if (data.results) {\n                results.summary.total_issues += results.agents[agentName].issue_count;\n                results.summary.critical_count += data.results.critical_bugs?.length || 0;\n                results.summary.warning_count += data.results.warnings?.length || 0;\n            }\n            \n        } catch (e) {\n            node.warn('Failed to parse ' + file + ': ' + e.message);\n        }\n    });\n    \n    results.summary.total_agents = Object.keys(results.agents).length;\n    \n} catch (e) {\n    node.error('Failed to read orchestration directory: ' + e.message);\n    return null;\n}\n\nmsg.payload = results;\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 600,
+    "y": 100,
+    "wires": [
+      [
+        "aggregator-switch"
+      ]
+    ]
+  },
+  {
+    "id": "aggregator-switch",
+    "type": "switch",
+    "z": "agent-aggregator-flow",
+    "name": "Route by Severity",
+    "property": "payload.summary.critical_count",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "gt",
+        "v": "0",
+        "vt": "num"
+      },
+      {
+        "t": "eq",
+        "v": "0",
+        "vt": "num"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 820,
+    "y": 100,
+    "wires": [
+      [
+        "aggregator-save",
+        "aggregator-notify-critical"
+      ],
+      [
+        "aggregator-save",
+        "aggregator-notify-info"
+      ]
+    ]
+  },
+  {
+    "id": "aggregator-save",
+    "type": "file",
+    "z": "agent-aggregator-flow",
+    "name": "Save Aggregated Report",
+    "filename": "/root/infra/orchestration/aggregated-{{$now | date: 'YYYYMMDD-HHmmss'}}.json",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "true",
+    "encoding": "utf8",
+    "x": 1080,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "aggregator-notify-critical",
+    "type": "http request",
+    "z": "agent-aggregator-flow",
+    "name": "Notify Critical",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://n8n:5678/webhook/notifications",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 1080,
+    "y": 120,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "aggregator-notify-info",
+    "type": "http request",
+    "z": "agent-aggregator-flow",
+    "name": "Log to WikiJS",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://wiki:3000/api/rest/v1/pages",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 1080,
+    "y": 160,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "notification-router-flow",
+    "type": "tab",
+    "label": "Notification Router",
+    "disabled": false,
+    "info": "Routes agent notifications based on severity to appropriate channels",
+    "env": []
+  },
+  {
+    "id": "notify-http-in",
+    "type": "http in",
+    "z": "notification-router-flow",
+    "name": "Receive Notification",
+    "url": "/notifications",
+    "method": "post",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 200,
+    "y": 100,
+    "wires": [
+      [
+        "notify-parse"
+      ]
+    ]
+  },
+  {
+    "id": "notify-parse",
+    "type": "function",
+    "z": "notification-router-flow",
+    "name": "Extract Severity",
+    "func": "// Parse notification payload\nconst payload = msg.payload;\n\n// Extract severity from payload\nlet severity = 'info';\nif (payload.severity) {\n    severity = payload.severity.toLowerCase();\n} else if (payload.level) {\n    severity = payload.level.toLowerCase();\n} else if (payload.critical_count > 0) {\n    severity = 'critical';\n} else if (payload.warning_count > 0) {\n    severity = 'warning';\n}\n\nmsg.severity = severity;\nmsg.notification = {\n    agent: payload.agent || 'unknown',\n    message: payload.message || payload.summary || 'Agent execution completed',\n    timestamp: payload.timestamp || new Date().toISOString(),\n    severity: severity,\n    data: payload\n};\n\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 400,
+    "y": 100,
+    "wires": [
+      [
+        "notify-switch"
+      ]
+    ]
+  },
+  {
+    "id": "notify-switch",
+    "type": "switch",
+    "z": "notification-router-flow",
+    "name": "Route by Severity",
+    "property": "severity",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "critical",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "error",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "warning",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "info",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 4,
+    "x": 620,
+    "y": 100,
+    "wires": [
+      [
+        "notify-discord",
+        "notify-alertmanager",
+        "notify-email"
+      ],
+      [
+        "notify-alertmanager",
+        "notify-email"
+      ],
+      [
+        "notify-email",
+        "notify-wikijs"
+      ],
+      [
+        "notify-wikijs",
+        "notify-log"
+      ]
+    ]
+  },
+  {
+    "id": "notify-discord",
+    "type": "http request",
+    "z": "notification-router-flow",
+    "name": "Discord Webhook",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "${DISCORD_WEBHOOK_URL}",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 880,
+    "y": 60,
+    "wires": [
+      [
+        "notify-response"
+      ]
+    ]
+  },
+  {
+    "id": "notify-alertmanager",
+    "type": "http request",
+    "z": "notification-router-flow",
+    "name": "Alertmanager",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://alertmanager:9093/api/v1/alerts",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 880,
+    "y": 100,
+    "wires": [
+      [
+        "notify-response"
+      ]
+    ]
+  },
+  {
+    "id": "notify-email",
+    "type": "http request",
+    "z": "notification-router-flow",
+    "name": "Email (via n8n)",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://n8n:5678/webhook/send-email",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 880,
+    "y": 140,
+    "wires": [
+      [
+        "notify-response"
+      ]
+    ]
+  },
+  {
+    "id": "notify-wikijs",
+    "type": "http request",
+    "z": "notification-router-flow",
+    "name": "Update WikiJS",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://wiki:3000/api/rest/v1/pages",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 880,
+    "y": 180,
+    "wires": [
+      [
+        "notify-response"
+      ]
+    ]
+  },
+  {
+    "id": "notify-log",
+    "type": "file",
+    "z": "notification-router-flow",
+    "name": "Log to File",
+    "filename": "/root/infra/orchestration/notifications.log",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 880,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "notify-response",
+    "type": "http response",
+    "z": "notification-router-flow",
+    "name": "Send Response",
+    "statusCode": "200",
+    "headers": {},
+    "x": 1080,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "scheduled-agents-flow",
+    "type": "tab",
+    "label": "Scheduled Agent Runner",
+    "disabled": false,
+    "info": "Runs agents on scheduled intervals (daily, weekly, monthly)",
+    "env": []
+  },
+  {
+    "id": "schedule-daily",
+    "type": "inject",
+    "z": "scheduled-agents-flow",
+    "name": "Daily (00:00 UTC)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "0 0 * * *",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "daily",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 80,
+    "wires": [
+      [
+        "schedule-route"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-hourly",
+    "type": "inject",
+    "z": "scheduled-agents-flow",
+    "name": "Hourly (00:00)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "0 * * * *",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "hourly",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 120,
+    "wires": [
+      [
+        "schedule-route"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-weekly",
+    "type": "inject",
+    "z": "scheduled-agents-flow",
+    "name": "Weekly (Sun 02:00 UTC)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "0 2 * * 0",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "weekly",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 160,
+    "wires": [
+      [
+        "schedule-route"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-route",
+    "type": "switch",
+    "z": "scheduled-agents-flow",
+    "name": "Route by Schedule",
+    "property": "topic",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "daily",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "hourly",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "weekly",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 3,
+    "x": 400,
+    "y": 120,
+    "wires": [
+      [
+        "schedule-daily-agents"
+      ],
+      [
+        "schedule-hourly-agents"
+      ],
+      [
+        "schedule-weekly-agents"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-daily-agents",
+    "type": "function",
+    "z": "scheduled-agents-flow",
+    "name": "Daily Agents",
+    "func": "// Daily agents: status, backstage\nconst agents = [\n    {\n        agent: 'status',\n        output_file: `/root/infra/orchestration/status-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'backstage',\n        output_file: `/root/infra/orchestration/backstage-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    }\n];\n\nreturn agents.map(a => ({\n    payload: a,\n    topic: 'invoke'\n}));",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 640,
+    "y": 80,
+    "wires": [
+      [
+        "schedule-invoke"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-hourly-agents",
+    "type": "function",
+    "z": "scheduled-agents-flow",
+    "name": "Hourly Agents",
+    "func": "// Hourly agents: ops\nconst agents = [\n    {\n        agent: 'ops',\n        output_file: `/root/infra/orchestration/ops-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${String(new Date().getHours()).padStart(2, '0')}${String(new Date().getMinutes()).padStart(2, '0')}.json`\n    }\n];\n\nreturn agents.map(a => ({\n    payload: a,\n    topic: 'invoke'\n}));",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 640,
+    "y": 120,
+    "wires": [
+      [
+        "schedule-invoke"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-weekly-agents",
+    "type": "function",
+    "z": "scheduled-agents-flow",
+    "name": "Weekly Agents",
+    "func": "// Weekly agents: orchestrator, security, performance, docs\nconst agents = [\n    {\n        agent: 'orchestrator',\n        output_file: `/root/infra/orchestration/orchestration-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'security',\n        output_file: `/root/infra/orchestration/security-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'performance',\n        output_file: `/root/infra/orchestration/performance-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'docs',\n        output_file: `/root/infra/orchestration/docs-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    }\n];\n\nreturn agents.map(a => ({\n    payload: a,\n    topic: 'invoke'\n}));",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 640,
+    "y": 160,
+    "wires": [
+      [
+        "schedule-invoke"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-invoke",
+    "type": "exec",
+    "z": "scheduled-agents-flow",
+    "command": "/root/infra/ai.engine/scripts/invoke-agent.sh",
+    "addpay": true,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "winHide": false,
+    "oldrc": false,
+    "name": "Invoke Agent",
+    "x": 880,
+    "y": 120,
+    "wires": [
+      [
+        "schedule-format"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "schedule-format",
+    "type": "function",
+    "z": "scheduled-agents-flow",
+    "name": "Format Result",
+    "func": "// Format agent execution result\nconst agent = msg.payload.agent || 'unknown';\nconst output = msg.payload.output_file || 'unknown';\nconst exitCode = msg.exitCode || 0;\n\nmsg.payload = {\n    agent: agent,\n    output_file: output,\n    exit_code: exitCode,\n    success: exitCode === 0,\n    timestamp: new Date().toISOString(),\n    trigger: 'scheduled'\n};\n\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1100,
+    "y": 120,
+    "wires": [
+      [
+        "schedule-notify"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-notify",
+    "type": "http request",
+    "z": "scheduled-agents-flow",
+    "name": "Notify Completion",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://nodered:1880/notifications",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "str",
+        "keyValue": "Content-Type",
+        "valueType": "str",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 1320,
+    "y": 120,
+    "wires": [
+      [
+        "schedule-debug"
+      ]
+    ]
+  },
+  {
+    "id": "schedule-debug",
+    "type": "debug",
+    "z": "scheduled-agents-flow",
+    "name": "Execution Log",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1520,
+    "y": 120,
+    "wires": []
+  }
+]

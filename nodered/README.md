@@ -13,15 +13,18 @@ docker compose up -d
 
 ## Configuration
 
-- **Domain:** `nodered.freqkflag.co`
+- **Access Type:** Infrastructure-only (internal network only)
 - **Port:** 1880 (internal)
+- **Network:** `edge` network (172.31.0.9)
 - **Data Directory:** `./data/`
 - **Timezone:** America/New_York
+- **Public Access:** ❌ Disabled (no Traefik routing)
 
 ## Access
 
-- **Web UI:** https://nodered.freqkflag.co
-- **Default:** No authentication (configure in settings)
+- **Internal Access:** `http://nodered:1880` (from other containers on `edge` network)
+- **SSH Tunnel:** `ssh -L 1880:localhost:1880 user@host` then access `http://localhost:1880`
+- **Authentication:** Enabled (username: `admin`, see CONFIGURATION.md for password)
 
 ## Features
 

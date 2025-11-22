@@ -1,6 +1,13 @@
 {
     "name": "node-red-project",
-    "description": "A Node-RED Project",
+    "description": "Node-RED Infrastructure Automation",
     "version": "0.0.1",
-    "private": true
+    "private": true,
+    "dependencies": {
+        "node-red-node-postgresql": "*",
+        "node-red-node-mysql": "*",
+        "node-red-contrib-redis": "*",
+        "node-red-contrib-cron-plus": "*",
+        "node-red-dashboard": "*"
+    }
 }

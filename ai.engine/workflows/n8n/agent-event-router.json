@@ -1,0 +1,255 @@
+{
+  "name": "Agent Event Router",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "agent-events",
+        "options": {}
+      },
+      "id": "webhook-agent-events",
+      "name": "Webhook - Agent Events",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "agent-events"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "merge-event-data",
+      "name": "Merge Event Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "value1": "={{$json.body.agent}}",
+              "operation": "equals",
+              "value2": "status"
+            },
+            {
+              "value1": "={{$json.body.agent}}",
+              "operation": "equals",
+              "value2": "bug-hunter"
+            },
+            {
+              "value1": "={{$json.body.agent}}",
+              "operation": "equals",
+              "value2": "security"
+            },
+            {
+              "value1": "={{$json.body.agent}}",
+              "operation": "equals",
+              "value2": "ops"
+            },
+            {
+              "value1": "={{$json.body.agent}}",
+              "operation": "equals",
+              "value2": "orchestrator"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "route-by-agent",
+      "name": "Route By Agent",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8080/api/v1/agents/invoke",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent",
+              "value": "={{$json.body.agent}}"
+            },
+            {
+              "name": "output_file",
+              "value": "={{$json.body.output_file || '/root/infra/orchestration/' + $json.body.agent + '-' + $now.format('YYYYMMDD-HHmmss') + '.json'}}"
+            },
+            {
+              "name": "trigger",
+              "value": "={{$json.body.trigger || 'webhook'}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "invoke-agent",
+      "name": "Invoke Agent Script",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "agent-api-auth",
+          "name": "Agent API Authentication"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}",
+              "type": "string"
+            },
+            {
+              "id": "agent",
+              "name": "agent",
+              "value": "={{$json.body.agent}}",
+              "type": "string"
+            },
+            {
+              "id": "status",
+              "name": "status",
+              "value": "triggered",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://infisical.freqkflag.co/api/v1/logs/agent-events",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "event",
+              "value": "={{JSON.stringify($json)}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-event",
+      "name": "Log Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify({status: 'success', message: 'Agent triggered', agent: $json.agent, timestamp: $json.timestamp})}}",
+        "options": {}
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - Agent Events": {
+      "main": [
+        [
+          {
+            "node": "Merge Event Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Event Data": {
+      "main": [
+        [
+          {
+            "node": "Route By Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route By Agent": {
+      "main": [
+        [
+          {
+            "node": "Invoke Agent Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoke Agent Script": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Log Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Event": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-11-22T12:00:00.000Z",
+      "updatedAt": "2025-11-22T12:00:00.000Z",
+      "id": "automation",
+      "name": "automation"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-22T12:00:00.000Z",
+  "versionId": "1"
+}
+

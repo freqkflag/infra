@@ -1,0 +1,233 @@
+{
+  "name": "Health Check Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "health-alert",
+        "options": {}
+      },
+      "id": "webhook-health-alert",
+      "name": "Webhook - Health Alert",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "health-alert"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "critical-alert",
+              "leftValue": "={{$json.body.status}}",
+              "rightValue": "unhealthy",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-critical",
+      "name": "Filter Critical Alerts",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://n8n.freqkflag.co/webhook/agent-events",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent",
+              "value": "ops"
+            },
+            {
+              "name": "trigger",
+              "value": "health-check-failure"
+            },
+            {
+              "name": "metadata",
+              "value": "={{JSON.stringify($json.body)}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "trigger-ops-agent",
+      "name": "Trigger Ops Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "alert-name",
+              "name": "alertname",
+              "value": "={{'HealthCheckFailure-' + $json.body.service}}",
+              "type": "string"
+            },
+            {
+              "id": "severity",
+              "name": "severity",
+              "value": "critical",
+              "type": "string"
+            },
+            {
+              "id": "summary",
+              "name": "summary",
+              "value": "={{'Service ' + $json.body.service + ' health check failed'}}",
+              "type": "string"
+            },
+            {
+              "id": "description",
+              "name": "description",
+              "value": "={{$json.body.health_check || 'Health check failed'}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-alert",
+      "name": "Format Alert",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://alertmanager.freqkflag.co/api/v1/alerts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "alerts",
+              "value": "=[{{JSON.stringify($json)}}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-to-alertmanager",
+      "name": "Send to Alertmanager",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://wiki.freqkflag.co/api/v1/pages",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{'Health Check Alert - ' + $json.body.service + ' - ' + $now.format('YYYY-MM-DD HH:mm:ss')}}"
+            },
+            {
+              "name": "content",
+              "value": "={{'## Health Check Failure\\n\\n**Service:** ' + $json.body.service + '\\n**Status:** ' + $json.body.status + '\\n**Health Check:** ' + ($json.body.health_check || 'Failed') + '\\n**Timestamp:** ' + $json.body.timestamp}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-to-wikijs",
+      "name": "Log to WikiJS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 200]
+    }
+  ],
+  "connections": {
+    "Webhook - Health Alert": {
+      "main": [
+        [
+          {
+            "node": "Filter Critical Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Critical Alerts": {
+      "main": [
+        [
+          {
+            "node": "Trigger Ops Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Format Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Ops Agent": {
+      "main": [
+        [
+          {
+            "node": "Log to WikiJS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert": {
+      "main": [
+        [
+          {
+            "node": "Send to Alertmanager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-11-22T12:00:00.000Z",
+      "updatedAt": "2025-11-22T12:00:00.000Z",
+      "id": "automation",
+      "name": "automation"
+    },
+    {
+      "createdAt": "2025-11-22T12:00:00.000Z",
+      "updatedAt": "2025-11-22T12:00:00.000Z",
+      "id": "monitoring",
+      "name": "monitoring"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-22T12:00:00.000Z",
+  "versionId": "1"
+}
+

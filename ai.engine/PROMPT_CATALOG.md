@@ -23,6 +23,7 @@ This catalog provides ready-to-use prompts for invoking each agent in the AI Eng
 | **release** | `Act as release agent. Evaluate /root/infra. Return readiness + blockers in strict JSON.` | Release readiness |
 | **development** | `Act as development agent. Analyze /root/infra. Return full technical sweep in strict JSON.` | Full development analysis |
 | **ops** | `Act as ops_agent. Analyze /root/infra. Return operational insights + commands in strict JSON.` | Operations management |
+| **backstage** | `Act as backstage_agent. Analyze /root/infra/services/backstage. Return Backstage health + catalog status in strict JSON.` | Backstage portal management |
 | **mcp** | `Act as mcp_agent. Analyze /root/infra and identify MCP opportunities. Return MCP recommendations in strict JSON.` | MCP integration guidance |
 | **orchestrator** | `Use Multi-Agent Orchestrator. Analyze /root/infra. Return aggregated report in strict JSON.` | Comprehensive analysis |
 
@@ -379,7 +380,42 @@ cat /root/infra/ai.engine/agents/ops-agent.md
 
 ---
 
-### 12. MCP Agent
+### 12. Backstage Agent
+
+**Purpose:** Backstage developer portal management and analysis
+
+**Quick Prompt:**
+```
+Act as backstage_agent. Analyze /root/infra/services/backstage for Backstage service health, entity catalog status, plugin configurations, and actionable insights. Return strict JSON.
+```
+
+**Full Prompt:**
+```
+You are the backstage_agent - a specialized agent for managing and analyzing the Backstage developer portal at backstage.freqkflag.co.
+
+Analyze /root/infra/services/backstage for Backstage service health, entity catalog status, plugin configurations, and actionable insights.
+
+Output strict JSON with:
+- backstage_status: Object with service_health, container_status, database_status, api_accessible, ui_accessible
+- catalog_health: Object with total_entities, entities_by_kind, sync_status, catalog_locations, sync_errors
+- plugin_status: Object with infisical, github_oauth, catalog plugin status
+- entity_analysis: Object with registered_services, missing_entities, entity_relationships, catalog_gaps
+- configuration_analysis: Object with app_config_valid, environment_variables, traefik_labels, database_config
+- operational_insights: Array of {priority, insight, recommendation, command}
+- integration_health: Object with infisical and github integration status
+- recommendations: Array of {category, priority, recommendation, action}
+
+Focus on Backstage-specific operations and catalog management. Provide concrete commands. Output only conclusions.
+```
+
+**File Reference:**
+```bash
+cat /root/infra/ai.engine/agents/backstage-agent.md
+```
+
+---
+
+### 13. MCP Agent
 
 **Purpose:** MCP server integration and tool usage guidance
 
@@ -431,7 +467,7 @@ Return missing docs + structure in strict JSON.
 
 ---
 
-### 13. Orchestrator Agent
+### 14. Orchestrator Agent
 
 **Purpose:** Multi-agent orchestrator coordinating all agents
 

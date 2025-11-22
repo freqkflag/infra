@@ -1,0 +1,276 @@
+[
+    {
+        "id": "scheduled-agents-flow",
+        "type": "tab",
+        "label": "Scheduled Agent Runner",
+        "disabled": false,
+        "info": "Runs agents on scheduled intervals (daily, weekly, monthly)",
+        "env": []
+    },
+    {
+        "id": "schedule-daily",
+        "type": "inject",
+        "z": "scheduled-agents-flow",
+        "name": "Daily (00:00 UTC)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "0 0 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "daily",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 80,
+        "wires": [
+            [
+                "schedule-route"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-hourly",
+        "type": "inject",
+        "z": "scheduled-agents-flow",
+        "name": "Hourly (00:00)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "0 * * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "hourly",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 120,
+        "wires": [
+            [
+                "schedule-route"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-weekly",
+        "type": "inject",
+        "z": "scheduled-agents-flow",
+        "name": "Weekly (Sun 02:00 UTC)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "0 2 * * 0",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "weekly",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 160,
+        "wires": [
+            [
+                "schedule-route"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-route",
+        "type": "switch",
+        "z": "scheduled-agents-flow",
+        "name": "Route by Schedule",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "daily",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "hourly",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "weekly",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 400,
+        "y": 120,
+        "wires": [
+            [
+                "schedule-daily-agents"
+            ],
+            [
+                "schedule-hourly-agents"
+            ],
+            [
+                "schedule-weekly-agents"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-daily-agents",
+        "type": "function",
+        "z": "scheduled-agents-flow",
+        "name": "Daily Agents",
+        "func": "// Daily agents: status, backstage\nconst agents = [\n    {\n        agent: 'status',\n        output_file: `/root/infra/orchestration/status-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'backstage',\n        output_file: `/root/infra/orchestration/backstage-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    }\n];\n\nreturn agents.map(a => ({\n    payload: a,\n    topic: 'invoke'\n}));",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 80,
+        "wires": [
+            [
+                "schedule-invoke"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-hourly-agents",
+        "type": "function",
+        "z": "scheduled-agents-flow",
+        "name": "Hourly Agents",
+        "func": "// Hourly agents: ops\nconst agents = [\n    {\n        agent: 'ops',\n        output_file: `/root/infra/orchestration/ops-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${String(new Date().getHours()).padStart(2, '0')}${String(new Date().getMinutes()).padStart(2, '0')}.json`\n    }\n];\n\nreturn agents.map(a => ({\n    payload: a,\n    topic: 'invoke'\n}));",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 120,
+        "wires": [
+            [
+                "schedule-invoke"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-weekly-agents",
+        "type": "function",
+        "z": "scheduled-agents-flow",
+        "name": "Weekly Agents",
+        "func": "// Weekly agents: orchestrator, security, performance, docs\nconst agents = [\n    {\n        agent: 'orchestrator',\n        output_file: `/root/infra/orchestration/orchestration-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'security',\n        output_file: `/root/infra/orchestration/security-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'performance',\n        output_file: `/root/infra/orchestration/performance-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    },\n    {\n        agent: 'docs',\n        output_file: `/root/infra/orchestration/docs-${new Date().toISOString().split('T')[0].replace(/-/g, '')}.json`\n    }\n];\n\nreturn agents.map(a => ({\n    payload: a,\n    topic: 'invoke'\n}));",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 160,
+        "wires": [
+            [
+                "schedule-invoke"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-invoke",
+        "type": "exec",
+        "z": "scheduled-agents-flow",
+        "command": "/root/infra/ai.engine/scripts/invoke-agent.sh",
+        "addpay": true,
+        "append": "",
+        "useSpawn": false,
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Invoke Agent",
+        "x": 880,
+        "y": 120,
+        "wires": [
+            [
+                "schedule-format"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "schedule-format",
+        "type": "function",
+        "z": "scheduled-agents-flow",
+        "name": "Format Result",
+        "func": "// Format agent execution result\nconst agent = msg.payload.agent || 'unknown';\nconst output = msg.payload.output_file || 'unknown';\nconst exitCode = msg.exitCode || 0;\n\nmsg.payload = {\n    agent: agent,\n    output_file: output,\n    exit_code: exitCode,\n    success: exitCode === 0,\n    timestamp: new Date().toISOString(),\n    trigger: 'scheduled'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 120,
+        "wires": [
+            [
+                "schedule-notify"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-notify",
+        "type": "http request",
+        "z": "scheduled-agents-flow",
+        "name": "Notify Completion",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://nodered:1880/notifications",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "str",
+                "keyValue": "Content-Type",
+                "valueType": "str",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 1320,
+        "y": 120,
+        "wires": [
+            [
+                "schedule-debug"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-debug",
+        "type": "debug",
+        "z": "scheduled-agents-flow",
+        "name": "Execution Log",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1520,
+        "y": 120,
+        "wires": []
+    }
+]
+

@@ -41,7 +41,7 @@ module.exports = {
      * node-red from being able to decrypt your existing credentials and they will be
      * lost.
      */
-    //credentialSecret: "a-secret-key",
+    credentialSecret: process.env.NODERED_CREDENTIAL_SECRET || "infra-nodered-secret-key-change-in-production",
 
     /** By default, the flow JSON will be formatted over multiple lines making
      * it easier to compare changes when using version control.
@@ -73,14 +73,14 @@ module.exports = {
     /** To password protect the Node-RED editor and admin API, the following
      * property can be used. See https://nodered.org/docs/security.html for details.
      */
-    //adminAuth: {
-    //    type: "credentials",
-    //    users: [{
-    //        username: "admin",
-    //        password: "$2a$08$zZWtXTja0fB1pzD4sHCMyOCMYz2Z6dNbM6tl8sJogENOMcxWV9DN.",
-    //        permissions: "*"
-    //    }]
-    //},
+    adminAuth: {
+        type: "credentials",
+        users: [{
+            username: process.env.NODERED_USERNAME || "admin",
+            password: process.env.NODERED_PASSWORD_HASH || "$2a$08$utTEjr8dFaZvpYJ7YsW0suAGGK1R1J0Q/lNsEqxSMgk2Gl4vFwV76",
+            permissions: "*"
+        }]
+    },
 
     /** The following property can be used to enable HTTPS
      * This property can be either an object, containing both a (private) key
@@ -149,8 +149,9 @@ module.exports = {
      * To listen on all IPv6 addresses, set uiHost to "::",
      * The following property can be used to listen on a specific interface. For
      * example, the following would only allow connections from the local machine.
+     * Set to 0.0.0.0 to listen on all interfaces (for internal network access)
      */
-    //uiHost: "127.0.0.1",
+    uiHost: process.env.NODERED_UI_HOST || "0.0.0.0",
 
     /** The maximum size of HTTP request that will be accepted by the runtime api.
      * Default: 5mb
@@ -379,22 +380,22 @@ module.exports = {
      * will install/load. It can use '*' as a wildcard that matches anything.
      */
     externalModules: {
-        // autoInstall: false,   /** Whether the runtime will attempt to automatically install missing modules */
-        // autoInstallRetry: 30, /** Interval, in seconds, between reinstall attempts */
-        // palette: {              /** Configuration for the Palette Manager */
-        //     allowInstall: true, /** Enable the Palette Manager in the editor */
-        //     allowUpdate: true,  /** Allow modules to be updated in the Palette Manager */
-        //     allowUpload: true,  /** Allow module tgz files to be uploaded and installed */
-        //     allowList: ['*'],
-        //     denyList: [],
-        //     allowUpdateList: ['*'],
-        //     denyUpdateList: []
-        // },
-        // modules: {              /** Configuration for node-specified modules */
-        //     allowInstall: true,
-        //     allowList: [],
-        //     denyList: []
-        // }
+        autoInstall: true,   /** Whether the runtime will attempt to automatically install missing modules */
+        autoInstallRetry: 30, /** Interval, in seconds, between reinstall attempts */
+        palette: {              /** Configuration for the Palette Manager */
+            allowInstall: true, /** Enable the Palette Manager in the editor */
+            allowUpdate: true,  /** Allow modules to be updated in the Palette Manager */
+            allowUpload: true,  /** Allow module tgz files to be uploaded and installed */
+            allowList: ['*'],
+            denyList: [],
+            allowUpdateList: ['*'],
+            denyUpdateList: []
+        },
+        modules: {              /** Configuration for node-specified modules */
+            allowInstall: true,
+            allowList: [],
+            denyList: []
+        }
     },
 
 
@@ -540,7 +541,33 @@ module.exports = {
      *    global.get("os")
      */
     functionGlobalContext: {
-        // os:require('os'),
+        // Infrastructure service access
+        // Access via: global.get("postgres"), global.get("mysql"), etc.
+        postgres: {
+            host: process.env.POSTGRES_HOST || "postgres",
+            port: process.env.POSTGRES_PORT || 5432,
+            database: process.env.POSTGRES_DB || "infra",
+            user: process.env.POSTGRES_USER || "postgres",
+            password: process.env.POSTGRES_PASSWORD || ""
+        },
+        mysql: {
+            host: process.env.MARIADB_HOST || "mariadb",
+            port: process.env.MARIADB_PORT || 3306,
+            database: process.env.MARIADB_DATABASE || "infra",
+            user: process.env.MARIADB_USER || "infra",
+            password: process.env.MARIADB_PASSWORD || ""
+        },
+        redis: {
+            host: process.env.REDIS_HOST || "redis",
+            port: process.env.REDIS_PORT || 6379,
+            password: process.env.REDIS_PASSWORD || ""
+        },
+        infisical: {
+            url: process.env.INFISICAL_PUBLIC_URL || "https://infisical.freqkflag.co",
+            projectId: process.env.INFISICAL_PROJECT_ID || "",
+            clientId: process.env.INFISICAL_CLIENT_ID || "",
+            clientSecret: process.env.INFISICAL_CLIENT_SECRET || ""
+        }
     },
 
     /** The maximum number of messages nodes will buffer internally as part of their

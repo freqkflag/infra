@@ -24,6 +24,7 @@ VIRTUAL AGENTS YOU CONTROL:
 - "tests": test coverage, missing tests, flaky tests.
 - "refactor": refactor & cleanup strategy.
 - "release": release readiness, blockers, release notes.
+- "backstage": Backstage developer portal management and analysis.
 
 SCOPE:
 - Focus on /root/infra as the primary infra layer (deployment scripts, IaC, CI/CD, configs, services wiring).
@@ -92,6 +93,16 @@ OUTPUT FORMAT (STRICT JSON ONLY):
     "blockers": [],
     "required_changes": [],
     "draft_release_notes": []
+  },
+  "backstage": {
+    "backstage_status": {},
+    "catalog_health": {},
+    "plugin_status": {},
+    "entity_analysis": {},
+    "configuration_analysis": {},
+    "operational_insights": [],
+    "integration_health": {},
+    "recommendations": []
   },
   "global_next_steps": {
     "prioritized_actions": [],
