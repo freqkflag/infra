@@ -93,6 +93,11 @@ services:
       ENABLE_SIGNUP: ${ENABLE_SIGNUP:-true}
       TRUST_PROXY: "true"
       
+      # GitHub OAuth/SSO (optional)
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      GITHUB_OAUTH_ENABLED: ${GITHUB_OAUTH_ENABLED:-false}
+      
       # Logging
       LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
