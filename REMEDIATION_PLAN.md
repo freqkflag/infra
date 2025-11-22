@@ -355,44 +355,44 @@ docker compose -f services/backstage/compose.yml restart backstage backstage-db
 
 **Verification:**
 
-- [ ] All critical secrets stored in Infisical `/prod`
+- [x] All critical secrets stored in Infisical `/prod`
 - [x] Secrets appear in `.workspace/.env` (via Infisical Agent)
 - [x] Backstage containers restart successfully (2025-11-22)
-- [ ] Backstage health check passes (main app running, but health check status still "starting")
+- [x] Backstage health check passes (2025-11-22) - HTTP health check added and verified
 - [ ] Cloudflare DNS API token configured
 - [ ] SSL certificates generate successfully via DNS-01 challenge
 
 **Status:** ✅ COMPLETED (2025-11-22) - All __UNSET__ placeholders resolved  
-**Restart Status (2025-11-22):**
+**Restart Status (2025-11-22 - Updated):**
 
 - ✅ **Backstage containers restarted** - Both `backstage` and `backstage-db` containers restarted successfully
 - ✅ **Database healthy** - `backstage-db` container reports healthy status, PostgreSQL 16 ready to accept connections
-- ⚠️ **Main application running** - `backstage` container is running and listening on port 7007, but health check status remains "starting"
-- ❌ __Infisical plugin failed__ - Plugin initialization failed due to empty `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` values; error: `TypeError: Invalid type in config for key 'infisical.authentication.universalAuth.clientId' in 'app-config.production.yaml', got empty-string, wanted string`
-- ⚠️ **Health check issue** - Health check may be failing because the container doesn't have `ps` command available (health check uses `ps aux | grep`)
+- ✅ **Main application running** - `backstage` container is running and listening on port 7007
+- ✅ **Health check passing** - HTTP health check added using Node.js to check root endpoint (returns 200)
+- ✅ **Infisical plugin initialized** - Plugin successfully authenticates and fetches secrets from Infisical
+- ✅ **Health check fixed** - Replaced `ps`-based check with HTTP check using Node.js (available in container)
 
-**Build Logs (2025-11-22 restart):**
+**Resolution (2025-11-22):**
 
-```text
-backstage-db: PostgreSQL 16.11 started, database system ready to accept connections
-backstage: Loading config from MergedConfigSource...
-backstage: Listening on :7007
-backstage: Plugin initialization started (app, proxy, scaffolder, techdocs, auth, catalog, permission, search, kubernetes, notifications, signals, infisical-backend)
-backstage: Plugin initialization: proxy, techdocs initialized successfully
-backstage: Database migration completed, catalog plugin initialized
-backstage: Auth provider (guest) configured
-backstage: Infisical API client initialized successfully
-backstage: Plugin 'infisical-backend' initialized successfully
-backstage: Plugin initialization: app, scaffolder, auth, catalog, search, notifications, infisical-backend initialized
-```
+1. ✅ **Health Check Fixed** - Added HTTP health check using Node.js to check root endpoint (`http://localhost:7007/`)
+   - Uses Node.js HTTP client (available in Backstage container)
+   - Checks for HTTP status code < 500 (accepts 200, 404, etc. as healthy)
+   - Start period: 60s (allows time for application to initialize)
+   - Interval: 30s, timeout: 10s, retries: 3
 
-**Next Actions:**
+2. ✅ **Infisical Plugin Verified** - Plugin initializes successfully with credentials from Infisical
+   - `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` correctly loaded from `.workspace/.env`
+   - Plugin authenticates successfully and fetches secrets from Infisical
+   - Logs confirm: "Successfully authenticated. Token expires in 43195 minutes"
+   - Logs confirm: "Successfully fetched 25 secrets and 0 imported secrets"
 
-1. Set `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in Infisical `/prod` environment
-2. Regenerate `.workspace/.env` via Infisical Agent
-3. Restart Backstage container to load new secrets
-4. Verify Infisical plugin initializes successfully
-5. Consider updating health check method if `ps` command unavailable
+3. ✅ **Compose File Updated** - Removed obsolete `version: "3.9"` field
+
+**Current Status:**
+- ✅ Backstage container: **healthy**
+- ✅ Backstage-db container: **healthy**
+- ✅ Infisical plugin: **initialized and functional**
+- ✅ Health check: **passing**
 
 __Documentation:__ See `docs/INFISICAL_SECRETS_AUDIT.md` for complete audit, prioritized list, and remediation procedures  
 __Owner:__ Infrastructure Lead  
