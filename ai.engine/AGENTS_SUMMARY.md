@@ -16,18 +16,23 @@
 7. **tests** (`tests-agent.md`) - Test coverage, missing tests, flaky tests
 8. **refactor** (`refactor-agent.md`) - Refactor & cleanup strategy
 9. **release** (`release-agent.md`) - Release readiness, blockers, release notes
+10. **code_reviewer** (`code-review-agent.md`) - Code quality review (best practices, maintainability, standards)
 
 ### Integration Agent
 
-10. **mcp_agent** (`mcp-agent.md`) - MCP server integration and tool usage guidance
+11. **mcp_agent** (`mcp-agent.md`) - MCP server integration and tool usage guidance
 
 ### Service-Specific Agents
 
-11. **backstage** (`backstage-agent.md`) - Backstage developer portal management and analysis
+12. **backstage** (`backstage-agent.md`) - Backstage developer portal management and analysis
+
+### Operations Agents
+
+13. **git** (`git-agent.md`) - Git operations and repository management
 
 ### Orchestration Agent
 
-12. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
+14. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
 
 ## Helper Scripts
 
@@ -70,7 +75,7 @@ Act as bug_hunter. Scan /root/infra. Return crit bugs + fixes in strict JSON.
 ```
 Use the Multi-Agent Orchestrator preset. Focus on /root/infra first, then repo-wide context. 
 Return a single strict JSON object with aggregated output from:
-status_agent, bug_hunter, performance, security, architecture, docs, tests, refactor, release, mcp_agent.
+status_agent, bug_hunter, performance, security, architecture, docs, tests, refactor, release, code_reviewer, backstage, git, mcp_agent.
 ```
 
 ### MCP Integration
@@ -112,7 +117,9 @@ All agents output strict JSON with structured fields:
 - **tests**: `{ coverage_summary, missing_tests, flaky_tests, high_priority_test_targets }`
 - **refactor**: `{ refactor_targets, duplication_groups, legacy_patterns, simplifications }`
 - **release**: `{ release_readiness, blockers, required_changes, draft_release_notes }`
+- **code_reviewer**: `{ code_quality_issues, best_practices_violations, maintainability_concerns, standards_compliance, positive_findings, refactoring_opportunities, documentation_gaps, security_code_review, performance_concerns, overall_assessment }`
 - **backstage**: `{ backstage_status, catalog_health, plugin_status, entity_analysis, configuration_analysis, operational_insights, integration_health, recommendations }`
+- **git**: `{ repository_status, branch_analysis, commit_analysis, repository_health, git_issues, git_operations, workflow_recommendations }`
 - **mcp_agent**: `{ mcp_servers_available, mcp_opportunities, mcp_integration_recommendations, mcp_usage_patterns, missing_mcp_integrations, mcp_best_practices }`
 - **orchestrator**: Aggregates all agent outputs + `{ global_next_steps, exec }`
 
@@ -130,15 +137,19 @@ All agents output strict JSON with structured fields:
 │   ├── tests-agent.md           ✅
 │   ├── refactor-agent.md        ✅
 │   ├── release-agent.md         ✅
+│   ├── code-review-agent.md     ✅
 │   ├── development-agent.md     ✅
 │   ├── ops-agent.md             ✅
 │   ├── backstage-agent.md       ✅
+│   ├── git-agent.md             ✅
 │   ├── mcp-agent.md             ✅
 │   ├── orchestrator-agent.md    ✅
 │   └── README.md                ✅
 ├── scripts/
 │   ├── invoke-agent.sh          ✅
+│   ├── code-review.sh           ✅
 │   ├── backstage.sh             ✅
+│   ├── git.sh                   ✅
 │   └── list-agents.sh           ✅
 ├── PROMPT_CATALOG.md            ✅
 ├── MCP_INTEGRATION.md           ✅

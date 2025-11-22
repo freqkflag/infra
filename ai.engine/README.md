@@ -165,35 +165,49 @@ Release readiness evaluator and release note drafter.
 
 **Use when:** Evaluating release readiness or drafting release notes.
 
-### 10. **development** (`development-agent.md`)
+### 10. **code_reviewer** (`code-review-agent.md`)
+Code quality reviewer focusing on best practices, maintainability, and standards compliance.
+
+**Output:** Code quality issues, best practices violations, maintainability concerns, standards compliance, positive findings, refactoring opportunities, documentation gaps, security code review, performance concerns, overall assessment.
+
+**Use when:** Performing comprehensive code reviews, checking code quality, or ensuring standards compliance.
+
+### 11. **development** (`development-agent.md`)
 Full technical sweep and development analysis.
 
 **Output:** Comprehensive development analysis with project summary, technical status, todos, and execution plan.
 
 **Use when:** Complete development analysis or technical debt assessment.
 
-### 11. **ops** (`ops-agent.md`)
+### 12. **ops** (`ops-agent.md`)
 Infrastructure operations and command control.
 
 **Output:** Operational insights, service health, current tasks, and actionable commands.
 
 **Use when:** Infrastructure operations management or service monitoring.
 
-### 12. **backstage** (`backstage-agent.md`)
+### 13. **backstage** (`backstage-agent.md`)
 Backstage developer portal management and analysis.
 
 **Output:** Backstage service health, catalog status, plugin configurations, entity analysis, integration health.
 
 **Use when:** Managing Backstage portal, analyzing catalog, checking plugin health, or entity registration.
 
-### 13. **mcp_agent** (`mcp-agent.md`)
+### 14. **mcp_agent** (`mcp-agent.md`)
 MCP server integration and tool usage guidance.
 
 **Output:** MCP server availability, opportunities, integration recommendations, usage patterns.
 
 **Use when:** Identifying MCP integration opportunities or verifying MCP server availability.
 
-### 14. **orchestrator** (`orchestrator-agent.md`)
+### 15. **git** (`git-agent.md`)
+Git operations and repository management agent.
+
+**Output:** Repository status, branch analysis, commit patterns, repository health, Git issues, operations, and workflow recommendations.
+
+**Use when:** Analyzing Git repository health, branch strategy, commit patterns, or Git operations.
+
+### 16. **orchestrator** (`orchestrator-agent.md`)
 Multi-agent orchestrator that coordinates all agents.
 
 **Output:** Complete JSON report with all agent findings aggregated.

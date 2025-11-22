@@ -1,0 +1,17 @@
+[Unit]
+Description=AI Engine Agent API Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/infra
+ExecStart=/usr/bin/python3 -u /root/infra/ai.engine/workflows/scripts/agent-api-server.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+

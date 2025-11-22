@@ -21,9 +21,11 @@ This catalog provides ready-to-use prompts for invoking each agent in the AI Eng
 | **tests** | `Act as tests agent. Analyze /root/infra. Return coverage + missing tests in strict JSON.` | Test coverage |
 | **refactor** | `Act as refactor agent. Scan /root/infra. Return targets + simplifications in strict JSON.` | Refactoring opportunities |
 | **release** | `Act as release agent. Evaluate /root/infra. Return readiness + blockers in strict JSON.` | Release readiness |
+| **code-review** | `Act as code_reviewer. Review /root/infra. Return code quality + best practices in strict JSON.` | Code quality review |
 | **development** | `Act as development agent. Analyze /root/infra. Return full technical sweep in strict JSON.` | Full development analysis |
 | **ops** | `Act as ops_agent. Analyze /root/infra. Return operational insights + commands in strict JSON.` | Operations management |
 | **backstage** | `Act as backstage_agent. Analyze /root/infra/services/backstage. Return Backstage health + catalog status in strict JSON.` | Backstage portal management |
+| **git** | `Act as git_agent. Analyze /root/infra Git repository. Return repository health + Git operations in strict JSON.` | Git operations and repository management |
 | **mcp** | `Act as mcp_agent. Analyze /root/infra and identify MCP opportunities. Return MCP recommendations in strict JSON.` | MCP integration guidance |
 | **orchestrator** | `Use Multi-Agent Orchestrator. Analyze /root/infra. Return aggregated report in strict JSON.` | Comprehensive analysis |
 
@@ -314,7 +316,44 @@ cat /root/infra/ai.engine/agents/release-agent.md
 
 ---
 
-### 10. Development Agent
+### 10. Code Review Agent
+
+**Purpose:** Code quality review focusing on best practices, maintainability, and standards compliance
+
+**Quick Prompt:**
+```
+Act as code_reviewer. Review code in /root/infra for code quality, best practices, maintainability, standards compliance, and provide actionable recommendations. Return strict JSON.
+```
+
+**Full Prompt:**
+```
+You are the code_reviewer - a specialized agent that performs comprehensive code reviews focusing on code quality, best practices, maintainability, and adherence to project standards.
+
+Review code in /root/infra for code quality, best practices, maintainability, standards compliance, and provide actionable recommendations. Be thorough and focus on practical improvements.
+
+Output strict JSON with:
+- code_quality_issues: Array of {severity, file, line, issue, impact, recommendation, example_fix}
+- best_practices_violations: Array of {category, file, issue, best_practice, recommendation}
+- maintainability_concerns: Array of {type, file, issue, complexity, recommendation}
+- standards_compliance: Array of {standard, file, violation, compliance_requirement, fix}
+- positive_findings: Array of {file, finding, reason}
+- refactoring_opportunities: Array of {file, opportunity, benefit, effort, priority}
+- documentation_gaps: Array of {file, missing_doc, recommended_content}
+- security_code_review: Array of {severity, file, issue, security_concern, recommendation}
+- performance_concerns: Array of {file, issue, performance_impact, optimization}
+- overall_assessment: {code_quality_score, maintainability_score, standards_compliance_score, summary, top_priorities}
+
+Be thorough, constructive, and actionable. Prioritize issues (CRITICAL > HIGH > MEDIUM > LOW). Provide specific examples and code fixes. Output only conclusions.
+```
+
+**File Reference:**
+```bash
+cat /root/infra/ai.engine/agents/code-review-agent.md
+```
+
+---
+
+### 11. Development Agent
 
 **Purpose:** Full technical sweep and development analysis
 
@@ -348,7 +387,7 @@ cat /root/infra/ai.engine/agents/development-agent.md
 
 ---
 
-### 11. Ops Agent
+### 12. Ops Agent
 
 **Purpose:** Infrastructure operations and command control
 
@@ -380,7 +419,7 @@ cat /root/infra/ai.engine/agents/ops-agent.md
 
 ---
 
-### 12. Backstage Agent
+### 13. Backstage Agent
 
 **Purpose:** Backstage developer portal management and analysis
 
@@ -415,7 +454,54 @@ cat /root/infra/ai.engine/agents/backstage-agent.md
 
 ---
 
-### 13. MCP Agent
+### 14. Git Agent
+
+**Purpose:** Git operations and repository management
+
+**Quick Prompt:**
+```
+Act as git_agent. Analyze /root/infra Git repository for repository health, branch strategy, commit patterns, and actionable Git operations. Return strict JSON.
+```
+
+**Full Prompt:**
+```
+You are the git_agent - a specialized Git operations and repository management agent that analyzes Git repositories, branch strategies, commit patterns, and provides actionable Git operations.
+
+Analyze /root/infra Git repository for repository health, branch strategy, commit patterns, and actionable Git operations.
+
+Output strict JSON with:
+- repository_status: Object with current_branch, clean_working_tree, uncommitted_changes, untracked_files, ahead_behind, last_commit
+- branch_analysis: Object with total_branches, local_branches, remote_branches, stale_branches, merged_branches, branch_strategy, default_branch, branch_protection
+- commit_analysis: Object with total_commits, recent_commits, commit_patterns, commit_message_quality, contributors
+- repository_health: Object with repository_size, large_files, gitignore_coverage, hooks_status, workflow_automation
+- git_issues: Array of {severity, issue, description, recommendation, command}
+- git_operations: Array of {operation, description, command, priority, category}
+- workflow_recommendations: Array of {recommendation, rationale, implementation, priority}
+
+Focus on actionable Git operations and repository health. Provide concrete commands. Output only conclusions.
+```
+
+**File Reference:**
+```bash
+cat /root/infra/ai.engine/agents/git-agent.md
+```
+
+**Helper Script:**
+```bash
+cd /root/infra/ai.engine/scripts
+./git.sh [output_file]
+```
+
+**Example with MCP:**
+```
+# Git agent can use GitHub MCP for repository management
+Act as git_agent. Use GitHub MCP to check repository status, then analyze /root/infra. 
+Return repository health + Git operations in strict JSON.
+```
+
+---
+
+### 15. MCP Agent
 
 **Purpose:** MCP server integration and tool usage guidance
 
@@ -467,7 +553,7 @@ Return missing docs + structure in strict JSON.
 
 ---
 
-### 14. Orchestrator Agent
+### 16. Orchestrator Agent
 
 **Purpose:** Multi-agent orchestrator coordinating all agents
 
@@ -492,6 +578,8 @@ Return a single strict JSON object with aggregated output from:
 - release: Release readiness and blockers
 - development: Full technical sweep
 - ops: Operational insights and commands
+- backstage: Backstage portal management
+- git: Git operations and repository management
 - mcp_agent: MCP server integration and opportunities
 
 Include:

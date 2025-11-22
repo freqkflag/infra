@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# Code Review Agent Helper Script
-# Quick invocation for code_reviewer
+# Git Agent Helper Script
+# Quick invocation for git_agent
 #
 # Usage:
-#   ./code-review.sh [output_file]
+#   ./git.sh [output_file]
 #
 
 set -euo pipefail
@@ -21,8 +21,8 @@ NC='\033[0m'
 
 output_file="${1:-}"
 
-echo -e "${BLUE}Invoking code_reviewer...${NC}"
-echo -e "${YELLOW}Purpose: Comprehensive code review focusing on quality, best practices, maintainability, and standards compliance${NC}"
+echo -e "${BLUE}Invoking git_agent...${NC}"
+echo -e "${YELLOW}Purpose: Git operations and repository management${NC}"
 echo ""
 
 cd "$INFRA_DIR" || exit 1
@@ -33,13 +33,13 @@ cat << EOF
 CURSOR AI PROMPT:
 ========================================
 
-Act as code_reviewer. Review code in /root/infra for code quality, best practices, maintainability, standards compliance, and provide actionable recommendations. Return strict JSON.
+Act as git_agent. Analyze /root/infra Git repository for repository health, branch strategy, commit patterns, and actionable Git operations. Return strict JSON.
 
 ========================================
 AGENT FILE REFERENCE:
 ========================================
 
-$(cat "$AGENTS_DIR/code-review-agent.md")
+$(cat "$AGENTS_DIR/git-agent.md")
 
 ========================================
 END PROMPT
@@ -55,5 +55,5 @@ else
 fi
 
 echo ""
-echo -e "${BLUE}Agent file: $AGENTS_DIR/code-review-agent.md${NC}"
+echo -e "${BLUE}Agent file: $AGENTS_DIR/git-agent.md${NC}"
 

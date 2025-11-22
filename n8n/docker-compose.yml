@@ -58,6 +58,7 @@ services:
     networks:
       - n8n-network
       - traefik-network
+      - edge
     depends_on:
       n8n-db:
         condition: service_healthy
@@ -105,4 +106,7 @@ networks:
   traefik-network:
     external: true
     name: traefik-network
+  edge:
+    external: true
+    name: edge
 

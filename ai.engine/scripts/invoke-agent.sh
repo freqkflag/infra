@@ -7,7 +7,7 @@
 #   ./invoke-agent.sh <agent_name> [output_file]
 #
 # Available agents:
-#   status, bug-hunter, performance, security, architecture, docs, tests, refactor, release, backstage, orchestrator
+#   status, bug-hunter, performance, security, architecture, docs, tests, refactor, release, code-review, backstage, git, orchestrator
 #
 
 set -euo pipefail
@@ -38,7 +38,9 @@ Available agents:
   tests           - Test coverage and missing tests
   refactor        - Refactoring targets and duplication
   release         - Release readiness and blockers
+  code-review     - Code quality review (best practices, maintainability, standards)
   backstage       - Backstage developer portal management
+  git             - Git operations and repository management
   orchestrator    - Full multi-agent orchestration
 
 Examples:
@@ -83,8 +85,14 @@ validate_agent() {
         release)
             agent_file="${AGENTS_DIR}/release-agent.md"
             ;;
+        code-review)
+            agent_file="${AGENTS_DIR}/code-review-agent.md"
+            ;;
         backstage)
             agent_file="${AGENTS_DIR}/backstage-agent.md"
+            ;;
+        git)
+            agent_file="${AGENTS_DIR}/git-agent.md"
             ;;
         orchestrator)
             agent_file="${AGENTS_DIR}/orchestrator-agent.md"

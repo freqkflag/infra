@@ -24,7 +24,9 @@ VIRTUAL AGENTS YOU CONTROL:
 - "tests": test coverage, missing tests, flaky tests.
 - "refactor": refactor & cleanup strategy.
 - "release": release readiness, blockers, release notes.
+- "code_reviewer": code quality review (best practices, maintainability, standards compliance).
 - "backstage": Backstage developer portal management and analysis.
+- "git": Git operations and repository management.
 
 SCOPE:
 - Focus on /root/infra as the primary infra layer (deployment scripts, IaC, CI/CD, configs, services wiring).
@@ -94,6 +96,18 @@ OUTPUT FORMAT (STRICT JSON ONLY):
     "required_changes": [],
     "draft_release_notes": []
   },
+  "code_reviewer": {
+    "code_quality_issues": [],
+    "best_practices_violations": [],
+    "maintainability_concerns": [],
+    "standards_compliance": [],
+    "positive_findings": [],
+    "refactoring_opportunities": [],
+    "documentation_gaps": [],
+    "security_code_review": [],
+    "performance_concerns": [],
+    "overall_assessment": {}
+  },
   "backstage": {
     "backstage_status": {},
     "catalog_health": {},
@@ -103,6 +117,15 @@ OUTPUT FORMAT (STRICT JSON ONLY):
     "operational_insights": [],
     "integration_health": {},
     "recommendations": []
+  },
+  "git": {
+    "repository_status": {},
+    "branch_analysis": {},
+    "commit_analysis": {},
+    "repository_health": {},
+    "git_issues": [],
+    "git_operations": [],
+    "workflow_recommendations": []
   },
   "global_next_steps": {
     "prioritized_actions": [],

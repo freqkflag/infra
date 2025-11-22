@@ -67,9 +67,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://localhost:8080/api/v1/agents/invoke",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "=http://host.docker.internal:8081/api/v1/agents/invoke",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -93,13 +91,7 @@
       "name": "Invoke Agent Script",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [850, 300],
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "agent-api-auth",
-          "name": "Agent API Authentication"
-        }
-      }
+      "position": [850, 300]
     },
     {
       "parameters": {
