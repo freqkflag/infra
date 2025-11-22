@@ -12,6 +12,11 @@ generate_secret() {
     openssl rand -base64 32 | tr -d '\n'
 }
 
+# Function to generate 16-byte hex string for ENCRYPTION_KEY
+generate_encryption_key() {
+    openssl rand -hex 16 | tr -d '\n'
+}
+
 echo "# Infisical Environment Variables"
 echo "# Generated: $(date)"
 echo ""
@@ -21,7 +26,7 @@ echo "POSTGRES_USER=infisical"
 echo "POSTGRES_PASSWORD=$(generate_secret)"
 echo ""
 echo "# Encryption Keys"
-echo "ENCRYPTION_KEY=$(generate_secret)"
+echo "ENCRYPTION_KEY=$(generate_encryption_key)"
 echo "ROOT_ENCRYPTION_KEY=$(generate_secret)"
 echo ""
 echo "# JWT Secrets"

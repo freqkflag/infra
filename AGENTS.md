@@ -14,8 +14,8 @@ This document provides a standardized overview of all services and agents in the
 ### Critical Issues
 - ✅ **Traefik running** - Reverse proxy container is now running and healthy
 - ✅ **Health checks fixed** - WordPress, WikiJS, Node-RED, Adminer now healthy after fixing health check configurations
-- ⚠️ **n8n database schema** - Database schema mismatch preventing service startup (missing columns Role.id, WorkflowEntity__WorkflowEntity_shared.userId)
-- ⚠️ **Infisical health check** - Health check reporting unhealthy despite service appearing functional
+- ✅ **n8n database schema** - Database reset and migrations completed successfully, service now healthy
+- ✅ **Infisical health check** - Fixed health check endpoint, service now healthy
 - ⚠️ **Edge network missing** - Required shared Docker network `edge` does not exist (documented but not created, services use traefik-network)
 
 ### Service Health Summary
@@ -108,7 +108,7 @@ This document provides a standardized overview of all services and agents in the
 ### n8n
 - **Domain:** `n8n.freqkflag.co`
 - **Location:** `/root/infra/n8n/`
-- **Status:** ⚠️ Unhealthy (database schema mismatch preventing startup)
+- **Status:** ✅ Running (healthy)
 - **Purpose:** Workflow automation and integration platform
 - **Database:** PostgreSQL 15
 - **Features:**
@@ -117,7 +117,7 @@ This document provides a standardized overview of all services and agents in the
   - Scheduled tasks
   - Webhook support
   - Service integrations (Mailu, etc.)
-- **Note:** Database schema errors - missing columns Role.id and WorkflowEntity__WorkflowEntity_shared.userId. Needs database reset or migration fix
+- **Note:** Fixed database schema by resetting database and running fresh migrations. Updated health check to process-based check (was using HTTP endpoint that was failing)
 
 ### Node-RED
 - **Domain:** `nodered.freqkflag.co`

@@ -38,4 +38,3 @@ networks:
   traefik-network:
     external: true
     name: traefik-network
-
