@@ -203,8 +203,13 @@ docker compose logs supabase-studio --tail=100
    - Verify DNS configuration
    - Review studio logs
 
-2. **API Not Working**:
-   - Verify Kong is running
+2. **API Not Working / Kong Restart Loop**:
+   - Verify Kong is running: `docker compose ps supabase-kong`
+   - Check Kong logs: `docker compose logs supabase-kong`
+   - **Kong restart loop fix (2025-11-22):** If Kong shows "No such file or directory" for `/var/lib/kong/kong.yml`:
+     - Create the config file: `mkdir -p data/kong && echo -e '_format_version: "2.1"\n\nservices: []\n\nroutes: []\n\nplugins: []' > data/kong/kong.yml`
+     - Restart Kong: `docker compose restart supabase-kong`
+     - **Note:** Kong 2.8.1 requires format version `2.1`, not `3.0`
    - Check API endpoint URL
    - Review Kong logs
 
@@ -247,5 +252,5 @@ docker compose up -d
 
 **Note:** This is a basic Supabase setup. For full features (Auth, Storage, Realtime), additional services and configuration are required.
 
-**Last Updated:** 2025-11-20
+**Last Updated:** 2025-11-22
 

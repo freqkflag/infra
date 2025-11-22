@@ -49,7 +49,7 @@ services:
           cpus: '0.25'
           memory: 256M
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ["CMD-SHELL", "grep -q ':0BB8' /proc/net/tcp && exit 0 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -57,6 +57,8 @@ services:
     env_file:
       - ../.workspace/.env
     environment:
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
       STUDIO_PG_META_URL: http://supabase-meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       DEFAULT_ORGANIZATION_NAME: ${ORG_NAME:-Default Org}
@@ -93,7 +95,7 @@ services:
           cpus: '0.1'
           memory: 128M
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:8080/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))\" || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
