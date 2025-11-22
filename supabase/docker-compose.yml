@@ -32,6 +32,7 @@ services:
       supabase-network:
         aliases:
           - db
+      edge:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U supabase_admin"]
       interval: 10s
@@ -81,6 +82,7 @@ services:
     networks:
       - supabase-network
       - traefik-network
+      - edge
     depends_on:
       - supabase-db
       - supabase-meta
@@ -123,6 +125,7 @@ services:
       POSTGRES_DB: postgres
     networks:
       - supabase-network
+      - edge
     depends_on:
       supabase-db:
         condition: service_healthy
@@ -157,6 +160,7 @@ services:
     networks:
       - supabase-network
       - traefik-network
+      - edge
     ports:
       - "8000:8000"  # Kong API Gateway
     labels:
@@ -167,6 +171,53 @@ services:
       - "traefik.http.routers.supabase-api.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.services.supabase-api.loadbalancer.server.port=8000"
 
+  supabase-functions:
+    image: supabase/edge-runtime:v1.69.24
+    container_name: supabase-functions
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    env_file:
+      - ../.workspace/.env
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      SUPABASE_DB_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@supabase-db:5432/postgres
+      VERIFY_JWT: "false"
+      FUNCTIONS_PATH: /home/deno/functions
+    volumes:
+      - ./functions:/home/deno/functions:ro
+    networks:
+      - supabase-network
+      - traefik-network
+      - edge
+    depends_on:
+      - supabase-db
+      - supabase-kong
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase-functions.rule=Host(`api.supabase.freqkflag.co`) && PathPrefix(`/functions/v1`)"
+      - "traefik.http.routers.supabase-functions.entrypoints=websecure"
+      - "traefik.http.routers.supabase-functions.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.supabase-functions.middlewares=security-headers@file,rate-limit@file"
+      - "traefik.http.services.supabase-functions.loadbalancer.server.port=9000"
+      - "traefik.http.middlewares.supabase-functions-stripprefix.stripprefix.prefixes=/functions/v1"
+      - "traefik.http.routers.supabase-functions.middlewares=supabase-functions-stripprefix@docker"
+
 networks:
   supabase-network:
     driver: bridge
@@ -174,4 +225,7 @@ networks:
   traefik-network:
     external: true
     name: traefik-network
+  edge:
+    external: true
+    name: edge
 

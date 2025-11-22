@@ -14,4 +14,19 @@ Reviewed-by: reagents 2025-11-09T04:02Z (docker compose -f compose.orchestrator.
 
 ## [2025-11-09]  
 ### Changed  
-- Synced Infisical prod secrets from `.workspace/.env` via `infisical --domain https://vault.freqkflag.co/api secrets set --file .workspace/.env --env prod --path / --token <service-token>` (2025-11-09T07:12:55Z).  
+- Synced Infisical prod secrets from `.workspace/.env` via `infisical --domain https://vault.freqkflag.co/api secrets set --file .workspace/.env --env prod --path / --token <service-token>` (2025-11-09T07:12:55Z).
+
+## [2025-11-22]
+### Added
+- Supabase stack deployment: Added `edge` network attachment to all Supabase services for inter-service communication.
+- Supabase-functions service configuration (optional, currently restarting due to image/command issue).
+
+### Changed
+- Updated Supabase docker-compose.yml to include `edge` network for all services (supabase-db, supabase-studio, supabase-meta, supabase-kong, supabase-functions).
+- Verified all Supabase secrets present in `.workspace/.env`: POSTGRES_PASSWORD, JWT_SECRET, ANON_KEY, SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY.
+
+### Fixed
+- All core Supabase services now healthy and connected to `edge` network.
+- HTTPS/TLS routing validated: Studio accessible at `https://supabase.freqkflag.co`, API at `https://api.supabase.freqkflag.co` via Kong.
+
+Reviewed-by: reagents 2025-11-22T14:39:51Z (docker compose -f supabase/docker-compose.yml config && docker compose ps)  

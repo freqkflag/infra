@@ -18,7 +18,7 @@ This document provides a standardized overview of all services and agents in the
 
 ### Service Health Summary
 - ✅ **Healthy:** Traefik, Infisical, WikiJS, WordPress, n8n, Node-RED, Adminer, LinkStack, Monitoring stack (Grafana, Prometheus, Loki, Alertmanager), Databases (PostgreSQL, MySQL, Redis), Backstage (app + DB)
-- ✅ **Healthy:** Supabase (all services healthy - Studio, Meta, Kong, Database)
+- ✅ **Healthy:** Supabase (all core services healthy - Studio, Meta, Kong, Database; connected to edge network; HTTPS/TLS working via Traefik)
 - 🔄 **Starting/Initializing:** GitLab (first boot, ~45 seconds since start)
 - ⚙️ **Configured but not running:** Mailu, Mastodon, Help Service
 
@@ -48,7 +48,8 @@ This document provides a standardized overview of all services and agents in the
 7. 🔧 **Monitoring gaps identified** (2025-11-22) - Missing: cAdvisor, postgres_exporter, mysqld_exporter, redis_exporter. Prometheus configured but exporters not deployed. See `docs/MONITORING_GAPS.md` for implementation plan
 8. ✅ **Phase 1.5 completed** (2025-11-22) - Database instance documentation (`docs/DATABASE_INSTANCES.md`) and audit script (`scripts/audit-database-instances.sh`) created
 9. ✅ **Phase 1.6 completed** (2025-11-22) - Environment variable loading documentation (`docs/COMPOSE_ENV_LOADING.md`) and validation script (`scripts/validate-env-loading.sh`) created
-10. Continue automating health monitoring (scripts, Prometheus metrics, alerts)
+10. ✅ **Phase 2.3 completed** (2025-11-22) - Health check monitoring script (`scripts/monitor-health.sh`) created with alerting and remediation
+11. Continue automating health monitoring (Prometheus metrics, Grafana dashboards - Phase 5.3)
 11. Run deliberate preflight script to ensure dependencies sequence is honored
 12. Optional: Integrate environment variable validation into preflight.sh script
 
@@ -496,25 +497,12 @@ When agents create or modify services:
   - Daily catalog health check: `./backstage.sh /tmp/backstage-health-$(date +%Y%m%d).json`
   - Pre-deployment validation: `./backstage.sh /tmp/backstage-pre-deploy.json`
 
-#### Medic Agent
-- Self-healing agent for AI Engine automation system.
-- Diagnoses automation failures, missed triggers, and broken flows.
-- Analyzes automation system health (n8n, Node-RED, webhooks, scheduled tasks).
-- Creates fix plans and executes fixes automatically.
-- Sets tasks for automation maintenance.
-- Monitors automation patterns and learns from failures.
-- Triggers:
-  - `cd /root/infra/ai.engine/scripts && ./invoke-agent.sh medic [output_file]`
-  - `cd /root/infra/ai.engine/scripts && ./medic.sh [output_file]`
-  - `cd /root/infra/ai.engine/scripts && ./check-automation-health.sh [output_file]`
-  - `cd /root/infra/ai.engine/workflows/scripts && ./auto-medic.sh [trigger_reason]`
-  - Scheduled: `0 0 * * * /root/infra/ai.engine/workflows/scripts/auto-medic.sh scheduled`
-
 ### AI Engine Integration
 
 **Location:** `/root/infra/ai.engine/`  
 **Documentation:** See [ai.engine/README.md](./ai.engine/README.md)  
-**MCP Integration:** See [ai.engine/MCP_INTEGRATION.md](./ai.engine/MCP_INTEGRATION.md)
+**MCP Integration:** See [ai.engine/MCP_INTEGRATION.md](./ai.engine/MCP_INTEGRATION.md)  
+**A2A Protocol:** See [ai.engine/workflows/A2A_PROTOCOL.md](./ai.engine/workflows/A2A_PROTOCOL.md)
 
 All agents must utilize the AI Engine system for:
 
@@ -530,6 +518,34 @@ All agents must utilize the AI Engine system for:
 - **Backstage management** - Use `backstage-agent` for Backstage portal health, catalog analysis, and entity management
 - **MCP integration** - Use `mcp-agent` for MCP server integration guidance
 - **Comprehensive analysis** - Use `orchestrator-agent` for full infrastructure analysis
+
+**Agent-to-Agent (A2A) Protocol:**
+
+The infrastructure implements a standardized A2A protocol for agent communication, context exchange, authentication, and escalation:
+
+- **Session Management:** A2A sessions track multi-agent workflows with context propagation
+- **Handshake Protocol:** Standardized initiation, acknowledgment, and context exchange
+- **Authentication:** Session tokens and agent signatures for secure communication
+- **Escalation:** Multi-level escalation (agent retry → alternative agent → human intervention)
+- **Orchestration:** Multi-agent runs with dependency management and result aggregation
+
+**Usage:**
+```bash
+# Single agent with A2A context
+./ai.engine/scripts/invoke-agent.sh status-agent /tmp/status.json \
+  --session a2a-20251122-abc123 \
+  --context /tmp/discovery-results.json
+
+# Multi-agent orchestration
+./ai.engine/scripts/orchestrate-agents.sh \
+  --agents status,architecture,security,code-review \
+  --output /tmp/multi-agent-run.json
+
+# Validate A2A protocol
+./ai.engine/scripts/validate-a2a.sh --output /tmp/validation.json
+```
+
+**Documentation:** See [ai.engine/workflows/A2A_PROTOCOL.md](./ai.engine/workflows/A2A_PROTOCOL.md) for complete protocol specification.
 
 **MCP Server Integration:**
 
