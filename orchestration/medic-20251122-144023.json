@@ -1,0 +1,98 @@
+{
+  "diagnosis": {
+    "automation_health": "degraded",
+    "overall_status": "issues_detected",
+    "critical_issues": [
+      "n8n workflows inactive - webhook endpoints not registered (404 errors)",
+      "Agent Event Router workflow has node type issue (Switch node not available)"
+    ],
+    "warnings": [
+      "No systemd timers found (but docker-event-monitor service is running)",
+      "Webhook endpoints returning 404 - workflows need activation in n8n UI"
+    ],
+    "healthy_components": [
+      "n8n service accessible and running (status: ok)",
+      "Node-RED service accessible",
+      "10 cron jobs configured for scheduled agent runs",
+      "docker-event-monitor service active and running",
+      "23 agent scripts present and executable",
+      "2 orchestration files found (previous runs exist)",
+      "Scheduled tasks properly configured (daily status, hourly ops, weekly orchestrator)"
+    ]
+  },
+  "trigger_analysis": {
+    "missed_triggers": [
+      {
+        "trigger_type": "webhook_agent_events",
+        "expected_time": "on-demand",
+        "actual_time": "never",
+        "missed_by": "workflow_not_active",
+        "agent": "all",
+        "impact": "high",
+        "root_cause": "Agent Event Router workflow not activated in n8n - Switch node type issue preventing activation"
+      }
+    ]
+  },
+  "remediation_plan": {
+    "critical": [
+      {
+        "task": "Fix Agent Event Router workflow - Replace Switch node with IF node or remove routing",
+        "priority": "critical",
+        "steps": [
+          "Open workflow in n8n UI: https://n8n.freqkflag.co/workflow/b05wnEzvdIZIH1yD",
+          "Delete or replace 'Route By Agent' Switch node (type not available)",
+          "Connect nodes directly or use IF node for routing",
+          "Save and activate workflow"
+        ],
+        "automated": false
+      },
+      {
+        "task": "Activate n8n workflows",
+        "priority": "critical",
+        "steps": [
+          "Fix workflow node issues",
+          "Activate Agent Event Router workflow",
+          "Activate Health Check Monitor workflow",
+          "Test webhook endpoints"
+        ],
+        "automated": false
+      }
+    ],
+    "warnings": [
+      {
+        "task": "Verify systemd timers if needed",
+        "priority": "low",
+        "steps": [
+          "Check if docker-event-monitor service is sufficient",
+          "Add systemd timers if additional scheduling needed"
+        ],
+        "automated": false
+      }
+    ]
+  },
+  "fixes_applied": [
+    {
+      "issue": "Scheduled tasks missing",
+      "fix": "Installed 10 cron jobs for automated agent runs",
+      "status": "success"
+    },
+    {
+      "issue": "Docker event monitor not running",
+      "fix": "Created and started docker-event-monitor systemd service",
+      "status": "success"
+    },
+    {
+      "issue": "Orchestration directory missing",
+      "fix": "Created /root/infra/orchestration/ directory",
+      "status": "success"
+    }
+  ],
+  "next_steps": [
+    "Fix Agent Event Router workflow node type issue in n8n UI",
+    "Activate both n8n workflows (Agent Event Router, Health Check Monitor)",
+    "Test webhook endpoints after activation: curl -X POST https://n8n.freqkflag.co/webhook/agent-events -H 'Content-Type: application/json' -d '{\"agent\":\"status\",\"trigger\":\"test\"}'",
+    "Monitor automation logs: tail -f /var/log/ai-engine-automation.log",
+    "Verify scheduled tasks are executing: Check orchestration directory for new JSON files"
+  ],
+  "timestamp": "2025-11-22T14:40:00Z"
+}

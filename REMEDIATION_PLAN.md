@@ -638,8 +638,8 @@ docker inspect traefik --format='{{.State.Health.Status}}'
 **Verification:**
 
 - [x] Health check monitoring script created ✅
-- [ ] Metrics exported to Prometheus (deferred to Phase 5)
-- [ ] Dashboards created in Grafana (deferred to Phase 5)
+- [ ] Metrics exported to Prometheus (deferred to Phase 5.3)
+- [ ] Dashboards created in Grafana (deferred to Phase 5.3)
 - [x] Alerts configured and tested ✅
 - [x] Automated remediation tested ✅
 
@@ -649,11 +649,13 @@ docker inspect traefik --format='{{.State.Health.Status}}'
 - ✅ **Monitoring Script Created:** `scripts/monitor-health.sh` - Automated health check monitoring with alerting and remediation
 - ✅ **Features Implemented:**
   - Health status checking for all containers with health checks
-  - Automatic alerting via n8n webhook (`/webhook/health-alert`)
+  - Automatic alerting via n8n webhook (`INFISICAL_WEBHOOK_URL` or `https://n8n.freqkflag.co/webhook/health-alert`)
   - Automatic remediation with restart limits (max 3 attempts)
-  - Restart tracking and cooldown periods
+  - Restart tracking and cooldown periods (5 minutes)
   - Comprehensive logging to `/var/log/health-monitor.log`
-- ✅ **Integration:** Script integrates with n8n webhook system and triggers ops-agent on failures
+  - Service filtering support (`--service <name>`)
+  - Alert-only mode (`--alert-only`) for monitoring without remediation
+- ✅ **Integration:** Script integrates with n8n webhook system and triggers alerts on failures
 - 📋 **Deferred:** Prometheus metrics and Grafana dashboards (Phase 5.3)
 
 **Usage:**
@@ -663,6 +665,9 @@ docker inspect traefik --format='{{.State.Health.Status}}'
 
 # Alert and remediate
 ./scripts/monitor-health.sh --remediate
+
+# Monitor specific service
+./scripts/monitor-health.sh --service traefik --remediate
 
 # Scheduled execution (add to cron)
 0 * * * * /root/infra/scripts/monitor-health.sh --remediate
@@ -1700,43 +1705,44 @@ __Phase 6 Agent Prompt:__
    - Backstage containers restarted successfully ✅
    - Remaining: Health check verification and plugin initialization testing
 
-### Pending Tasks 📋
+### Completed Tasks ✅
 
-5. **Phase 1.5: Service Discovery and Database Instance Management** - 📋 PENDING
+5. **Phase 1.5: Service Discovery and Database Instance Management** - ✅ COMPLETED (2025-11-22)
 
-   - Database instances identified but not formally documented
-   - Missing: `docs/DATABASE_INSTANCES.md`
-   - Missing: `scripts/audit-database-instances.sh`
-   - Deadline: 2025-12-01
+   - ✅ Database instances fully documented in `docs/DATABASE_INSTANCES.md`
+   - ✅ Audit script created: `scripts/audit-database-instances.sh`
+   - ✅ Service-to-database mappings documented
 
-6. **Phase 1.6: Compose File Environment Variable Loading Standardization** - 📋 PENDING
+6. **Phase 1.6: Compose File Environment Variable Loading Standardization** - ✅ COMPLETED (2025-11-22)
 
-   - Patterns identified but not formally documented
-   - Missing: `docs/COMPOSE_ENV_LOADING.md`
-   - Missing: `scripts/validate-env-loading.sh`
-   - Deadline: 2025-12-01
+   - ✅ Patterns documented in `docs/COMPOSE_ENV_LOADING.md`
+   - ✅ Validation script created: `scripts/validate-env-loading.sh`
+   - ✅ Best practices and troubleshooting documented
 
 ## Phase 2 Progress Summary
 
-**Status:** ✅ COMPLETED (2025-11-21)  
-**Completion:** 1/3 tasks completed
+**Status:** ✅ COMPLETED (2025-11-22)  
+**Completion:** 2/3 tasks completed (1 deferred as optional)
 
 ### Completed Tasks ✅
 
-1. **Phase 2.1: Verify Health Check Configurations** - ✅ COMPLETED
+1. **Phase 2.1: Verify Health Check Configurations** - ✅ COMPLETED (2025-11-21)
    - All services verified healthy
    - Health check configurations fixed and working
    - Commits: `a298d08`, `5f58b64`
 
-### Pending Tasks 📋
+2. **Phase 2.3: Implement Health Check Monitoring** - ✅ COMPLETED (2025-11-22)
+   - Health monitoring script created: `scripts/monitor-health.sh`
+   - Alerting via n8n webhook implemented
+   - Automatic remediation with restart limits
+   - Comprehensive logging and tracking
 
-2. **Phase 2.2: Fix Traefik Ping Endpoint** - 📋 OPTIONAL ENHANCEMENT
+### Deferred Tasks 📋
 
-   - Low priority, current process-based check working
+3. **Phase 2.2: Fix Traefik Ping Endpoint** - 📋 DEFERRED (Optional Enhancement)
 
-3. **Phase 2.3: Implement Health Check Monitoring** - 📋 DEFERRED
-
-   - Planned for Phase 5 integration with Prometheus/Grafana
+   - Low priority, current process-based check working reliably
+   - No impact on service availability or monitoring accuracy
 
 ---
 
@@ -1984,19 +1990,9 @@ __Phase 1.6 Agent Prompt:__
 ---
 
 **Plan Version:** 1.5  
-**Last Updated:** 2025-11-22 (Phase 1 COMPLETE, Phase 2 COMPLETE, automation fixed)  
+**Last Updated:** 2025-11-22 (Phase 1 COMPLETE, Phase 2 COMPLETE, automation implemented)  
 **Owner:** Infrastructure Team  
 **Status:** Active - Phase 1 COMPLETE (6/6 tasks), Phase 2 COMPLETE (2/3 tasks, 1 deferred), Phase 3 expanded (4 sub-phases including MCP integration)
-
-**Automation Fix (2025-11-22):**
-- ✅ **Post-Agent Automation Script Created:** `ai.engine/workflows/scripts/post-agent-automation.sh`
-  - Automatically commits changes after agent runs
-  - Triggers code review agent automatically
-  - Pushes to remote (if not on main/master)
-  - Handles errors gracefully
-- ✅ **Documentation:** `ai.engine/workflows/AUTOMATION_FIX.md` - Complete automation fix documentation
-- ✅ **Tested:** Automation successfully committed Phase 1.5, 1.6, and Phase 2 completion
-- ⏭️ **Next:** Update n8n workflows to integrate post-agent automation
 
 ### Recent Updates (2025-11-22)
 
@@ -2010,4 +2006,3 @@ __Phase 1.6 Agent Prompt:__
 - ⚠️ DEFERRED: System password rotation (see `docs/CREDENTIAL_ROTATION.md` for manual rotation procedures)
 - ✅ **Phase 1 Status:** 100% COMPLETE (6/6 sub-phases)
 - ✅ **Phase 2 Status:** COMPLETE (2/3 tasks, 1 deferred) - Health monitoring automation implemented
-- ✅ **Automation Fix:** Post-agent automation script created and tested - Git commits and code review now trigger automatically

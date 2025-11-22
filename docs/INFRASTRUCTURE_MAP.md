@@ -64,10 +64,19 @@ twist3dkinkst3r.com workloads
 - Traefik fronts every HTTP(S) workload; ensure Traefik + `edge` exist before compose-up
 - Infisical agent populates `.workspace/.env` every 60s; every compose file uses the shared env (see `infisical-agent.yml`)
 
+## Agent Communication
+
+- **A2A Protocol:** Agents communicate via standardized A2A protocol for context exchange and orchestration
+- **Session Management:** Multi-agent workflows use A2A sessions for tracking and context propagation
+- **Agent Inventory:** List all agents and MCP servers using `ai.engine/scripts/inventory-agents.sh`
+- **Orchestration:** Use `ai.engine/scripts/orchestrate-agents.sh` for multi-agent workflows
+- **Documentation:** See [ai.engine/workflows/A2A_PROTOCOL.md](../ai.engine/workflows/A2A_PROTOCOL.md) for protocol specification
+
 ## Validation Notes
 
 - Health signals pulled from `AGENTS.md` status table (2025-11-22) and service directories.
 - For live verification, run `./scripts/status.sh` or the relevant AI Engine agent (`ai.engine/scripts/invoke-agent.sh status-agent`).
+- For multi-agent validation, use `ai.engine/scripts/validate-a2a.sh` to test A2A protocol implementation.
 - Update this file whenever service state, domain mappings, or node assignments change so reviewers have an accurate tree to cross-check with compose files and DNS maps.
 
 ### Post-Deployment Validation (2025-11-22 09:25:14)

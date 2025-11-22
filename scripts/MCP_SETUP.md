@@ -8,6 +8,10 @@ This directory contains MCP (Model Context Protocol) servers for infrastructure 
 - **WikiJS MCP Server** - Wiki page management
 - **Supabase MCP Server** - Supabase database and API management
 - **GitHub MCP Server** - GitHub repository and issue management
+- **Kong Admin MCP Server** - Kong API Gateway management (NEW - Phase 3.4)
+- **Docker/Compose MCP Server** - Docker container lifecycle management (NEW - Phase 3.4)
+- **Monitoring MCP Server** - Prometheus, Grafana, Alertmanager queries (NEW - Phase 3.4)
+- **GitLab MCP Server** - GitLab projects, pipelines, issues management (NEW - Phase 3.4)
 
 ## WikiJS MCP Server
 
@@ -47,6 +51,39 @@ Add to your MCP configuration file (typically `~/.config/cursor/mcp.json` or sim
         "SUPABASE_ANON_KEY": "your-anon-key",
         "SUPABASE_SERVICE_KEY": "your-service-key",
         "POSTGRES_PASSWORD": "your-db-password"
+      }
+    },
+    "kong": {
+      "command": "node",
+      "args": ["/root/infra/scripts/kong-mcp-server.js"],
+      "env": {
+        "KONG_ADMIN_URL": "http://kong:8001",
+        "KONG_ADMIN_KEY": "${KONG_ADMIN_KEY}"
+      }
+    },
+    "docker-compose": {
+      "command": "node",
+      "args": ["/root/infra/scripts/docker-compose-mcp-server.js"],
+      "env": {
+        "DEVTOOLS_WORKSPACE": "/root/infra"
+      }
+    },
+    "monitoring": {
+      "command": "node",
+      "args": ["/root/infra/scripts/monitoring-mcp-server.js"],
+      "env": {
+        "PROMETHEUS_URL": "https://prometheus.freqkflag.co",
+        "GRAFANA_URL": "https://grafana.freqkflag.co",
+        "ALERTMANAGER_URL": "https://alertmanager.freqkflag.co",
+        "GRAFANA_API_KEY": "${GRAFANA_API_KEY}"
+      }
+    },
+    "gitlab": {
+      "command": "node",
+      "args": ["/root/infra/scripts/gitlab-mcp-server.js"],
+      "env": {
+        "GITLAB_URL": "https://gitlab.freqkflag.co",
+        "GITLAB_PAT": "${GITLAB_PAT}"
       }
     }
   }
@@ -90,6 +127,32 @@ Add to your MCP configuration file (typically `~/.config/cursor/mcp.json` or sim
 - `create_issue` - Create issue
 - `list_pull_requests` - List pull requests
 - And more (see `github-mcp-server.md`)
+
+#### Kong Admin Tools (NEW - Phase 3.4)
+- `list_services` - List all Kong services
+- `list_routes` - List all Kong routes
+- `apply_service_patch` - Create or update a Kong service
+- `sync_plugin` - Create or update a Kong plugin
+- `reload` - Reload Kong configuration
+
+#### Docker/Compose Tools (NEW - Phase 3.4)
+- `list_containers` - List all Docker containers with status and health
+- `compose_up` - Start services using docker compose
+- `compose_down` - Stop services using docker compose
+- `compose_logs` - Get logs from docker compose services
+- `health_report` - Get aggregated health status of all containers
+
+#### Monitoring Tools (NEW - Phase 3.4)
+- `prom_query` - Execute a PromQL query against Prometheus
+- `grafana_dashboard` - Get Grafana dashboard by UID
+- `alertmanager_list` - List all active alerts from Alertmanager
+- `ack_alert` - Acknowledge/silence an alert in Alertmanager
+
+#### GitLab Tools (NEW - Phase 3.4)
+- `list_projects` - List all GitLab projects
+- `get_pipeline_status` - Get status of a GitLab pipeline
+- `create_issue` - Create a new GitLab issue
+- `update_variable` - Update a GitLab CI/CD variable
 
 ### Usage Examples
 

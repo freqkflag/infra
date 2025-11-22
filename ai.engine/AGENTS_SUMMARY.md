@@ -29,11 +29,10 @@
 ### Operations Agents
 
 13. **git** (`git-agent.md`) - Git operations and repository management
-14. **medic** (`medic-agent.md`) - AI Engine automation health check and self-healing
 
 ### Orchestration Agent
 
-15. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
+14. **orchestrator** (`orchestrator-agent.md`) - Multi-agent orchestrator coordinating all agents
 
 ## Helper Scripts
 

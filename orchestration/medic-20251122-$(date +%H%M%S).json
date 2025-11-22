@@ -1,0 +1,361 @@
+{
+  "diagnosis": {
+    "automation_health": "degraded",
+    "overall_status": "critical_issues_detected",
+    "critical_issues": [
+      "No scheduled tasks configured (cron/systemd timers missing)",
+      "n8n workflows imported but inactive (webhooks not available)",
+      "No recent agent runs detected (orchestration directory empty)",
+      "Automation triggers not operational"
+    ],
+    "warnings": [
+      "Health check script had unbound variable bug (fixed)",
+      "Webhook endpoints not responding (workflows inactive)",
+      "Expected scheduled tasks missing (status daily, ops hourly, backstage daily, orchestrator weekly, security weekly)"
+    ],
+    "healthy_components": [
+      "n8n service accessible and running",
+      "Node-RED service accessible and running",
+      "All agent scripts present and executable (20 scripts)",
+      "Workflow files exist (4 n8n, 6 Node-RED)",
+      "Orchestration directory exists and writable"
+    ]
+  },
+  "trigger_analysis": {
+    "missed_triggers": [
+      {
+        "trigger_type": "scheduled_daily_status",
+        "expected_time": "00:00 UTC daily",
+        "actual_time": "never",
+        "missed_by": "not_configured",
+        "agent": "status",
+        "impact": "high",
+        "root_cause": "No cron job or systemd timer configured for daily status check"
+      },
+      {
+        "trigger_type": "scheduled_hourly_ops",
+        "expected_time": "Top of every hour",
+        "actual_time": "never",
+        "missed_by": "not_configured",
+        "agent": "ops",
+        "impact": "high",
+        "root_cause": "No cron job configured for hourly ops check"
+      },
+      {
+        "trigger_type": "scheduled_daily_backstage",
+        "expected_time": "06:00 UTC daily",
+        "actual_time": "never",
+        "missed_by": "not_configured",
+        "agent": "backstage",
+        "impact": "medium",
+        "root_cause": "No cron job configured for daily backstage health check"
+      },
+      {
+        "trigger_type": "scheduled_weekly_orchestrator",
+        "expected_time": "Sunday 02:00 UTC",
+        "actual_time": "never",
+        "missed_by": "not_configured",
+        "agent": "orchestrator",
+        "impact": "high",
+        "root_cause": "No cron job configured for weekly orchestrator run"
+      },
+      {
+        "trigger_type": "scheduled_weekly_security",
+        "expected_time": "Monday 03:00 UTC",
+        "actual_time": "never",
+        "missed_by": "not_configured",
+        "agent": "security",
+        "impact": "high",
+        "root_cause": "No cron job configured for weekly security audit"
+      }
+    ],
+    "failed_triggers": [],
+    "trigger_patterns": {
+      "scheduled_triggers": {
+        "total": 5,
+        "successful": 0,
+        "failed": 0,
+        "missed": 5
+      },
+      "webhook_triggers": {
+        "total": 0,
+        "successful": 0,
+        "failed": 0,
+        "missed": 0
+      },
+      "event_triggers": {
+        "total": 0,
+        "successful": 0,
+        "failed": 0,
+        "missed": 0
+      }
+    }
+  },
+  "flow_analysis": {
+    "failed_flows": [],
+    "broken_patterns": [
+      {
+        "pattern": "scheduled_agent_execution",
+        "expected_behavior": "Agents run on schedule via cron/systemd timers",
+        "actual_behavior": "No scheduled tasks configured, agents never run automatically",
+        "impact": "critical",
+        "root_cause": "Scheduled tasks setup script not executed or failed"
+      },
+      {
+        "pattern": "webhook_triggered_agents",
+        "expected_behavior": "Webhook endpoints receive events and trigger agents",
+        "actual_behavior": "n8n workflows imported but inactive, webhooks not registered",
+        "impact": "high",
+        "root_cause": "Workflows need manual configuration and activation in n8n UI"
+      },
+      {
+        "pattern": "agent_output_storage",
+        "expected_behavior": "Agent outputs stored in orchestration/ directory",
+        "actual_behavior": "Orchestration directory empty, no recent agent runs",
+        "impact": "medium",
+        "root_cause": "No agents have been executed recently"
+      }
+    ],
+    "missing_integrations": [
+      {
+        "integration": "cron_scheduled_tasks",
+        "expected_location": "crontab or /etc/cron.d/",
+        "status": "missing",
+        "impact": "critical",
+        "fix_required": "Run setup-automation.sh to install scheduled tasks"
+      },
+      {
+        "integration": "n8n_workflow_activation",
+        "expected_location": "n8n UI at https://n8n.freqkflag.co/workflows",
+        "status": "inactive",
+        "impact": "high",
+        "fix_required": "Activate workflows in n8n UI after configuration"
+      },
+      {
+        "integration": "docker_event_monitoring",
+        "expected_location": "Node-RED flow or systemd service",
+        "status": "missing",
+        "impact": "medium",
+        "fix_required": "Import docker-events.json flow to Node-RED and activate"
+      }
+    ]
+  },
+  "system_health": {
+    "n8n_status": {
+      "accessible": true,
+      "workflows_active": 0,
+      "workflows_inactive": 2,
+      "webhook_endpoints": [
+        "/webhook/agent-events",
+        "/webhook/health-alert"
+      ],
+      "issues": [
+        "Workflows imported but inactive - webhooks not available",
+        "Workflows need configuration (node URLs, credentials)",
+        "API activation failed - requires manual UI activation"
+      ]
+    },
+    "nodered_status": {
+      "accessible": true,
+      "flows_active": 0,
+      "flows_inactive": 0,
+      "issues": [
+        "Flows not imported to Node-RED instance",
+        "6 flow files exist but not deployed"
+      ]
+    },
+    "scheduled_tasks": {
+      "cron_jobs": [],
+      "systemd_timers": [],
+      "missing_tasks": [
+        "status.*daily",
+        "backstage.*daily",
+        "ops.*hourly",
+        "orchestrator.*weekly",
+        "security.*weekly"
+      ],
+      "failed_tasks": []
+    },
+    "webhook_endpoints": {
+      "registered": [
+        "https://n8n.freqkflag.co/webhook/agent-events",
+        "https://n8n.freqkflag.co/webhook/health-alert"
+      ],
+      "responding": [],
+      "failing": [
+        "https://n8n.freqkflag.co/webhook/agent-events",
+        "https://n8n.freqkflag.co/webhook/health-alert"
+      ]
+    },
+    "agent_scripts": {
+      "total": 20,
+      "executable": 20,
+      "missing": [],
+      "broken": []
+    }
+  },
+  "fix_plan": {
+    "immediate_fixes": [
+      {
+        "issue": "No scheduled tasks configured",
+        "fix": "Run setup-automation.sh to install cron jobs for scheduled agent runs",
+        "command": "cd /root/infra/ai.engine/workflows/scripts && ./setup-automation.sh",
+        "priority": "critical",
+        "estimated_effort": "5 minutes"
+      },
+      {
+        "issue": "Health check script unbound variable bug",
+        "fix": "Fixed unbound variable in check-automation-health.sh (systemd_timers initialization)",
+        "command": "Already fixed - no action needed",
+        "priority": "high",
+        "estimated_effort": "completed"
+      },
+      {
+        "issue": "n8n workflows inactive",
+        "fix": "Activate workflows in n8n UI after configuration",
+        "command": "Navigate to https://n8n.freqkflag.co/workflows, configure nodes, activate workflows",
+        "priority": "high",
+        "estimated_effort": "15 minutes"
+      }
+    ],
+    "planned_fixes": [
+      {
+        "issue": "Node-RED flows not imported",
+        "fix": "Import Node-RED flows using import-flows.sh script",
+        "command": "cd /root/infra/ai.engine/workflows/nodered && ./import-flows.sh",
+        "priority": "medium",
+        "estimated_effort": "10 minutes",
+        "dependencies": ["Node-RED accessible"]
+      },
+      {
+        "issue": "Docker event monitoring not configured",
+        "fix": "Set up Docker event monitoring via Node-RED or systemd service",
+        "command": "Import docker-events.json to Node-RED or set up systemd service",
+        "priority": "medium",
+        "estimated_effort": "20 minutes",
+        "dependencies": ["Node-RED flows imported"]
+      },
+      {
+        "issue": "No recent agent runs",
+        "fix": "Trigger initial agent runs after scheduled tasks are configured",
+        "command": "Run manual agent invocations to populate orchestration directory",
+        "priority": "low",
+        "estimated_effort": "5 minutes",
+        "dependencies": ["Scheduled tasks configured"]
+      }
+    ],
+    "preventive_measures": [
+      {
+        "measure": "Automated health check for automation system",
+        "rationale": "Detect automation failures before they impact operations",
+        "implementation": "Schedule auto-medic.sh to run daily via cron",
+        "priority": "high"
+      },
+      {
+        "measure": "Monitor scheduled task execution",
+        "rationale": "Ensure scheduled tasks are running as expected",
+        "implementation": "Add monitoring to track cron job execution and alert on failures",
+        "priority": "medium"
+      },
+      {
+        "measure": "Automated workflow activation check",
+        "rationale": "Ensure n8n workflows remain active after updates",
+        "implementation": "Add health check to verify workflow status and reactivate if needed",
+        "priority": "medium"
+      }
+    ]
+  },
+  "tasks": {
+    "critical": [
+      {
+        "task": "Install scheduled tasks for agent automation",
+        "description": "Run setup-automation.sh to configure cron jobs for daily/hourly/weekly agent runs",
+        "assignee": "deployment-runner",
+        "deadline": "immediate",
+        "dependencies": []
+      },
+      {
+        "task": "Activate n8n workflows",
+        "description": "Configure and activate n8n workflows in UI to enable webhook endpoints",
+        "assignee": "api-gatekeeper",
+        "deadline": "today",
+        "dependencies": ["n8n accessible"]
+      }
+    ],
+    "high_priority": [
+      {
+        "task": "Import Node-RED flows",
+        "description": "Import Node-RED flow files to enable Docker event monitoring and agent aggregation",
+        "assignee": "automator",
+        "deadline": "this week",
+        "dependencies": ["Node-RED accessible"]
+      },
+      {
+        "task": "Set up Docker event monitoring",
+        "description": "Configure Docker event monitoring to trigger ops-agent on container failures",
+        "assignee": "automator",
+        "deadline": "this week",
+        "dependencies": ["Node-RED flows imported"]
+      },
+      {
+        "task": "Store n8n API key in Infisical",
+        "description": "Store n8n API key in Infisical /prod path for future automation",
+        "assignee": "secrets-steward",
+        "deadline": "today",
+        "dependencies": []
+      }
+    ],
+    "maintenance": [
+      {
+        "task": "Run initial agent executions",
+        "description": "Trigger manual agent runs to populate orchestration directory and verify system",
+        "assignee": "deployment-runner",
+        "deadline": "this week",
+        "dependencies": ["Scheduled tasks configured"]
+      },
+      {
+        "task": "Document automation system status",
+        "description": "Update AUTOMATION_WORKFLOWS.md with current status and next steps",
+        "assignee": "documentation-scribe",
+        "deadline": "this week",
+        "dependencies": []
+      },
+      {
+        "task": "Set up auto-medic scheduled task",
+        "description": "Schedule auto-medic.sh to run daily for automated health checks",
+        "assignee": "automator",
+        "deadline": "this week",
+        "dependencies": ["Scheduled tasks configured"]
+      }
+    ]
+  },
+  "executed_fixes": [
+    {
+      "fix": "Fixed unbound variable bug in check-automation-health.sh",
+      "command": "search_replace: initialized systemd_timers and cron_jobs variables",
+      "result": "success",
+      "timestamp": "2025-11-22T12:00:00Z",
+      "verification": "Script now runs without errors"
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation": "Implement automation health monitoring dashboard",
+      "rationale": "Visual dashboard would help track automation system health and identify issues quickly",
+      "priority": "medium",
+      "implementation": "Create Grafana dashboard or simple web UI showing automation status"
+    },
+    {
+      "recommendation": "Add automated workflow testing",
+      "rationale": "Automated tests would catch workflow configuration issues before deployment",
+      "priority": "medium",
+      "implementation": "Add workflow validation tests to CI/CD pipeline"
+    },
+    {
+      "recommendation": "Implement agent execution metrics",
+      "rationale": "Track agent execution metrics (success rate, duration, output size) for optimization",
+      "priority": "low",
+      "implementation": "Add metrics collection to agent scripts and store in Prometheus"
+    }
+  ]
+}

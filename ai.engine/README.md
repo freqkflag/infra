@@ -207,14 +207,7 @@ Git operations and repository management agent.
 
 **Use when:** Analyzing Git repository health, branch strategy, commit patterns, or Git operations.
 
-### 16. **medic** (`medic-agent.md`)
-AI Engine automation health check and self-healing agent.
-
-**Output:** Automation system diagnosis, trigger analysis, flow analysis, system health, fix plans, tasks, executed fixes, and recommendations.
-
-**Use when:** Diagnosing automation failures, missed triggers, broken flows, or when automation system needs self-healing.
-
-### 17. **orchestrator** (`orchestrator-agent.md`)
+### 16. **orchestrator** (`orchestrator-agent.md`)
 Multi-agent orchestrator that coordinates all agents.
 
 **Output:** Complete JSON report with all agent findings aggregated.

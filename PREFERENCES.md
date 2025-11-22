@@ -58,6 +58,12 @@ This document defines how AI assistants should interact with the infrastructure 
    - Every planning artifact (e.g., `REMEDIATION_PLAN.md`) must include per-phase `ai.engine` command prompts so follow-up agents know exactly which tools to run
    - Keep those prompts current with the latest status and include referencing context such as service names or files being analyzed
 
+6. **Use A2A Protocol for Multi-Agent Workflows**
+   - When orchestrating multiple agents, use the A2A protocol for context exchange and session management
+   - Pass context between agents using `--session` and `--context` flags in `invoke-agent.sh`
+   - Use `orchestrate-agents.sh` for complex multi-agent workflows
+   - Validate A2A protocol implementation using `validate-a2a.sh`
+
 **These files must be maintained and followed for every request - no exceptions.**
 
 ---

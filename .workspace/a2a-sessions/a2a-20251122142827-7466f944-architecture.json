@@ -1,0 +1,11 @@
+{
+  "agent_id": "architecture",
+  "session_id": "a2a-20251122142827-7466f944",
+  "status": "simulated",
+  "timestamp": "2025-11-22T14:28:27Z",
+  "output": {
+    "simulated": true,
+    "agent": "architecture",
+    "findings": []
+  }
+}

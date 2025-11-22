@@ -53,8 +53,22 @@ services:
       - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
       - EXECUTIONS_DATA_PRUNE=true
       - EXECUTIONS_DATA_MAX_AGE=168  # 7 days
+      # Enable community nodes installation
+      - N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom
+      # Connect to Supabase
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@localhost:5432/postgres
+      # Direct connection to the database. Used for migrations
+      - DIRECT_URL=postgresql://postgres:${POSTGRES_PASSWORD}@localhost:5432/postgres
+      # React Supabase client configuration
+      - REACT_APP_SUPABASE_URL=https://supabase.freqkflag.co
+      - REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiYXVkIjoiYXV0aGVudGljYXRlZCJ9.MXh4BwPJFOkYSmb0IUUuCKFgjMDMge_fV1-LLxSPNC8
+      # Vite Supabase client configuration
+      - VITE_SUPABASE_URL=https://supabase.freqkflag.co
+      - VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiYXVkIjoiYXV0aGVudGljYXRlZCJ9.MXh4BwPJFOkYSmb0IUUuCKFgjMDMge_fV1-LLxSPNC8
     volumes:
       - ./data/n8n:/home/node/.n8n
+      # Persist custom nodes
+      - ./data/n8n/custom:/home/node/.n8n/custom
     networks:
       - n8n-network
       - traefik-network

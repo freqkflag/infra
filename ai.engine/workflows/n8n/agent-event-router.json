@@ -61,7 +61,7 @@
       "id": "route-by-agent",
       "name": "Route By Agent",
       "type": "n8n-nodes-base.switch",
-      "typeVersion": 3,
+      "typeVersion": 2,
       "position": [650, 300]
     },
     {

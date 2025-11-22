@@ -1,49 +1,135 @@
 #!/bin/bash
 #
-# Medic Agent Helper Script
-# Quick invocation for medic_agent
-#
-# Usage:
-#   ./medic.sh [output_file]
-#
-# Example:
-#   ./medic.sh /root/infra/orchestration/medic-$(date +%Y%m%d).json
+# Medic Agent - Automation Health Diagnosis
+# Runs automation health check and invokes medic agent for diagnosis
 #
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-AGENTS_DIR="$(cd "$SCRIPT_DIR/../agents" && pwd)"
-OUTPUT_FILE="${1:-/root/infra/orchestration/medic-$(date +%Y%m%d-%H%M%S).json}"
+INFRA_DIR="/root/infra"
+ORCHESTRATION_DIR="${INFRA_DIR}/orchestration"
+OUTPUT_FILE="${ORCHESTRATION_DIR}/medic-$(date +%Y%m%d-%H%M%S).json"
+
+# Create orchestration directory if it doesn't exist
+mkdir -p "$ORCHESTRATION_DIR"
 
 # Colors
-BLUE='\033[0;34m'
+GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}Medic Agent - AI Engine Automation Health Check${NC}"
-echo "=========================================="
-echo ""
-echo -e "${YELLOW}Purpose: Self-diagnose, review, analyze, plan, set tasks, and fix AI Engine automation system${NC}"
-echo ""
-echo "Analyzing automation system health..."
+echo -e "${BLUE}=== Running Medic Agent ===${NC}"
+echo "Output: $OUTPUT_FILE"
 echo ""
 
-# Create output directory if it doesn't exist
-mkdir -p "$(dirname "$OUTPUT_FILE")"
+# Prompt for Cursor AI to act as medic agent
+cat << 'PROMPT' | tee "$OUTPUT_FILE.prompt"
+Act as the medic_agent. You are a specialized self-healing agent for diagnosing, reviewing, analyzing, planning, setting tasks, and fixing the AI Engine automation system.
 
-# Agent prompt
-cat << 'EOF'
-Act as medic_agent. Analyze /root/infra/ai.engine automation system for missed triggers, failed flows, broken patterns, and automation failures. Diagnose issues, create fix plans, set tasks, and execute fixes automatically. Return strict JSON.
+## Your Task
 
-EOF
+1. **Diagnose** the automation system health by analyzing:
+   - n8n service status and workflow activation
+   - Node-RED service status
+   - Scheduled tasks (cron jobs, systemd timers)
+   - Webhook endpoints responsiveness
+   - Agent script executability
+   - Recent agent runs in orchestration directory
 
+2. **Review** the current state and identify:
+   - Critical issues preventing automation
+   - Warnings that need attention
+   - Healthy components working correctly
+
+3. **Analyze** root causes for any issues found
+
+4. **Plan** remediation steps with priorities
+
+5. **Set tasks** for fixing identified issues
+
+6. **Fix** issues automatically where possible
+
+## Output Format
+
+Return a strict JSON object with this structure:
+
+{
+  "diagnosis": {
+    "automation_health": "healthy|degraded|critical",
+    "overall_status": "operational|issues_detected|critical_issues_detected",
+    "critical_issues": ["issue1", "issue2"],
+    "warnings": ["warning1", "warning2"],
+    "healthy_components": ["component1", "component2"]
+  },
+  "trigger_analysis": {
+    "missed_triggers": [
+      {
+        "trigger_type": "scheduled_daily_status",
+        "expected_time": "00:00 UTC daily",
+        "actual_time": "never|timestamp",
+        "missed_by": "not_configured|failed|error",
+        "agent": "status",
+        "impact": "high|medium|low",
+        "root_cause": "description"
+      }
+    ]
+  },
+  "remediation_plan": {
+    "critical": [
+      {
+        "task": "description",
+        "priority": "critical|high|medium|low",
+        "steps": ["step1", "step2"],
+        "automated": true|false
+      }
+    ],
+    "warnings": []
+  },
+  "fixes_applied": [
+    {
+      "issue": "description",
+      "fix": "action taken",
+      "status": "success|failed|partial"
+    }
+  ],
+  "next_steps": [
+    "action1",
+    "action2"
+  ],
+  "timestamp": "ISO8601"
+}
+
+## Current Infrastructure Context
+
+- Location: /root/infra
+- Orchestration directory: /root/infra/orchestration
+- n8n: https://n8n.freqkflag.co
+- Node-RED: https://nodered.freqkflag.co
+- Agent scripts: /root/infra/ai.engine/scripts/
+- Workflows: /root/infra/ai.engine/workflows/
+
+## Instructions
+
+1. Check n8n service: curl -s https://n8n.freqkflag.co/healthz || echo "n8n not accessible"
+2. Check Node-RED service: curl -s https://nodered.freqkflag.co/ || echo "Node-RED not accessible"
+3. Check scheduled tasks: crontab -l 2>/dev/null | grep -i "ai.engine\|orchestration" || echo "No cron jobs found"
+4. Check systemd timers: systemctl list-timers --all --no-pager 2>/dev/null | grep -i "ai.engine\|orchestration" || echo "No systemd timers found"
+5. Check webhook endpoints: curl -X POST https://n8n.freqkflag.co/webhook/agent-events -H "Content-Type: application/json" -d '{"test":true}' || echo "Webhook not responding"
+6. List agent scripts: ls -1 /root/infra/ai.engine/scripts/*.sh | wc -l
+7. Check orchestration directory: ls -1 /root/infra/orchestration/*.json 2>/dev/null | wc -l || echo "0"
+
+Analyze all this information and provide your diagnosis in the strict JSON format above.
+PROMPT
+
+echo -e "${YELLOW}Medic agent prompt created.${NC}"
+echo -e "${BLUE}Please review the prompt and execute the medic agent analysis.${NC}"
 echo ""
-echo -e "${BLUE}Agent file: $AGENTS_DIR/medic-agent.md${NC}"
-echo -e "${BLUE}Output file: $OUTPUT_FILE${NC}"
+echo "To invoke the medic agent, use Cursor AI with the prompt file:"
+echo "  $OUTPUT_FILE.prompt"
 echo ""
-echo "=========================================="
+echo "Or use the invoke-agent script if a medic agent is defined."
 echo ""
-echo "Provide the agent file content to Cursor AI and save output to: $OUTPUT_FILE"
-echo ""
+echo -e "${GREEN}Medic prompt ready at: $OUTPUT_FILE.prompt${NC}"
 

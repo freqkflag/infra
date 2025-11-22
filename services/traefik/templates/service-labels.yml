@@ -1,0 +1,69 @@
+# Traefik Service Labels Template
+# Purpose: Standard Traefik labels for service routing
+# Usage: Reference this template when creating new services
+
+# Standard Traefik Labels for HTTP Services
+# Replace ${SERVICE_DOMAIN} with actual domain (e.g., wiki.freqkflag.co)
+# Replace ${SERVICE_PORT} with actual service port (e.g., 3000)
+# Replace ${SERVICE_NAME} with service name (e.g., wikijs)
+
+traefik_labels:
+  # Enable Traefik for this service
+  - "traefik.enable=true"
+  
+  # Router configuration
+  - "traefik.http.routers.${SERVICE_NAME}.rule=Host(`${SERVICE_DOMAIN}`)"
+  - "traefik.http.routers.${SERVICE_NAME}.entrypoints=websecure"
+  - "traefik.http.routers.${SERVICE_NAME}.tls.certresolver=letsencrypt"
+  
+  # Service configuration
+  - "traefik.http.services.${SERVICE_NAME}.loadbalancer.server.port=${SERVICE_PORT}"
+  
+  # Middleware (choose one based on service type)
+  # For public services:
+  - "traefik.http.routers.${SERVICE_NAME}.middlewares=secure-headers@file"
+  
+  # For admin/internal services (use basic auth):
+  # - "traefik.http.routers.${SERVICE_NAME}.middlewares=traefik-auth,secure-headers@file"
+  # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USERS}"
+  
+  # For Cloudflare Access protected services:
+  # - "traefik.http.routers.${SERVICE_NAME}.middlewares=cf-access@file"
+
+# Example: WikiJS Service
+wikijs_example:
+  - "traefik.enable=true"
+  - "traefik.http.routers.wikijs.rule=Host(`wiki.freqkflag.co`)"
+  - "traefik.http.routers.wikijs.entrypoints=websecure"
+  - "traefik.http.routers.wikijs.tls.certresolver=letsencrypt"
+  - "traefik.http.services.wikijs.loadbalancer.server.port=3000"
+  - "traefik.http.routers.wikijs.middlewares=secure-headers@file"
+
+# Example: WordPress Service
+wordpress_example:
+  - "traefik.enable=true"
+  - "traefik.http.routers.wordpress.rule=Host(`cultofjoey.com`)"
+  - "traefik.http.routers.wordpress.entrypoints=websecure"
+  - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
+  - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+  - "traefik.http.routers.wordpress.middlewares=secure-headers@file"
+
+# Example: Admin Service with Basic Auth
+admin_example:
+  - "traefik.enable=true"
+  - "traefik.http.routers.adminer.rule=Host(`adminer.freqkflag.co`)"
+  - "traefik.http.routers.adminer.entrypoints=websecure"
+  - "traefik.http.routers.adminer.tls.certresolver=letsencrypt"
+  - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+  - "traefik.http.routers.adminer.middlewares=traefik-auth,secure-headers@file"
+  - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USERS}"
+
+# Example: Cloudflare Access Protected Service
+cf_access_example:
+  - "traefik.enable=true"
+  - "traefik.http.routers.n8n.rule=Host(`n8n.freqkflag.co`)"
+  - "traefik.http.routers.n8n.entrypoints=websecure"
+  - "traefik.http.routers.n8n.tls.certresolver=letsencrypt"
+  - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+  - "traefik.http.routers.n8n.middlewares=cf-access@file"
+

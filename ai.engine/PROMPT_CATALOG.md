@@ -26,7 +26,6 @@ This catalog provides ready-to-use prompts for invoking each agent in the AI Eng
 | **ops** | `Act as ops_agent. Analyze /root/infra. Return operational insights + commands in strict JSON.` | Operations management |
 | **backstage** | `Act as backstage_agent. Analyze /root/infra/services/backstage. Return Backstage health + catalog status in strict JSON.` | Backstage portal management |
 | **git** | `Act as git_agent. Analyze /root/infra Git repository. Return repository health + Git operations in strict JSON.` | Git operations and repository management |
-| **medic** | `Act as medic_agent. Diagnose /root/infra/ai.engine automation system. Return automation health + fixes in strict JSON.` | AI Engine automation health check and self-healing |
 | **mcp** | `Act as mcp_agent. Analyze /root/infra and identify MCP opportunities. Return MCP recommendations in strict JSON.` | MCP integration guidance |
 | **orchestrator** | `Use Multi-Agent Orchestrator. Analyze /root/infra. Return aggregated report in strict JSON.` | Comprehensive analysis |
 
@@ -502,66 +501,7 @@ Return repository health + Git operations in strict JSON.
 
 ---
 
-### 15. Medic Agent
-
-**Purpose:** AI Engine automation health check and self-healing
-
-**Quick Prompt:**
-```
-Act as medic_agent. Diagnose /root/infra/ai.engine automation system for missed triggers, failed flows, and automation failures. Return automation health + fixes in strict JSON.
-```
-
-**Full Prompt:**
-```
-You are the medic_agent - a specialized self-healing agent that diagnoses, reviews, analyzes, plans, sets tasks, and fixes the AI Engine automation system when triggers and flow patterns are missed.
-
-Analyze /root/infra/ai.engine automation system for missed triggers, failed flows, broken patterns, and automation failures. Diagnose issues, create fix plans, set tasks, and execute fixes automatically.
-
-Return strict JSON with:
-- diagnosis: {automation_health, overall_status, critical_issues, warnings, healthy_components}
-- trigger_analysis: {missed_triggers, failed_triggers, trigger_patterns}
-- flow_analysis: {failed_flows, broken_patterns, missing_integrations}
-- system_health: {n8n_status, nodered_status, scheduled_tasks, webhook_endpoints, agent_scripts}
-- fix_plan: {immediate_fixes, planned_fixes, preventive_measures}
-- tasks: {critical, high_priority, maintenance}
-- executed_fixes: Array of fixes that were automatically executed
-- recommendations: Array of recommendations for automation improvements
-```
-
-**File Reference:**
-```bash
-cat /root/infra/ai.engine/agents/medic-agent.md
-```
-
-**Helper Scripts:**
-```bash
-# Run medic agent
-cd /root/infra/ai.engine/scripts
-./medic.sh [output_file]
-
-# Check automation health
-./check-automation-health.sh [output_file]
-
-# Auto-medic (runs medic when issues detected)
-cd /root/infra/ai.engine/workflows/scripts
-./auto-medic.sh [trigger_reason]
-```
-
-**Usage Examples:**
-```bash
-# Manual diagnosis
-./invoke-agent.sh medic /tmp/medic-report.json
-
-# Scheduled health check
-0 0 * * * /root/infra/ai.engine/workflows/scripts/auto-medic.sh scheduled
-
-# Trigger on automation failure
-./auto-medic.sh automation_failure
-```
-
----
-
-### 16. MCP Agent
+### 15. MCP Agent
 
 **Purpose:** MCP server integration and tool usage guidance
 
@@ -613,7 +553,7 @@ Return missing docs + structure in strict JSON.
 
 ---
 
-### 17. Orchestrator Agent
+### 16. Orchestrator Agent
 
 **Purpose:** Multi-agent orchestrator coordinating all agents
 
