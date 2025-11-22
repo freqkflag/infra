@@ -203,7 +203,7 @@ git log --all --full-history --source --pretty=format: --name-only | \
   - Multiple service-specific passwords (ghost_password, wordpress_password, wikijs_password, discourse_password, linkstack_password, gitea_password, etc.)
 - **NEW (2025-11-22):** `__UNSET__` placeholders identified in Infisical `/prod` environment:
   - **Critical Blockers:** `BACKSTAGE_DB_PASSWORD`, `INFISICAL_CLIENT_ID`, `INFISICAL_CLIENT_SECRET` (Backstage cannot start)
-  - **High Priority:** `GHOST_DB_PASSWORD`, `CF_TUNNEL_TOKEN_*`, `CF_DNS_API_TOKEN`, `KONG_ADMIN_KEY`
+  - **High Priority:** `GHOST_DB_PASSWORD`, `CF_DNS_API_TOKEN`, `KONG_ADMIN_KEY`
   - **Medium Priority:** `INFISICAL_WEBHOOK_URL`, `ALERTMANAGER_WEBHOOK_URL`, `N8N_WEBHOOK_URL`
   - **Full Audit:** See `docs/INFISICAL_SECRETS_AUDIT.md` for complete list and remediation plan
 
@@ -240,17 +240,13 @@ infisical secrets set --env prod --path /prod BACKSTAGE_DB_PASSWORD="$BACKSTAGE_
 infisical secrets set --env prod --path /prod INFISICAL_CLIENT_ID="<from_infisical_ui>"
 infisical secrets set --env prod --path /prod INFISICAL_CLIENT_SECRET="<from_infisical_ui>"
 
-# Step 3: Generate and store Cloudflare tokens (via Cloudflare UI)
-# Generate tunnel tokens for each node
-infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_VPS="<from_cloudflare_ui>"
-infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_MAC="<from_cloudflare_ui>"
-infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_LINUX="<from_cloudflare_ui>"
-
-# Generate DNS API token
+# Step 3: Generate and store Cloudflare DNS API token (via Cloudflare UI)
+# Note: Using Cloudflare DNS management only (not Cloudflared tunnels)
+# Generate DNS API token with DNS:Edit permissions
 infisical secrets set --env prod --path /prod CF_DNS_API_TOKEN="<from_cloudflare_ui>"
 
 # Step 4: Verify secrets are injected
-infisical export --env prod --path /prod --format env | grep -E "(BACKSTAGE|INFISICAL_CLIENT|CF_TUNNEL|CF_DNS)"
+infisical export --env prod --path /prod --format env | grep -E "(BACKSTAGE|INFISICAL_CLIENT|CF_DNS)"
 
 # Step 5: Restart services after secret injection
 docker compose -f services/backstage/compose.yml restart backstage backstage-db
@@ -261,8 +257,8 @@ docker compose -f services/backstage/compose.yml restart backstage backstage-db
 - [x] Secrets appear in `.workspace/.env` (via Infisical Agent)
 - [x] Backstage containers restart successfully (2025-11-22)
 - [ ] Backstage health check passes (main app running, but health check status still "starting")
-- [ ] Cloudflare tunnels establish correctly
-- [ ] SSL certificates generate successfully
+- [ ] Cloudflare DNS API token configured
+- [ ] SSL certificates generate successfully via DNS-01 challenge
 
 **Status:** 🔄 IN PROGRESS (2025-11-22)  
 **Restart Status (2025-11-22):**
@@ -299,6 +295,38 @@ backstage: Plugin initialization: app, scaffolder, auth, catalog, search, notifi
 
 **Phase 1.4 Agent Prompt:**  
 `Act as ai.engine docs-agent. Audit the Infisical /prod secret set for remaining __UNSET__ placeholders (GHOST, webhook, etc.), collect the required real values from owners, and document the expectations plus replacement plan in REMEDIATION_PLAN.md and supporting runbooks.`
+
+**Phase 1.4 Audit Update (2025-11-22):**
+
+**Remaining __UNSET__ Placeholders Found:**
+1. `GHOST_API_KEY=__UNSET__` (line 10 in `.workspace/.env`)
+   - **Purpose:** Ghost Content API key for programmatic access, webhooks, and integrations
+   - **Owner:** Infrastructure Lead
+   - **Priority:** 🟡 MEDIUM
+   - **Action:** Generate via Ghost admin panel at `https://ghost.freqkflag.co/ghost/#/settings/integrations`
+   - **Deadline:** 2025-11-29
+
+2. `INFISICAL_WEBHOOK_URL=__UNSET__` (line 34 in `.workspace/.env`)
+   - **Purpose:** Webhook endpoint for agent event broadcasting (see `AGENTS.md` line 394)
+   - **Owner:** Infrastructure Lead
+   - **Priority:** 🟡 MEDIUM
+   - **Action:** Create n8n webhook workflow or use Infisical webhook endpoint
+   - **Recommended URL:** `https://n8n.freqkflag.co/webhook/agent-events`
+   - **Deadline:** 2025-11-29
+
+**Total __UNSET__ Count:** 2 remaining (down from initial audit)
+
+**Infisical Agent Status:** ✅ Running and syncing secrets from `/prod` path every 60 seconds
+- Agent process active (PID verified)
+- Token file exists: `.workspace/.infisical-agent-token`
+- Secrets syncing to `.workspace/.env` automatically
+- Last sync: Verified at 2025-11-22 05:41:51
+
+**Documentation Updates:**
+- ✅ `AGENTS.md` - Updated with Infisical Agent configuration and status
+- ✅ `infisical/README.md` - Added Infisical Agent integration section
+- ✅ `docs/INFISICAL_SECRETS_AUDIT.md` - Updated with `GHOST_API_KEY` and `INFISICAL_WEBHOOK_URL` findings
+- ✅ `docs/runbooks/SECRET_REPLACEMENT_RUNBOOK.md` - Procedures already documented
 
 ---
 

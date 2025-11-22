@@ -20,7 +20,7 @@ See [DOMAIN_ARCHITECTURE.md](./DOMAIN_ARCHITECTURE.md) for complete domain struc
 ### Quick Overview
 
 **Infrastructure (`freqkflag.co`):**
-- Traefik, Vault, WikiJS, n8n, Mailu, Supabase, Adminer
+- Traefik, Infisical, WikiJS, n8n, GitLab, Mailu, Supabase, Adminer, Node-RED, Backstage
 
 **Personal Brand (`cultofjoey.com`):**
 - WordPress, LinkStack
@@ -60,14 +60,17 @@ docker compose down
 infra/
 ├── .devcontainer/      # Development container configuration
 ├── adminer/            # Database management tool
+├── gitlab/             # GitLab CE (Git repository hosting)
+├── infisical/          # Secrets management
 ├── linkstack/          # Link-in-bio platform
 ├── mailu/              # Mail server (IMAP/SMTP)
 ├── mastadon/           # Mastodon instance
 ├── n8n/                # Workflow automation
+├── nodered/            # Node-RED flow automation
 ├── projects/           # Development projects and themes
+├── services/           # Service definitions (Backstage, etc.)
 ├── supabase/           # Backend-as-a-Service
 ├── traefik/            # Reverse proxy and SSL
-├── vault/              # Secrets management
 ├── wikijs/             # Documentation wiki
 ├── wordpress/          # WordPress site
 ├── AGENTS.md           # Complete service catalog

@@ -22,20 +22,21 @@
 
 ## 3. Node Inventory
 
-| Host | Profile | Node Directory | Compose Bundle | Deploy Script | Domains Config | Networks Config | Cloudflared Token |
-| ---- | ------- | -------------- | -------------- | ------------- | -------------- | --------------- | ----------------- |
-| `vps.host` | production | `nodes/vps.host/` | `nodes/vps.host/compose.yml` | `nodes/vps.host/deploy.sh` | `nodes/vps.host/domains.yml` | `nodes/vps.host/networks.yml` | `${CF_TUNNEL_TOKEN_VPS}` |
-| `home.macmini` | development | `nodes/home.macmini/` | `nodes/home.macmini/compose.yml` | `nodes/home.macmini/deploy.sh` | `nodes/home.macmini/domains.yml` | `nodes/home.macmini/networks.yml` | `${CF_TUNNEL_TOKEN_MAC}` |
-| `home.linux` | homelab | `nodes/home.linux/` | `nodes/home.linux/compose.yml` | `nodes/home.linux/deploy.sh` | `nodes/home.linux/domains.yml` | `nodes/home.linux/networks.yml` | `${CF_TUNNEL_TOKEN_LINUX}` |
+| Host | Profile | Node Directory | Compose Bundle | Deploy Script | Domains Config | Networks Config | DNS Management |
+| ---- | ------- | -------------- | -------------- | ------------- | -------------- | --------------- | -------------- |
+| `vps.host` | production | `nodes/vps.host/` | `nodes/vps.host/compose.yml` | `nodes/vps.host/deploy.sh` | `nodes/vps.host/domains.yml` | `nodes/vps.host/networks.yml` | Cloudflare DNS API |
+| `home.macmini` | development | `nodes/home.macmini/` | `nodes/home.macmini/compose.yml` | `nodes/home.macmini/deploy.sh` | `nodes/home.macmini/domains.yml` | `nodes/home.macmini/networks.yml` | Cloudflare DNS API |
+| `home.linux` | homelab | `nodes/home.linux/` | `nodes/home.linux/compose.yml` | `nodes/home.linux/deploy.sh` | `nodes/home.linux/domains.yml` | `nodes/home.linux/networks.yml` | Cloudflare DNS API |
 
 Domain coverage:
 - `nodes/vps.host/domains.yml` — freqkflag.co services (Traefik, Kong, Infisical, application suite).
 - `nodes/home.macmini/domains.yml` — twist3dkink.online developer endpoints (frontend, dev-tools).
 - `nodes/home.linux/domains.yml` — cult-of-joey.com homelab endpoints (Vaultwarden, BookStack, Auxiliary).
 
-Networks & tunnels:
+Networks & DNS:
 - Each node attaches to the shared external `edge` network as described in its `networks.yml`.
-- Cloudflared tunnel metadata (token variables and purpose) resides alongside each node; execute node scripts with `infisical run --env=<profile>` to populate secrets.
+- DNS records managed via Cloudflare DNS API using `${CF_DNS_API_TOKEN}`; execute node scripts with `infisical run --env=<profile>` to populate secrets.
+- **Note:** Using Cloudflare DNS management only (not Cloudflared tunnels). Services are accessed directly via public IP.
 
 ## 4. Ingestion & Redeploy Roadmap
 

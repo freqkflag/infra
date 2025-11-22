@@ -155,57 +155,57 @@ docker logs backstage-db --tail 50
 
 ---
 
-### Cloudflare Tunnel Tokens
+### Cloudflare DNS API Token
 
-**Required Secrets:**
-- `CF_TUNNEL_TOKEN_VPS`
-- `CF_TUNNEL_TOKEN_MAC`
-- `CF_TUNNEL_TOKEN_LINUX`
-- `CF_DNS_API_TOKEN`
+**Required Secret:**
+- `CF_DNS_API_TOKEN` - Cloudflare DNS API token for DNS management and DNS-01 challenge
+
+**Note:** Using Cloudflare DNS management only (not Cloudflared tunnels). Services are accessed directly via public IP with DNS records managed through Cloudflare API.
 
 **Procedure:**
 ```bash
-# 1. Generate tunnel tokens (via Cloudflare UI)
-# - Navigate to Cloudflare Zero Trust dashboard
-# - Go to Networks > Tunnels
-# - Create or edit tunnel for each node
-# - Copy tunnel token
-
-# 2. Store tunnel tokens
-infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_VPS="<from_cloudflare>"
-infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_MAC="<from_cloudflare>"
-infisical secrets set --env prod --path /prod CF_TUNNEL_TOKEN_LINUX="<from_cloudflare>"
-
-# 3. Generate DNS API token (via Cloudflare UI)
+# 1. Generate DNS API token (via Cloudflare UI)
 # - Navigate to Cloudflare Dashboard
 # - Go to My Profile > API Tokens
-# - Create token with DNS:Edit permissions
+# - Click "Create Token"
+# - Use "Edit zone DNS" template or create custom token with:
+#   - Zone: DNS:Edit permissions
+#   - Zone Settings: Zone:Read permissions (for zone ID lookup)
 # - Copy token
 
-# 4. Store DNS API token
+# 2. Store DNS API token in Infisical
 infisical secrets set --env prod --path /prod CF_DNS_API_TOKEN="<from_cloudflare>"
 
-# 5. Restart Cloudflared containers
-docker compose -f compose.orchestrator.yml restart cloudflared
+# 3. Wait for Infisical Agent to sync (60s polling) or verify manually
+grep "CF_DNS_API_TOKEN" .workspace/.env
 
-# 6. Verify tunnels
-docker logs cloudflared --tail 50
-# Check for "Connection established" messages
+# 4. Verify DNS API access
+# Test DNS record management (requires CF_ACCOUNT_ID and CF_ZONE_* variables)
+curl -X GET "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_FREQKFLAG_CO}/dns_records" \
+  -H "Authorization: Bearer ${CF_DNS_API_TOKEN}" \
+  -H "Content-Type: application/json"
+
+# 5. Verify SSL certificate generation
+# Check Traefik logs for successful DNS-01 challenge
+docker logs traefik --tail 50 | grep -i "certificate\|acme\|dns"
 ```
 
 **Verification:**
-- [ ] Tunnels establish successfully (check logs)
+- [ ] DNS API token stored in Infisical `/prod`
+- [ ] Token appears in `.workspace/.env` (check via Infisical Agent)
+- [ ] DNS API access works (can list/manage DNS records)
+- [ ] SSL certificates generate successfully via DNS-01 challenge (check Traefik logs)
 - [ ] Services accessible via external domains
-- [ ] SSL certificates generate successfully (check Traefik logs)
 
 ---
 
-### Ghost Database Password
+### Ghost Service Secrets
 
-**Required Secret:**
-- `GHOST_DB_PASSWORD`
+**Required Secrets:**
+- `GHOST_DB_PASSWORD` - MariaDB password for Ghost database connection
+- `GHOST_API_KEY` - Ghost Content API key for programmatic access (NEW - 2025-11-22)
 
-**Procedure:**
+**Procedure for Database Password:**
 ```bash
 # 1. Verify MariaDB user exists
 docker exec mariadb mysql -u root -p"${MARIADB_ROOT_PASSWORD}" -e "SELECT User FROM mysql.user WHERE User='ghost';"
@@ -229,9 +229,32 @@ docker logs ghost --tail 50
 # Check for successful database connection
 ```
 
+**Procedure for API Key (NEW - 2025-11-22):**
+```bash
+# 1. Access Ghost admin panel
+# Navigate to: https://ghost.freqkflag.co/ghost/#/settings/integrations
+
+# 2. Create new custom integration
+# - Click "Add custom integration"
+# - Name it (e.g., "Infrastructure API")
+# - Copy the Content API Key
+
+# 3. Store API key in Infisical
+infisical secrets set --env prod --path /prod GHOST_API_KEY="<content_api_key_from_ghost>"
+
+# 4. Wait for Infisical Agent to sync (60s polling) or restart Ghost
+docker compose -f services/ghost/compose.yml restart ghost
+
+# 5. Verify API key works
+curl -H "Authorization: Ghost ${GHOST_API_KEY}" \
+  https://ghost.freqkflag.co/ghost/api/content/posts/
+```
+
 **Verification:**
 - [ ] Ghost container starts without database errors
 - [ ] Ghost can connect to MariaDB
+- [ ] `GHOST_API_KEY` appears in `.workspace/.env` (check via Infisical Agent)
+- [ ] Ghost API responds to requests with API key
 - [ ] Health check passes
 
 ---
@@ -239,32 +262,53 @@ docker logs ghost --tail 50
 ### Webhook URLs
 
 **Required Secrets (Optional):**
-- `INFISICAL_WEBHOOK_URL`
-- `ALERTMANAGER_WEBHOOK_URL`
-- `N8N_WEBHOOK_URL`
+- `INFISICAL_WEBHOOK_URL` - **NEW (2025-11-22):** Currently `__UNSET__`, required for agent event broadcasting
+- `ALERTMANAGER_WEBHOOK_URL` - Optional, for Alertmanager notifications
+- `N8N_WEBHOOK_URL` - Optional, for external n8n workflow triggers
 
-**Procedure:**
+**Procedure for INFISICAL_WEBHOOK_URL (NEW - 2025-11-22):**
 ```bash
-# 1. Determine webhook endpoint
-# For n8n: https://n8n.freqkflag.co/webhook/<workflow-id>
-# For Alertmanager: https://discord.com/api/webhooks/<id>/<token>
-# For Infisical: Check if Infisical supports webhooks or use n8n
+# 1. Create n8n webhook workflow (recommended approach)
+# - Navigate to: https://n8n.freqkflag.co
+# - Create new workflow named "Agent Events"
+# - Add "Webhook" trigger node
+# - Configure webhook path: `/webhook/agent-events`
+# - Save workflow and activate
+# - Copy webhook URL: https://n8n.freqkflag.co/webhook/agent-events
 
-# 2. Store webhook URL
+# 2. Store webhook URL in Infisical
 infisical secrets set --env prod --path /prod INFISICAL_WEBHOOK_URL="https://n8n.freqkflag.co/webhook/agent-events"
 
-# 3. Configure receiving service (n8n workflow, Discord webhook, etc.)
-# 4. Test webhook
-curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d '{"test": true}'
+# 3. Wait for Infisical Agent to sync (60s polling) or verify manually
+grep "INFISICAL_WEBHOOK_URL" .workspace/.env
 
-# 5. Restart services if needed
+# 4. Test webhook
+curl -X POST "https://n8n.freqkflag.co/webhook/agent-events" \
+  -H "Content-Type: application/json" \
+  -d '{"agent": "test", "action": "test", "status": "success", "timestamp": "'$(date -Iseconds)'", "details": {"test": true}}'
+
+# 5. Verify agents can broadcast events (see AGENTS.md line 394)
+```
+
+**Procedure for Other Webhooks:**
+```bash
+# For Alertmanager: https://discord.com/api/webhooks/<id>/<token>
+# For n8n external: https://n8n.freqkflag.co/webhook/<workflow-id>
+
+# Store webhook URL
+infisical secrets set --env prod --path /prod ALERTMANAGER_WEBHOOK_URL="<discord_webhook_url>"
+infisical secrets set --env prod --path /prod N8N_WEBHOOK_URL="<n8n_webhook_url>"
+
+# Restart services if needed
 docker compose -f compose.orchestrator.yml restart n8n alertmanager
 ```
 
 **Verification:**
+- [ ] `INFISICAL_WEBHOOK_URL` appears in `.workspace/.env` (check via Infisical Agent)
 - [ ] Webhook endpoint accessible
 - [ ] Test webhook call succeeds
-- [ ] Receiving service processes webhook correctly
+- [ ] Receiving service (n8n workflow) processes webhook correctly
+- [ ] Agent event broadcasting works (see `AGENTS.md` for agent webhook usage)
 
 ---
 

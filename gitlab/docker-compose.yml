@@ -13,7 +13,7 @@ services:
         postgresql['enable'] = false
         gitlab_rails['db_adapter'] = 'postgresql'
         gitlab_rails['db_encoding'] = 'unicode'
-        gitlab_rails['db_host'] = 'postgres'
+        gitlab_rails['db_host'] = 'infisical-db'
         gitlab_rails['db_port'] = 5432
         gitlab_rails['db_username'] = '${GITLAB_DB_USER}'
         gitlab_rails['db_password'] = '${GITLAB_DB_PASSWORD}'

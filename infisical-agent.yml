@@ -16,6 +16,7 @@ templates:
     destination-path: /root/infra/.workspace/.env
     config:
       polling-interval: 60s
+      # Template file specifies path "/prod" - secrets sync from /prod path
       execute:
         timeout: 30
         command: ./reload-app.sh

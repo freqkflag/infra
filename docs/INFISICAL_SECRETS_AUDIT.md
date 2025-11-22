@@ -59,24 +59,34 @@ This audit identifies all secrets in Infisical `/prod` environment that contain 
 ### 2. Ghost Service Secrets
 
 **Service:** Ghost CMS (`ghost.freqkflag.co`)  
-**Status:** ⚠️ POTENTIALLY BLOCKED - Service may fail database connection  
+**Status:** ⚠️ POTENTIALLY BLOCKED - Service may fail database connection or API functionality  
 **Location:** `/root/infra/services/ghost/compose.yml`
 
 | Secret | Purpose | Owner | Priority | Notes |
 |--------|---------|-------|----------|-------|
 | `GHOST_DB_PASSWORD` | MariaDB password for Ghost database connection | Infrastructure Lead | 🟠 HIGH | Required for Ghost to connect to MariaDB |
+| `GHOST_API_KEY` | Ghost Content API key for programmatic access | Infrastructure Lead | 🟡 MEDIUM | **NEW (2025-11-22):** Currently `__UNSET__` - Required for API integrations, webhooks, and external content management |
 
-**Impact:** Ghost service cannot connect to MariaDB database if password is `__UNSET__` or missing.
+**Impact:** 
+- Ghost service cannot connect to MariaDB database if password is `__UNSET__` or missing
+- Ghost API integrations, webhooks, and programmatic content management will fail if `GHOST_API_KEY` is `__UNSET__`
+
+**Current Status (2025-11-22 Audit):**
+- `GHOST_API_KEY=__UNSET__` found in `.workspace/.env` (line 10)
+- `GHOST_DB_PASSWORD` status unknown - needs verification
 
 **Reference:**
 - `services/ghost/compose.yml` (line 13)
 - `env/templates/vps.env.example` (line 20)
+- `.workspace/.env` (line 10) - `GHOST_API_KEY=__UNSET__`
 
 **Action Required:**
 1. Verify MariaDB user `ghost` exists and has correct password
-2. Store `GHOST_DB_PASSWORD` in Infisical `/prod`
-3. Update `.workspace/.env` via Infisical Agent
-4. Restart Ghost container if running
+2. Store `GHOST_DB_PASSWORD` in Infisical `/prod` (if missing or using default)
+3. Generate Ghost API key via Ghost admin panel (`https://ghost.freqkflag.co/ghost/#/settings/integrations`)
+4. Store `GHOST_API_KEY` in Infisical `/prod`
+5. Update `.workspace/.env` via Infisical Agent (automatic, 60s polling)
+6. Restart Ghost container if running
 
 ---
 
@@ -88,7 +98,7 @@ This audit identifies all secrets in Infisical `/prod` environment that contain 
 
 | Secret | Purpose | Owner | Priority | Notes |
 |--------|---------|-------|----------|-------|
-| `INFISICAL_WEBHOOK_URL` | Webhook endpoint for agent event broadcasting | Infrastructure Lead | 🟡 MEDIUM | Used by agents for event notifications (see `AGENTS.md` line 394) |
+| `INFISICAL_WEBHOOK_URL` | Webhook endpoint for agent event broadcasting | Infrastructure Lead | 🟡 MEDIUM | **NEW (2025-11-22):** Currently `__UNSET__` - Used by agents for event notifications (see `AGENTS.md` line 394) |
 | `N8N_WEBHOOK_URL` | n8n webhook endpoint for external integrations | Automation Lead | 🟡 MEDIUM | Optional - n8n can generate webhooks internally |
 | `ALERTMANAGER_WEBHOOK_URL` | Webhook for Alertmanager notifications | DevOps Lead | 🟡 MEDIUM | Optional - for Discord/Matrix/Slack integration |
 
@@ -97,44 +107,51 @@ This audit identifies all secrets in Infisical `/prod` environment that contain 
 - External systems cannot trigger n8n workflows via webhooks
 - Alertmanager cannot send notifications to external services
 
+**Current Status (2025-11-22 Audit):**
+- `INFISICAL_WEBHOOK_URL=__UNSET__` found in `.workspace/.env` (line 34)
+- Agent webhook broadcasting disabled until configured
+
 **Reference:**
 - `AGENTS.md` (line 394) - Agent webhook broadcasting
 - `n8n/docker-compose.yml` (line 34) - WEBHOOK_URL configuration
 - `monitoring/config/alertmanager/alertmanager.yml` (lines 88-98) - Webhook configs
+- `.workspace/.env` (line 34) - `INFISICAL_WEBHOOK_URL=__UNSET__`
 
 **Action Required:**
-1. **INFISICAL_WEBHOOK_URL:** Create webhook endpoint in Infisical (if supported) or use n8n webhook
+1. **INFISICAL_WEBHOOK_URL:** 
+   - Option A: Create n8n webhook workflow at `https://n8n.freqkflag.co/webhook/agent-events`
+   - Option B: Use Infisical webhook endpoint (if supported)
+   - Store URL in Infisical `/prod` as `INFISICAL_WEBHOOK_URL`
 2. **N8N_WEBHOOK_URL:** Configure if external systems need to trigger workflows (optional)
 3. **ALERTMANAGER_WEBHOOK_URL:** Configure Discord/Matrix/Slack webhooks if alerting needed (optional)
 
 ---
 
-### 4. Cloudflare Tunnel Tokens
+### 4. Cloudflare DNS Management
 
-**Service:** Cloudflared (all nodes)  
-**Status:** ⚠️ CRITICAL - Tunnels will not establish without tokens  
+**Service:** Cloudflare DNS (all nodes)  
+**Status:** ⚠️ CRITICAL - DNS management and SSL certificates require API token  
 **Location:** `env/templates/base.env.example`
+
+**Note:** Using Cloudflare DNS management only (not Cloudflared tunnels). Services are accessed directly via public IP with DNS records managed through Cloudflare API.
 
 | Secret | Purpose | Owner | Priority | Notes |
 |--------|---------|-------|----------|-------|
-| `CF_TUNNEL_TOKEN_VPS` | Cloudflare tunnel token for VPS node | Infrastructure Lead | 🔴 CRITICAL | Required for `freqkflag.co` tunnel |
-| `CF_TUNNEL_TOKEN_MAC` | Cloudflare tunnel token for Mac Mini node | Infrastructure Lead | 🔴 CRITICAL | Required for `twist3dkink.online` tunnel |
-| `CF_TUNNEL_TOKEN_LINUX` | Cloudflare tunnel token for Linux homelab | Infrastructure Lead | 🔴 CRITICAL | Required for `cult-of-joey.com` tunnel |
-| `CF_DNS_API_TOKEN` | Cloudflare DNS API token for DNS-01 challenge | Infrastructure Lead | 🔴 CRITICAL | Required for Let's Encrypt certificate generation |
+| `CF_DNS_API_TOKEN` | Cloudflare DNS API token for DNS management and DNS-01 challenge | Infrastructure Lead | 🔴 CRITICAL | Required for DNS record management and Let's Encrypt certificate generation via DNS-01 challenge |
 
 **Impact:** 
-- Services cannot be accessed externally if tunnel tokens are missing
-- SSL certificates cannot be generated if DNS API token is missing
+- DNS records cannot be managed automatically if API token is missing
+- SSL certificates cannot be generated via DNS-01 challenge if DNS API token is missing
 
 **Reference:**
-- `env/templates/base.env.example` (lines 6-14)
+- `env/templates/base.env.example` (lines 5-9)
 - `infra-build-plan.md` - Domain architecture
 
 **Action Required:**
-1. Generate Cloudflare tunnel tokens for each node via Cloudflare Zero Trust dashboard
-2. Generate Cloudflare DNS API token with DNS:Edit permissions
-3. Store all tokens in Infisical `/prod`
-4. Verify tunnels establish correctly after token injection
+1. Generate Cloudflare DNS API token with DNS:Edit permissions via Cloudflare Dashboard
+2. Store token in Infisical `/prod` as `CF_DNS_API_TOKEN`
+3. Verify DNS records can be managed via API
+4. Verify SSL certificates generate successfully via DNS-01 challenge
 
 ---
 

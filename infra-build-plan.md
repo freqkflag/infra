@@ -107,7 +107,7 @@ infra/
 | 1     | Infisical DB   | Docker daemon, persistent volumes    | PostgreSQL + Redis backing Infisical |
 | 2     | Infisical API  | Infisical DB                         | Provides secret injection |
 | 3     | Traefik        | Cloudflare API (DNS-01), edge network| Handles TLS + ingress |
-| 4     | Cloudflared    | Traefik, CF token                    | Publishes tunnel |
+| 4     | Cloudflare DNS | Cloudflare API (DNS-01)              | DNS management and certificate validation |
 | 5     | Kong OSS       | Traefik, Infisical                   | API gateway and auth |
 | 6     | Databases      | Traefik (for admin UIs), Infisical   | PostgreSQL, MariaDB, Redis for apps |
 | 7     | ClamAV         | Databases (for logging)              | Malware scanning service |
@@ -187,11 +187,10 @@ Every Compose definition must include:
    infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d traefik
    ```
 
-3. Deploy Cloudflared tunnel:
-
-   ```bash
-   infisical run --env=production -- docker compose -f nodes/vps.host/compose.yml up -d cloudflared
-   ```
+3. Configure Cloudflare DNS (via API or dashboard):
+   - Ensure `CF_DNS_API_TOKEN` is set in Infisical
+   - DNS records will be managed via Cloudflare DNS API
+   - **Note:** Using Cloudflare DNS management only (not Cloudflared tunnels)
 
 4. Deploy Kong and databases:
 
@@ -213,7 +212,7 @@ Every Compose definition must include:
 
 ### 7.3 Mac mini Sequence
 
-1. Ensure VPN / tunnel connection established via Cloudflared container.
+1. Ensure DNS records are configured via Cloudflare DNS API.
 2. Deploy dev services:
 
    ```bash
@@ -224,10 +223,12 @@ Every Compose definition must include:
 
 ### 7.4 Homelab Sequence
 
-1. Start Cloudflared tunnel:
+1. Configure Cloudflare DNS for homelab domains:
 
    ```bash
-   infisical run --env=homelab -- docker compose -f nodes/home.linux/compose.yml up -d cloudflared
+   # Ensure CF_DNS_API_TOKEN is set in Infisical
+   # DNS records managed via Cloudflare DNS API
+   # Note: Using Cloudflare DNS management only (not Cloudflared tunnels)
    ```
 
 2. Deploy core services:
@@ -307,12 +308,13 @@ Every Compose definition must include:
   curl -s https://api.freqkflag.co/status --header "Authorization: Kong-Key ${KONG_ADMIN_KEY}"
   ```
 
-- Confirm cloudflared tunnel:
+- Confirm Cloudflare DNS configuration:
 
   ```bash
-  docker logs --tail 50 cloudflared
-  # Check tunnel status per node
-  docker logs cloudflared | grep -i "connection\|tunnel\|error"
+  # Verify DNS records via Cloudflare API
+  curl -X GET "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_FREQKFLAG_CO}/dns_records" \
+    -H "Authorization: Bearer ${CF_DNS_API_TOKEN}" \
+    -H "Content-Type: application/json"
   ```
 
 - Monitor resource usage:

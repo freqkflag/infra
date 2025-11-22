@@ -134,6 +134,24 @@ services:
     type: postgres
     version: '15'
     container: supabase-db
+- id: gitlab
+  name: GitLab CE
+  dir: /root/infra/gitlab
+  url: https://gitlab.freqkflag.co
+  type: app
+  status: starting
+  depends_on:
+  - traefik
+  - postgres
+  - redis
+  description: Git repository hosting and DevOps platform (Community Edition)
+  domain: gitlab.freqkflag.co
+  database:
+    type: postgres
+    version: '15'
+    container: infisical-db
+    name: gitlab
+    user: gitlab
 - id: adminer
   name: Adminer
   dir: /root/infra/adminer

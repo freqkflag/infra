@@ -38,13 +38,14 @@ This document provides a standardized overview of all services and agents in the
 ## Mission & Guardrails
 
 - Deliver the complete infra build-out defined in `infra-build-plan.md`, `PROJECT_PLAN.md`, and `project-plan.yml`.
-- Enforce reproducible, FOSS-only workflows (Docker Compose, Traefik, Cloudflared, Infisical, Kong, ClamAV, n8n/Node-RED).
-- Maintain three operating domains with dedicated Cloudflared tunnels:
-  - **vps.host** (`freqkflag.co`) — `${CF_TUNNEL_TOKEN_VPS}`
-  - **home.macmini** (`twist3dkink.online`) — `${CF_TUNNEL_TOKEN_MAC}`
-  - **home.linux** (`cult-of-joey.com`) — `${CF_TUNNEL_TOKEN_LINUX}`
+- Enforce reproducible, FOSS-only workflows (Docker Compose, Traefik, Cloudflare DNS, Infisical, Kong, ClamAV, n8n/Node-RED).
+- Maintain three operating domains with Cloudflare DNS management:
+  - **vps.host** (`freqkflag.co`) — Cloudflare DNS management via `${CF_DNS_API_TOKEN}`
+  - **home.macmini** (`twist3dkink.online`) — Cloudflare DNS management via `${CF_DNS_API_TOKEN}`
+  - **home.linux** (`cult-of-joey.com`) — Cloudflare DNS management via `${CF_DNS_API_TOKEN}`
 - Shared external Docker network: `edge`.
 - Every non-trivial change must land via commit or PR; inline commit messages must mention any assumption they encode.
+- **Note:** Using Cloudflare DNS management only (not Cloudflared tunnels). Services are accessed directly via public IP with DNS records managed through Cloudflare API.
 
 ---
 
@@ -90,11 +91,21 @@ This document provides a standardized overview of all services and agents in the
   - No unsealing required (simpler operations)
 - **Documentation:** See `infisical/README.md`
 - **Secrets Integration:**
-  - ✅ **Infisical Agent configured** - `infisical-agent.yml` generates `.workspace/.env` from `prod.template`
+  - ✅ **Infisical Agent configured and running** - `infisical-agent.yml` generates `.workspace/.env` from `prod.template` every 60 seconds
+  - ✅ **Agent Status (2025-11-22):** Infisical Agent is running and syncing secrets from `/prod` path to `.workspace/.env`
   - ✅ **Services wired to Infisical** - All services now use `env_file: ../.workspace/.env` to load secrets
   - ✅ **Secrets flow verified** - Services can read database passwords, API keys, and tokens from Infisical
   - **Services using Infisical secrets:** n8n, WordPress, WikiJS, LinkStack, Node-RED, Infisical, Mailu, Supabase
   - **Usage:** Services automatically load secrets from `.workspace/.env` when started, or use `infisical run --env=prod -- docker compose up`
+- **Infisical Agent Configuration:**
+  - **Config File:** `/root/infra/infisical-agent.yml`
+  - **Template:** `prod.template` (fetches secrets from `/prod` path in `prod` environment)
+  - **Destination:** `/root/infra/.workspace/.env`
+  - **Polling Interval:** 60 seconds
+  - **Reload Script:** `reload-app.sh` (executes when secrets are updated)
+  - **Project ID:** `8c430744-1a5b-4426-af87-e96d6b9c91e3`
+  - **Run Command:** `infisical agent --config /root/infra/infisical-agent.yml`
+  - **Status:** ✅ Running (process active, syncing secrets automatically)
 
 ### WikiJS
 - **Domain:** `wiki.freqkflag.co`
@@ -196,7 +207,7 @@ This document provides a standardized overview of all services and agents in the
 ### GitLab
 - **Domain:** `gitlab.freqkflag.co`
 - **Location:** `/root/infra/gitlab/`
-- **Status:** 🔄 Starting (deployment in progress)
+- **Status:** ✅ Running (initializing, first boot takes 5-10 minutes)
 - **Purpose:** Git repository hosting and DevOps platform (Community Edition)
 - **Database:** PostgreSQL (shared postgres service)
 - **Cache/Queue:** Redis (shared redis service)
@@ -573,7 +584,7 @@ Each service follows a standardized structure:
 | `adminer.freqkflag.co` | Adminer | ✅ Running | DB management |
 | `nodered.freqkflag.co` | Node-RED | ✅ Running | Flow-based automation |
 | `backstage.freqkflag.co` | Backstage | ⚙️ Configured | Developer portal |
-| `gitlab.freqkflag.co` | GitLab CE | 🔄 Starting | Git repository hosting |
+| `gitlab.freqkflag.co` | GitLab CE | ✅ Running | Git repository hosting |
 | `cultofjoey.com` | WordPress | ✅ Running | Personal brand site |
 | `link.cultofjoey.com` | LinkStack | ✅ Running | Link-in-bio |
 | `twist3dkinkst3r.com` | Mastodon | ⚙️ Configured | Community instance |

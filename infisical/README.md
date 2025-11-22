@@ -123,6 +123,45 @@ docker compose exec infisical-db pg_dump -U infisical infisical > backup.sql
 
 ## Integration
 
+### Infisical Agent (Automatic Secret Sync)
+
+**Status:** ✅ Configured and Running (2025-11-22)
+
+The Infisical Agent automatically syncs secrets from Infisical `/prod` path to `.workspace/.env` every 60 seconds.
+
+**Configuration:**
+- **Config File:** `/root/infra/infisical-agent.yml`
+- **Template:** `prod.template` (fetches from `/prod` path)
+- **Destination:** `/root/infra/.workspace/.env`
+- **Polling Interval:** 60 seconds
+- **Project ID:** `8c430744-1a5b-4426-af87-e96d6b9c91e3`
+
+**Start Agent:**
+```bash
+cd /root/infra
+infisical agent --config /root/infra/infisical-agent.yml
+```
+
+**Verify Agent Status:**
+```bash
+# Check if agent is running
+ps aux | grep "infisical.*agent"
+
+# Check agent token file
+ls -lh .workspace/.infisical-agent-token
+
+# Check last sync time
+stat .workspace/.env | grep Modify
+```
+
+**Manual Secret Sync:**
+```bash
+# Export secrets directly (if agent not running)
+infisical export --env prod --path /prod --format env > .workspace/.env
+```
+
+**Documentation:** See `gitlab/SECRETS_SYNC.md` for detailed configuration and troubleshooting.
+
 ### API Usage
 
 ```bash
