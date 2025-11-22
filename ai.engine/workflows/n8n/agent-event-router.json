@@ -66,6 +66,166 @@
     },
     {
       "parameters": {
+        "jsCode": "// A2A Protocol: Create session if not provided, otherwise use existing\nconst body = $input.item.json.body;\nconst existingSessionId = body.session_id;\n\n// If session_id already provided, skip creation\nif (existingSessionId) {\n  return {\n    json: {\n      ...body,\n      session_id: existingSessionId,\n      session_created: false\n    }\n  };\n}\n\n// Otherwise, prepare for session creation\nreturn {\n  json: {\n    ...body,\n    needs_session_creation: true,\n    task_id: body.task_id || `task-${Date.now()}`,\n    task_type: body.task_type || 'single-agent',\n    priority: body.priority || 'normal',\n    timeout: body.timeout || 3600,\n    agents: body.agents || [body.agent]\n  }\n};"
+      },
+      "id": "a2a-session-check",
+      "name": "A2A Session Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300],
+      "notes": "Checks if session_id exists, prepares for creation if needed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-creation",
+              "leftValue": "={{$json.needs_session_creation}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a2a-session-conditional",
+      "name": "A2A Session Conditional",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 300],
+      "notes": "Routes to session creation if needed"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8081/api/v1/sessions/create",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{$json.task_id}}"
+            },
+            {
+              "name": "task_type",
+              "value": "={{$json.task_type}}"
+            },
+            {
+              "name": "priority",
+              "value": "={{$json.priority}}"
+            },
+            {
+              "name": "timeout",
+              "value": "={{$json.timeout}}"
+            },
+            {
+              "name": "agents",
+              "value": "={{$json.agents}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "a2a-session-create",
+      "name": "A2A Session Create",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [950, 200],
+      "notes": "Creates new A2A session via API"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "session_id",
+              "name": "session_id",
+              "value": "={{$json.session_id || $('A2A Session Create').item.json.session_id}}",
+              "type": "string"
+            },
+            {
+              "id": "session_created",
+              "name": "session_created",
+              "value": "={{$json.session_created !== false}}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {
+          "keepOnlySet": false
+        }
+      },
+      "id": "a2a-merge-session",
+      "name": "A2A Merge Session",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [1050, 300],
+      "notes": "Merges session_id from creation or existing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "session_id",
+              "name": "session_id",
+              "value": "={{$json.body.session_id || $json.session_id}}",
+              "type": "string"
+            },
+            {
+              "id": "context_file",
+              "name": "context_file",
+              "value": "={{$json.body.context_file || null}}",
+              "type": "string"
+            },
+            {
+              "id": "task_id",
+              "name": "task_id",
+              "value": "={{$json.body.task_id || $json.task_id || 'task-' + $now.format('x')}}",
+              "type": "string"
+            },
+            {
+              "id": "agent",
+              "name": "agent",
+              "value": "={{$json.body.agent}}",
+              "type": "string"
+            },
+            {
+              "id": "a2a_protocol",
+              "name": "a2a_protocol",
+              "value": "=true",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2a-session-manager",
+      "name": "A2A Session Manager",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [1150, 300],
+      "notes": "Manages session context and prepares data for agent invocation"
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "=http://host.docker.internal:8081/api/v1/agents/invoke",
         "sendBody": true,
@@ -82,16 +242,28 @@
             {
               "name": "trigger",
               "value": "={{$json.body.trigger || 'webhook'}}"
+            },
+            {
+              "name": "session_id",
+              "value": "={{$json.session_id}}"
+            },
+            {
+              "name": "context_file",
+              "value": "={{$json.context_file}}"
+            },
+            {
+              "name": "task_id",
+              "value": "={{$json.task_id}}"
             }
           ]
         },
         "options": {}
       },
       "id": "invoke-agent",
-      "name": "Invoke Agent Script",
+      "name": "Invoke Agent Script (A2A)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [850, 300]
+      "position": [1250, 300]
     },
     {
       "parameters": {
@@ -106,7 +278,7 @@
             {
               "id": "agent",
               "name": "agent",
-              "value": "={{$json.body.agent}}",
+              "value": "={{$json.body.agent || $json.agent}}",
               "type": "string"
             },
             {
@@ -114,16 +286,71 @@
               "name": "status",
               "value": "triggered",
               "type": "string"
+            },
+            {
+              "id": "session_id",
+              "name": "session_id",
+              "value": "={{$json.session_id || $json.body.session_id}}",
+              "type": "string"
+            },
+            {
+              "id": "task_id",
+              "name": "task_id",
+              "value": "={{$json.task_id || $json.body.task_id}}",
+              "type": "string"
+            },
+            {
+              "id": "a2a_protocol",
+              "name": "a2a_protocol",
+              "value": "={{$json.a2a_protocol || true}}",
+              "type": "boolean"
             }
           ]
         },
         "options": {}
       },
       "id": "format-response",
-      "name": "Format Response",
+      "name": "Format Response (A2A)",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.2,
-      "position": [1050, 300]
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8081/api/v1/sessions/{{$json.session_id}}/update",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{$json.agent}}"
+            },
+            {
+              "name": "status",
+              "value": "=completed"
+            },
+            {
+              "name": "output_file",
+              "value": "={{$json.body.output_file || $json.output_file || '/root/infra/orchestration/' + $json.agent + '-' + $now.format('YYYYMMDD-HHmmss') + '.json'}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "a2a-session-update",
+      "name": "A2A Session Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1650, 300],
+      "notes": "Updates A2A session with agent execution results"
     },
     {
       "parameters": {
@@ -144,19 +371,19 @@
       "name": "Log Event",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [1250, 300]
+      "position": [1850, 300]
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{JSON.stringify({status: 'success', message: 'Agent triggered', agent: $json.agent, timestamp: $json.timestamp})}}",
+        "responseBody": "={{JSON.stringify({status: 'success', message: 'Agent triggered with A2A protocol', agent: $json.agent, session_id: $json.session_id, task_id: $json.task_id, timestamp: $json.timestamp, a2a_protocol: $json.a2a_protocol})}}",
         "options": {}
       },
       "id": "respond-webhook",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1450, 300]
+      "position": [2050, 300]
     }
   ],
   "connections": {
@@ -186,25 +413,98 @@
       "main": [
         [
           {
-            "node": "Invoke Agent Script",
+            "node": "A2A Session Check",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Invoke Agent Script": {
+    "A2A Session Check": {
       "main": [
         [
           {
-            "node": "Format Response",
+            "node": "A2A Session Conditional",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format Response": {
+    "A2A Session Conditional": {
+      "main": [
+        [
+          {
+            "node": "A2A Session Create",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "A2A Merge Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A2A Session Create": {
+      "main": [
+        [
+          {
+            "node": "A2A Merge Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A2A Merge Session": {
+      "main": [
+        [
+          {
+            "node": "A2A Session Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A2A Session Manager": {
+      "main": [
+        [
+          {
+            "node": "Invoke Agent Script (A2A)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoke Agent Script (A2A)": {
+      "main": [
+        [
+          {
+            "node": "Format Response (A2A)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response (A2A)": {
+      "main": [
+        [
+          {
+            "node": "A2A Session Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A2A Session Update": {
       "main": [
         [
           {

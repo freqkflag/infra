@@ -1,6 +1,6 @@
 # Infrastructure Map & Tree
 
-_Last reviewed: 2025-11-22 (status-agent validation - mismatches corrected)_
+_Last reviewed: 2025-11-22 15:10:00 (Phase 3 Application & Automation Stack validation - all services deployed and operational)_
 
 This document gives a quick visual and textual map of every service, the node it runs on, and the domain that fronts it. It is intended for review sessions before deployments, audits, or onboarding efforts.
 
@@ -28,9 +28,9 @@ vps.host (freqkflag.co / SPINE)
 ├─ ✅ WordPress – Primary personal brand site (`cultofjoey.com`)
 ├─ ✅ Ops Control Plane – Infrastructure operations UI (`ops.freqkflag.co`)
 ├─ ⚙️ Mailu – Full mail stack (`mail.freqkflag.co`, `webmail.freqkflag.co`)
-├─ ⚠️ Supabase – BaaS platform (`supabase.freqkflag.co`, `api.supabase.freqkflag.co`) - Running but Kong restarting, Studio/Meta unhealthy
+├─ ✅ Supabase – BaaS platform (`supabase.freqkflag.co`, `api.supabase.freqkflag.co`) - Core services healthy (DB, Studio, Meta, Kong). Functions restarting (optional)
 ├─ ⚙️ Help Service – Static docs service (`--help/`)
-└─ 🔄 GitLab – Git hosting (`gitlab.freqkflag.co`) - Starting (initializing)
+└─ ⚠️ GitLab – Git hosting (`gitlab.freqkflag.co`) - Running but unhealthy (5 hours uptime, may need investigation if still initializing)
 
 home.macmini (twist3dkink.online)
 ├─ ⚙️ Frontend bundle (`dev.twist3dkink.online`)

@@ -422,6 +422,7 @@ When agents create or modify services:
 ### Supervisory Loop (Primary Orchestrator Agent)
 
 - Owns the task board, splits work into reviewable phases, and keeps sub-agents from idling or duplicating effort.
+- Executes the autonomous bring-up blueprint documented in `plans/AUTONOMOUS_INFRA_PLAN.md`, ensuring each embedded AI prompt runs under the active A2A session with full context capture.
 - Approves phase start, tracks status in `CHANGE.log`, and ensures downstream docs (`server-changelog.md`) get updates.
 - Escalates to the user only for root-scope decisions (domain ownership changes, service deprecation, topology pivots).
 - Verifies that each phase outputs:
