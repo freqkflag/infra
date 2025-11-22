@@ -49,6 +49,40 @@ docker compose ps
 
 ---
 
+## Runme & Cursor Automation Hooks
+
+- Tag runnable snippets with Runme metadata so Cursor can surface the dispatcher menu:
+  ```markdown
+  ```bash {"id":"supabase-restart","runme":{"label":"Restart Supabase","tags":["runbook","supabase"]}}
+  cd /root/infra/supabase
+  docker compose restart
+  ```
+  ```
+- Each Runme cell should ultimately call a dispatcher (see `docs/runbooks/RUNME_INTEGRATION_PLAN.md`) that asks whether to run locally or ship commands to a fresh Cursor agent thread.
+
+### AI Orchestration Prompts (copy/paste ready)
+
+**Full Multi-Agent Sweep**
+```
+Use the Multi-Agent Orchestrator preset. Scope analysis to /root/infra/supabase (Supabase) first, then capture upstream dependencies from compose.orchestrator.yml. Return strict JSON with prioritized run actions plus any restart commands needed for Supabase.
+```
+
+**Service Health Check**
+```
+Act as status_agent. Focus on /root/infra/supabase and the supabase containers. Confirm docker compose ps, health checks, and Traefik routing. Return strict JSON with health summary + restart recommendation.
+```
+
+**Targeted Operational Command**
+```
+Act as Deployment Runner. Execute the following commands for Supabase at /root/infra/supabase:
+cd /root/infra/supabase
+docker compose up -d
+Verify the service at https://supabase.freqkflag.co and capture logs if unhealthy.
+```
+
+---
+
+
 ## Health Checks
 
 ### Container Health

@@ -7,6 +7,7 @@ import yaml
 import os
 import re
 from pathlib import Path
+from datetime import date
 
 INFRA_ROOT = Path("/root/infra")
 TEMPLATE = INFRA_ROOT / "runbooks" / "TEMPLATE_SERVICE_RUNBOOK.md"
@@ -71,7 +72,7 @@ def generate_runbook(service, template):
         '[Service Name]': service['name'],
         '[service-id]': service['id'],
         '[running|configured|deprecated]': service['status'],
-        '[date]': '2025-11-21',
+        '[date]': date.today().isoformat(),
         '[Brief description...]': service['description'],
         '[primary-domain]': service['domain'] or 'N/A',
         '[service-urls]': service['url'] or 'N/A',

@@ -49,6 +49,40 @@ docker compose ps
 
 ---
 
+## Runme & Cursor Automation Hooks
+
+- Tag runnable snippets with Runme metadata so Cursor can surface the dispatcher menu:
+  ```markdown
+  ```bash {"id":"mailu-restart","runme":{"label":"Restart Mailu","tags":["runbook","mailu"]}}
+  cd /root/infra/mailu
+  docker compose restart
+  ```
+  ```
+- Each Runme cell should ultimately call a dispatcher (see `docs/runbooks/RUNME_INTEGRATION_PLAN.md`) that asks whether to run locally or ship commands to a fresh Cursor agent thread.
+
+### AI Orchestration Prompts (copy/paste ready)
+
+**Full Multi-Agent Sweep**
+```
+Use the Multi-Agent Orchestrator preset. Scope analysis to /root/infra/mailu (Mailu) first, then capture upstream dependencies from compose.orchestrator.yml. Return strict JSON with prioritized run actions plus any restart commands needed for Mailu.
+```
+
+**Service Health Check**
+```
+Act as status_agent. Focus on /root/infra/mailu and the mailu containers. Confirm docker compose ps, health checks, and Traefik routing. Return strict JSON with health summary + restart recommendation.
+```
+
+**Targeted Operational Command**
+```
+Act as Deployment Runner. Execute the following commands for Mailu at /root/infra/mailu:
+cd /root/infra/mailu
+docker compose up -d
+Verify the service at https://mail.freqkflag.co and capture logs if unhealthy.
+```
+
+---
+
+
 ## Health Checks
 
 ### Container Health

@@ -156,6 +156,7 @@ services:
 networks:
   supabase-network:
     driver: bridge
+    name: supabase_supabase-network
   traefik-network:
     external: true
     name: traefik-network

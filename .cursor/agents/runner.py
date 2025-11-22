@@ -169,8 +169,80 @@ def handle_run(args: argparse.Namespace, registry: Dict[str, Any]) -> int:
     if agent_args and agent_args[0] == "--":
         agent_args = agent_args[1:]
 
+    # Check for --script flag for non-interactive script execution
+    if agent_args and len(agent_args) >= 2 and agent_args[0] == "--script":
+        script_arg = agent_args[1]
+        script_path = Path(script_arg)
+        # Resolve relative paths
+        if not script_path.is_absolute():
+            script_path = (Path.cwd() / script_path).resolve()
+        if not script_path.exists():
+            raise FileNotFoundError(f"script file not found: {script_path}")
+        
+        # Read script content
+        with script_path.open("r", encoding="utf-8") as fh:
+            script_content = fh.read()
+        
+        # Instantiate agent for script context
+        agent = instantiate_agent(args.agent, registry)
+        
+        # Execute script with agent context
+        return execute_script(script_content, agent, registry, script_path)
+    
+    # Normal agent execution
     agent = instantiate_agent(args.agent, registry)
     return agent.run(agent_args)
+
+
+def execute_script(
+    script_content: str,
+    agent: BaseAgent,
+    registry: Dict[str, Any],
+    script_path: Path,
+) -> int:
+    """
+    Execute arbitrary Python script with agent context.
+    
+    The script has access to:
+    - `agent`: The instantiated agent instance
+    - `registry`: The agent registry
+    - `REPO_ROOT`: Repository root path
+    - Standard library imports
+    """
+    # Prepare execution context
+    context = {
+        "__name__": "__main__",
+        "__file__": str(script_path),
+        "agent": agent,
+        "registry": registry,
+        "REPO_ROOT": REPO_ROOT,
+        "Path": Path,
+        "sys": sys,
+        "json": json,
+    }
+    
+    # Add common imports to context
+    import os
+    import subprocess
+    import tempfile
+    context.update({
+        "os": os,
+        "subprocess": subprocess,
+        "tempfile": tempfile,
+    })
+    
+    try:
+        # Execute script in the provided context
+        exec(compile(script_content, str(script_path), "exec"), context)
+        return 0
+    except SystemExit as e:
+        # Allow scripts to exit with a code
+        return e.code if isinstance(e.code, int) else 0
+    except Exception as e:
+        print(f"Error executing script {script_path}: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        return 1
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

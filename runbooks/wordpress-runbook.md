@@ -49,6 +49,40 @@ docker compose ps
 
 ---
 
+## Runme & Cursor Automation Hooks
+
+- Tag runnable snippets with Runme metadata so Cursor can surface the dispatcher menu:
+  ```markdown
+  ```bash {"id":"wordpress-restart","runme":{"label":"Restart WordPress","tags":["runbook","wordpress"]}}
+  cd /root/infra/wordpress
+  docker compose restart
+  ```
+  ```
+- Each Runme cell should ultimately call a dispatcher (see `docs/runbooks/RUNME_INTEGRATION_PLAN.md`) that asks whether to run locally or ship commands to a fresh Cursor agent thread.
+
+### AI Orchestration Prompts (copy/paste ready)
+
+**Full Multi-Agent Sweep**
+```
+Use the Multi-Agent Orchestrator preset. Scope analysis to /root/infra/wordpress (WordPress) first, then capture upstream dependencies from compose.orchestrator.yml. Return strict JSON with prioritized run actions plus any restart commands needed for WordPress.
+```
+
+**Service Health Check**
+```
+Act as status_agent. Focus on /root/infra/wordpress and the wordpress containers. Confirm docker compose ps, health checks, and Traefik routing. Return strict JSON with health summary + restart recommendation.
+```
+
+**Targeted Operational Command**
+```
+Act as Deployment Runner. Execute the following commands for WordPress at /root/infra/wordpress:
+cd /root/infra/wordpress
+docker compose up -d
+Verify the service at https://cultofjoey.com and capture logs if unhealthy.
+```
+
+---
+
+
 ## Health Checks
 
 ### Container Health

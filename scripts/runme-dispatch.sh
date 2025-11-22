@@ -54,7 +54,7 @@ get_service_metadata() {
   else
     # Fallback: basic grep-based extraction
     if grep -q "id: ${service_id}" "${SERVICES_YML}" 2>/dev/null; then
-      log "Service: ${service_id}"
+      log "Service: ${service_id}" >&2
       grep -A 20 "id: ${service_id}" "${SERVICES_YML}" | head -20 || true
     fi
   fi
@@ -160,11 +160,11 @@ execute_local() {
 # Prompt user for execution target
 prompt_execution_target() {
   while true; do
-    log ""
-    log "Select execution target:"
-    log "  1) Local shell (execute commands directly)"
-    log "  2) Cursor agent (generate ready-to-paste prompt)"
-    log ""
+    log "" >&2
+    log "Select execution target:" >&2
+    log "  1) Local shell (execute commands directly)" >&2
+    log "  2) Cursor agent (generate ready-to-paste prompt)" >&2
+    log "" >&2
     read -r -p "Enter choice [1-2]: " choice
     
     case "${choice:-}" in
@@ -177,7 +177,7 @@ prompt_execution_target() {
         return 0
         ;;
       *)
-        log "❌ Invalid choice. Please enter 1 or 2."
+        log "❌ Invalid choice. Please enter 1 or 2." >&2
         ;;
     esac
   done

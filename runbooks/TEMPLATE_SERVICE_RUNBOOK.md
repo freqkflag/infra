@@ -49,6 +49,39 @@ docker compose ps
 
 ---
 
+## Runme & Cursor Automation Hooks
+
+- Tag runnable snippets with Runme metadata so Cursor can surface the dispatcher menu:
+  ```markdown
+  ```bash {"id":"[service-id]-restart","runme":{"label":"Restart [Service Name]","tags":["runbook","[service-id]"]}}
+  cd /root/infra/[service-dir]
+  docker compose restart
+  ```
+  ```
+- Each Runme cell should ultimately call a dispatcher (see `docs/runbooks/RUNME_INTEGRATION_PLAN.md`) that asks whether to run locally or ship commands to a fresh Cursor agent thread.
+
+### AI Orchestration Prompts (copy/paste ready)
+
+**Full Multi-Agent Sweep**
+```
+Use the Multi-Agent Orchestrator preset. Scope analysis to /root/infra/[service-dir] ([Service Name]) first, then capture upstream dependencies from compose.orchestrator.yml. Return strict JSON with prioritized run actions plus any restart commands needed for [Service Name].
+```
+
+**Service Health Check**
+```
+Act as status_agent. Focus on /root/infra/[service-dir] and the [service-id] containers. Confirm docker compose ps, health checks, and Traefik routing. Return strict JSON with health summary + restart recommendation.
+```
+
+**Targeted Operational Command**
+```
+Act as Deployment Runner. Execute the following commands for [Service Name] at /root/infra/[service-dir]:
+cd /root/infra/[service-dir]
+docker compose up -d
+Verify the service at https://[primary-domain] and capture logs if unhealthy.
+```
+
+---
+
 ## Health Checks
 
 ### Container Health
@@ -262,4 +295,3 @@ docker compose up -d
 
 **Last Updated:** [date]  
 **Maintained By:** [team/person]
-
