@@ -2,7 +2,8 @@
 
 **Purpose:** Step-by-step procedure for replacing `__UNSET__` placeholders in Infisical with real secret values  
 **Audience:** Infrastructure Lead, DevOps Team  
-**Last Updated:** 2025-11-22
+**Last Updated:** 2025-11-22  
+**Status:** ✅ All __UNSET__ placeholders resolved (2025-11-22)
 
 ---
 
@@ -391,5 +392,6 @@ infisical secrets set --env prod --path /prod SECRET_NAME="<base64_encoded>"
 ---
 
 **Last Updated:** 2025-11-22  
-**Next Review:** After all `__UNSET__` placeholders are replaced
+**Status:** ✅ All `__UNSET__` placeholders resolved (2025-11-22)  
+**Next Review:** 2025-12-22 (monthly audit)
 
